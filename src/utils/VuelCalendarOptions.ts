@@ -15,7 +15,7 @@ class VuelCalendarOptions{
         console.error('Provided startDate must be a type of Date')
         return;
       }
-      this.startDate = this.startDate
+      this.startDate = vuelCalendarOptions.startDate
     }
     
     if(vuelCalendarOptions.daysForward)

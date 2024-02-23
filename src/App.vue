@@ -21,11 +21,41 @@ export default defineComponent({
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
         },
+        events:[
+        {
+          id:1,
+          label:'Event #1',
+          data:{},
+          start:new Date(new Date().setHours(8, 0)),
+          end:new Date(new Date().setHours(23, 0)),  
+        }
+      ]
       },
       events:[
         {
           id:1,
-          label:'Event #1',
+          label:'Event #2',
+          data:{},
+          start:new Date(new Date().setHours(8, 0)),
+          end:new Date(new Date().setHours(23, 0)),  
+        },
+        {
+          id:1,
+          label:'Event #3',
+          data:{},
+          start:new Date(new Date().setHours(8, 0)),
+          end:new Date(new Date().setHours(23, 0)),  
+        },
+        {
+          id:1,
+          label:'Event #3',
+          data:{},
+          start:new Date(new Date().setHours(8, 0)),
+          end:new Date(new Date().setHours(23, 0)),  
+        },
+        {
+          id:1,
+          label:'Event #3',
           data:{},
           start:new Date(new Date().setHours(8, 0)),
           end:new Date(new Date().setHours(23, 0)),  

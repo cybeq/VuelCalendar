@@ -1,34 +1,19 @@
 <template>
-  <nav id="timeline" class="border-primary-200 border-b-2 border-t-2 w-full bg-surface-100 grid grid-cols-24">
+  <nav id="timeline" class="border-primary-200 border-b-2 border-t-2 w-full bg-surface-100 grid grid-cols-24 rounded-t-lg">
         <div v-for="hour in helper.hours" :key="hour" class="col-span-1 text-primary-300">{{ hour }}</div>
   </nav> 
-  <main :class="['w-full h-full  bg-surface-400 border-box overflow-auto']"  ref="container"> 
-      <div id="vuecal-day_1" v-for="day in daysForwardConfigurable" :key="day" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        {{ pairDateToContainer(startDateConfigurable, day) }}
-        <div class="w-[30px] h-[20px] bg-surface-200" v-for="event in eventsConfigurable" :key="event">dasd</div>
-        <div  @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
+  <main :class="['w-full h-full  bg-surface-400 border-box overflow-auto rounded-b-lg']"  ref="container"> 
+      <div :id="`vuelcalendar_day-${day}`" v-for="day in daysForwardConfigurable" :key="day" @click="onDayClick" 
+      :class="['w-full relative overflow-y-auto overflow-x-hidden border-box']" :style="{height:`${rowHeight}px`}">
+        {{ pairDateToContainer(startDateConfigurable, day).toLocaleDateString() }}
+        <div class="w-[100px] h-[20px] bg-surface-200 mt-2"
+         v-for="event in getEventsToContainer(day)" 
+         :key="event" 
+         :style="{marginLeft:`${getEventMarginLeft(event)}%`, width:`${getEventWidth(event)}%`}">
+         {{event.label}}
+        </div>
+        <div  @mousedown.stop.prevent="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
       </div>
-      <!-- <div id="vuecal-day_1" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        <div   @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div>
-      <div id="vuecal-day_2" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        <div   @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div>
-      <div id="vuecal-day_3" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        <div   @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div>
-      <div id="vuecal-day_4" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        <div   @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div>
-      <div id="vuecal-day_5" @click="onDayClick" :class="['w-full relative overflow-y-auto']" :style="{height:`${rowHeight}px`}">
-        <div   @mousedown.stop="onResizerMouseDown"   class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div> -->
-      <!-- <div id="vuecal-day_6" @click="onDayClick" class="border-primary-200 w-full relative overflow-y-auto" v-show="showWeekends">
-        <div class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div>
-      <div id="vuecal-day_7" @click="onDayClick" class="border-primary-200 w-full relative overflow-y-auto" v-show="showWeekends">
-        <div class="w-full h-[3px] bg-surface-200 absolute bottom-0 cursor-ns-resize"/>
-      </div> -->
   </main>
   {{ eventsConfigurable }}
 </template>
@@ -73,7 +58,6 @@ export default defineComponent({
       var containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
       this.rowHeight = (containerHeight / this.vuelCalendarOptions.daysForward);
       console.log(this.rowHeight);
-      
     })
   },
   methods:{
@@ -120,7 +104,36 @@ export default defineComponent({
     },
     setEvents(events:[]){
         this.eventsConfigurable = events;
+    },
+    getEventsToContainer(day:number){
+      const newDate = new Date(this.startDateConfigurable);
+      const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
+
+      const events = this.eventsConfigurable ?? [];
+      const divEvents = [];
+
+      for (const event of events) {
+        const eventDate = new Date(event.start);
+        if (
+          eventDate.getDate() === targetDate.getDate() &&
+          eventDate.getMonth() === targetDate.getMonth() &&
+          eventDate.getFullYear() === targetDate.getFullYear()
+        ) {
+          divEvents.push(event);
+        }
+      }
+
+      console.log('divEvents', divEvents);
+      return divEvents;
+    },
+    // szerokosci oraz marginy
+    getEventMarginLeft(event:any){
+      return this.helper.convertTimeToPercentage(this.helper.getTimeFromDate(event.start))
+    },
+    getEventWidth(event:any){
+      return this.helper.convertTimeDistanceToPercentage(this.helper.getTimeFromDate(event.start), this.helper.getTimeFromDate(event.end))
     }
+    /* */
   }
 }) 
 </script>
