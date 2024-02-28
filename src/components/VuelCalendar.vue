@@ -27,10 +27,12 @@
          :style="{marginLeft:`${getEventMarginLeft(event)}%`, width:`${getEventWidth(event)}%`, backgroundColor:theme.colors.event, color:theme.colors.textPrimary, borderRadius:'5px', zIndex:'22', position:'sticky'}">
          {{event.label}}
         </div>
-        <div  class="w-full  absolute top-0 h-full cursor-ns-resize" 
-        :style="{display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`, pointerEvents:'none'}"><div v-for="r in 24" :key="r" :style="{borderLeft:'solid 1px', borderColor:theme.colors.surface}"/></div>
-        <div  @mousedown.stop.prevent="onResizerMouseDown"   class="w-full h-[3px] absolute bottom-0 cursor-ns-resize" :style="{backgroundColor: theme.colors.surface}"/>
-      </div>
+          <div 
+              :style="{position:'absolute', width:'100%', top:'0', display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`, pointerEvents:'none',height:'100%'}">
+               <div v-for="r in 24-startHourConfigurable" :key="r" :style="{borderLeft:'solid 1px', borderColor:theme.colors.surface, height:'100%'}"/>
+          </div>
+          <div  @mousedown.stop.prevent="onResizerMouseDown"   class="w-full h-[3px] absolute bottom-0 cursor-ns-resize" :style="{backgroundColor: theme.colors.surface}"/>
+        </div>
   </main>
 </div>
   {{ eventsConfigurable }}
