@@ -18,14 +18,12 @@ export default {
       },
       colors: {
         surface: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#f3f3f3',
-          500: '#e2e1f1',
-          600: '#eaeaea',
-          700: '#eee8c7'
+          50: '#ececec',
+          100: '#cbcfd2',
+          200: '#a7adb2',
+          300: '#8b929a',
+          400: '#767b8d',
+
         },
         primary: {
           0: '#70b672',

@@ -1,7 +1,7 @@
 <template>
   <input type="date" @change="onDateChange"  v-model="date"/>
   <button @click="setEvents">Set events</button>
-  <section class="w-[600px] h-[400px]">
+  <section class="w-[100vw]">
     <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
   </section>
 </template>
@@ -16,11 +16,16 @@ export default defineComponent({
       date:new Date(),
       calendarApi:{} as VuelCalendarApi,
       vuelCalendarOptions:{
+        height:600,
+        lockResize:false,
+        theme:'dark',
         startDate:new Date(),
         daysForward:7,
+        startHour:6,
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
         },
+        onEventClicked:this.onEventClicked,
         events:[
         {
           id:1,
@@ -53,7 +58,7 @@ export default defineComponent({
           start:new Date(new Date().setHours(8, 0)),
           end:new Date(new Date().setHours(23, 0)),  
         },
-        {
+            {
           id:1,
           label:'Event #3',
           data:{},
@@ -71,6 +76,10 @@ export default defineComponent({
     },
     setEvents(){
       this.calendarApi.setNewEvents(this.events)
+    },
+    onEventClicked(event:any){
+      console.log(event, 'event clicked');
+      
     }
   }
 })

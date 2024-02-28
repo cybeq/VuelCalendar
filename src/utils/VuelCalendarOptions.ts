@@ -1,14 +1,31 @@
 class VuelCalendarOptions{
-  onVuelCalendarApiReady = (params:any) => {}
+  onVuelCalendarApiReady:Function = (params:any) => {}
+  onEventClicked:Function = (params:any)=>{};
   api?:VuelCalendarApi;
   setNewStartDate?:Function;
   setEvents?:Function;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<any> = [];
+  theme?:string = 'light';
+  height?:number = 600;
+  lockResize?:boolean = false;
+  startHour?:number = 0
   constructor(vuelCalendarOptions:VuelCalendarOptions, componentSetNewStartDate:Function, componentSetEvents:Function){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
+    if(vuelCalendarOptions.lockResize){
+      this.lockResize = vuelCalendarOptions.lockResize
+    }
+    if(vuelCalendarOptions.startHour){
+      this.startHour = vuelCalendarOptions.startHour
+    }
+    if(vuelCalendarOptions.height){
+      this.height = vuelCalendarOptions.height
+    }
+    if(vuelCalendarOptions.theme){
+      this.theme = vuelCalendarOptions.theme
+    }
     if(vuelCalendarOptions.startDate)
     {
       if(!(vuelCalendarOptions.startDate instanceof Date)){
@@ -31,6 +48,14 @@ class VuelCalendarOptions{
       this.onVuelCalendarApiReady = (api:VuelCalendarApi)=>
       {
         return vuelCalendarOptions.onVuelCalendarApiReady(api)
+      }
+    }
+    
+    if(vuelCalendarOptions.onEventClicked)
+    {
+      this.onEventClicked = (event:any)=>
+      {
+        return vuelCalendarOptions.onEventClicked(event);
       }
     }
         
