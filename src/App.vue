@@ -1,7 +1,7 @@
 <template>
   <input type="date" @change="onDateChange"  v-model="date"/>
   <button @click="setEvents">Set events</button>
-  <section class="w-[100vw]">
+  <section class="w-[100vw]" style=" height:900px; overflow:auto">
     <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
   </section>
 </template>
@@ -16,7 +16,7 @@ export default defineComponent({
       date:new Date(),
       calendarApi:{} as VuelCalendarApi,
       vuelCalendarOptions:{
-        height:600,
+        // height:600,
         lockResize:false,
         theme:'dark',
         startDate:new Date(),

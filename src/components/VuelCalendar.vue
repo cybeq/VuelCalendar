@@ -1,41 +1,57 @@
 <template>
-  <div class="w-full h-full overflow-y-hidden overflow-x-auto">
-  <nav id="timeline" class="h-[50px] border-b-2 border-t-2 w-full rounded-t-lg overflow-hidden min-w-[1200px]" 
-       :style="{backgroundColor: theme.colors.primary, borderColor:theme.colors.surface, display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`}">
-        <div v-for="hour in helper.getHours(startHourConfigurable)" :key="hour" class="col-span-1 text-primary-300" 
-          :style="{borderLeft: 'solid 1px',borderColor:theme.colors.surface, display:'flex',justifyContent: 'center',alignItems:'center', color:theme.colors.textPrimary}">
-          <span >{{ hour }}</span>
-          <span style="font-size:0.8em;margin-top:-3px"> 00</span>
+  <div :style="`display:flex;width:100%; height:${height! + 50} +'px'; border-radius:12px`">
+    <nav :style="{overflow:'hidden', background:theme.colors.primary, width:'40px', borderTopLeftRadius:'12px', borderBottomLeftRadius:'12px', paddingTop:'50px'}">
+      <div 
+        v-for="day in daysForwardConfigurable" :key="day"
+        :id="`day_label-${day}`"
+        :style="{overflow:'hidden', display:'grid', gridTemplateColumns:'1fr 1fr', color:theme.colors.textPrimary, whiteSpace: 'nowrap', fontSize:'0.9em',  boxSizing:'border-box', background:theme.colors.primary, width:'100%', height:rowHeight +'px',borderBottom:'solid 3px', borderColor:theme.colors.surface } ">
+        <div :style="{fontWeight:'bold',display:'flex', justifyContent:'center', alignItems:'center',maxWidth:'20px',  writingMode:'sideways-lr',  boxSizing:'border-box'}">
+          {{ helper.daysEnumerable[pairDateToContainer(startDateConfigurable!, day).getDay()] }}
         </div>
-  </nav> 
-  <!-- <nav :style="{position:'absolute', height:height +'px', width:'30px', background:'red', zIndex:'32'}">
-    
-  </nav> -->
-  <main :class="['w-full h-full  border-box rounded-b-lg min-w-[1200px] overflow-auto']" :style="{backgroundColor:'#ffffff', minHeight: height + 'px', maxHeight:theme.lockResize ? height +'px' : 'unset'}"  ref="container"> 
-      <div :id="`vuelcalendar_day-${day}`" v-for="day in daysForwardConfigurable" :key="day" @click="onDayClick" 
-      :class="[' w-full relative overflow-y-hidden overflow-x-hidden border-box']" :style="{height:`${rowHeight}px`, backgroundColor:theme.colors.primary, color:theme.colors.textPrimary}">
-        <div class="text-sm" 
-          :style="{cursor:'pointer',backgroundColor:helper.isCurrentDay(startDateConfigurable!, day) ? theme.colors.highlight : theme.colors.menuBg, position:'absolute', zIndex:'2', fontWeight:'bold', width:'200px', paddingInline:'5px', borderBottomRightRadius:'5px', display:'grid', gridTemplateColumns:'1fr 1fr'}">  
-          <div style="text-align:left"> {{ helper.daysEnumerable[pairDateToContainer(startDateConfigurable!, day).getDay()] }} </div>
-          <div style="text-align:right"> {{pairDateToContainer(startDateConfigurable!, day).toLocaleDateString() }} </div>
-        </div>  
-    
-        <div class="w-[100px] h-[20px] mt-2"
-         v-for="event in getEventsToContainer(day)" 
-         :key="event" 
-         @click.stop="vuelCalendarApi.onEventClicked(event)"
-         :style="{marginLeft:`${getEventMarginLeft(event)}%`, width:`${getEventWidth(event)}%`, backgroundColor:theme.colors.event, color:theme.colors.textPrimary, borderRadius:'5px', zIndex:'22', position:'sticky'}">
-         {{event.label}}
+        <div :style="{display:'flex', justifyContent:'center', alignItems:'center',backgroundColor:helper.isCurrentDay(startDateConfigurable!, day) ? theme.colors.highlight : theme.colors.menuBg, writingMode:'sideways-lr', maxWidth:'20px'}">
+          {{pairDateToContainer(startDateConfigurable!, day).toLocaleDateString() }}
         </div>
+       </div>
+    </nav>
+    <div :style="{width:'100%', height:'100%', overflowY:'hidden', overflowX:'auto'}">
+    <nav id="timeline" 
+        :style="{height:'50px', borderBottom:'solid 2px', borderTop:'solid 2px', width:'100%', borderTopRightRadius:'12px', overflow:'hidden', minWidth:'1200px',backgroundColor: theme.colors.primary, borderColor:theme.colors.surface, display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`}">
           <div 
-              :style="{position:'absolute', width:'100%', top:'0', display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`, pointerEvents:'none',height:'100%'}">
-               <div v-for="r in 24-startHourConfigurable" :key="r" :style="{borderLeft:'solid 1px', borderColor:theme.colors.surface, height:'100%'}"/>
+            v-for="hour in helper.getHours(startHourConfigurable)" 
+            :key="hour"
+            :style="{borderLeft: 'solid 1px',borderColor:theme.colors.surface, display:'flex',justifyContent: 'center',alignItems:'center', color:theme.colors.textPrimary}">
+            <span >{{ hour }}</span>
+            <span style="font-size:0.8em;margin-top:-3px"> 00</span>
           </div>
-          <div  @mousedown.stop.prevent="onResizerMouseDown"   class="w-full h-[3px] absolute bottom-0 cursor-ns-resize" :style="{backgroundColor: theme.colors.surface}"/>
-        </div>
-  </main>
+    </nav> 
+
+    <main 
+          :style="{minHeight: height + 'px', maxHeight:theme.lockResize ? height +'px' : 'unset',
+                  width:'100%', height:'100%', boxSizing:'border-box', borderBottomRightRadius:'12px',
+                  minWidth:'1200px', overflow:'auto'  }"  
+
+          ref="container"> 
+        <div :id="`vuelcalendar_day-${day}`" v-for="day in daysForwardConfigurable" :key="day" @click="onDayClick" 
+            :style="{height:`${rowHeight}px`, backgroundColor:theme.colors.primary, color:theme.colors.textPrimary,
+                      width:'100%', position:'relative', overflow:'hidden', boxSizing:'border-box' }">  
+          <div style="margin-top:15px">
+            <div 
+              v-for="event in getEventsToContainer(day)" 
+              :key="event" 
+              @click.stop="vuelCalendarApi.onEventClicked(event)"
+              :style="{ height:'20px', marginTop:'1rem', marginLeft:`${getEventMarginLeft(event)}%`, width:`${getEventWidth(event)}%`, backgroundColor:theme.colors.event, color:theme.colors.textPrimary, borderRadius:'5px', zIndex:'22', position:'sticky'}">
+              {{event.label}}
+            </div>
+          </div>
+            <div 
+                :style="{position:'absolute', width:'100%', top:'0', display:'grid', gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`, pointerEvents:'none',height:'100%'}">
+                <div v-for="r in 24-startHourConfigurable" :key="r" :style="{borderLeft:'solid 1px', borderColor:theme.colors.surface, height:'100%'}"/>
+            </div>
+            <div  @mousedown.stop.prevent="onResizerMouseDown"   class="w-full h-[3px] absolute bottom-0 cursor-ns-resize" :style="{backgroundColor: theme.colors.surface}"/>
+          </div>
+    </main>
+  </div>
 </div>
-  {{ eventsConfigurable }}
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -125,13 +141,23 @@ export default defineComponent({
     onResizerMouseMove(event:MouseEvent) {
       if (!this.resizer.isResizing) return;
       const el = (this.resizer.resizedEl! as HTMLDivElement);
+      const dayNumber = el.id.split('-')[1];
+      const dayLabelElement = document.getElementById(`day_label-${dayNumber}`);
       const deltaY = event.clientY;
       const newHeight = (deltaY - el.getBoundingClientRect().top)
-      if(newHeight <20){
-        el.style.height = 20 + 'px';
+      if(newHeight < this.rowHeight){
+        el.style.height = this.rowHeight + 'px';
+        if(dayLabelElement && !this.theme.lockResize)
+        {
+          dayLabelElement!.style.height = this.rowHeight +'px'
+        }
         return;
       }
       el.style.height = newHeight + 'px';
+      if(dayLabelElement && !this.theme.lockResize)
+      {
+        dayLabelElement!.style.height = newHeight +'px'
+      }
     },
     pairDateToContainer(startDate:Date, day:number){
       const newDate = new Date(startDate);
