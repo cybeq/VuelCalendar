@@ -7,10 +7,10 @@ class VuelCalendarOptions{
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<any> = [];
-  theme?:string = 'light';
+  theme?:string = 'dark';
   height?:number = 600;
   lockResize?:boolean = false;
-  startHour?:number = 0
+  startHour?:number = 0;
   constructor(vuelCalendarOptions:VuelCalendarOptions, componentSetNewStartDate:Function, componentSetEvents:Function){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
@@ -39,6 +39,10 @@ class VuelCalendarOptions{
     {
       if(!( typeof  vuelCalendarOptions.daysForward === 'number')){
           console.error('Provided daysForward must be a type of number')
+      }
+      if(vuelCalendarOptions.daysForward < 1){
+        console.error('daysForward must be greater than 0')
+        this.daysForward = 1;
       }
       this.daysForward = vuelCalendarOptions.daysForward
     }
