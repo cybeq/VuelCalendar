@@ -2,6 +2,10 @@ export class Helper{
 
   public daysEnumerable = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   public daysEnumerableFromMonday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  public monthsEnumerable: string[] = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
   public getTimeFromDate( date: Date ) : string
   {
     const hours = date.getHours()
@@ -100,7 +104,7 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
   {
     return new Date(data.getFullYear(), data.getMonth(), 1);
   }
-  public getDayFromFirstDayByAdd( date: Date, addDayNumber: number ) : Date
+  public getDayFromFirstDayByAdd( date: Date, addDayNumber: number) : Date
   {
     // const firstDayOfMonth = this.firstDayOfMonthByDate(date);
     const firstDayOfMonth = this.findFirstMonday(date);
@@ -146,4 +150,19 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
       }
   }
 
+  public dateToMonthAndDay(date:Date): string{
+      const monthIndex: number = date.getMonth();
+      const day: number = date.getDate();
+      const formattedDay: string = ("0" + day).slice(-2);
+      return `${this.monthsEnumerable[monthIndex]} ${formattedDay}`;
+  }
+
+  public setTimeToDate(date:Date, time:string){
+      const [hours, minutes] = time.split(':').map(Number);
+
+      date.setHours(hours);
+      date.setMinutes(minutes);
+
+      return new Date(date);
+  }
 }

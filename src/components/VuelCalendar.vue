@@ -39,8 +39,8 @@
                   justifyContent:'center',
                   alignItems:'center',
                   maxWidth:'20px',
-                   writingMode:'sideways-lr',
-                   boxSizing:'border-box'}">
+                  writingMode:'sideways-lr',
+                  boxSizing:'border-box'}">
 
           {{ helper.daysEnumerable[pairDateToContainer(startDateConfigurable!, day).getDay()] }}
 
@@ -129,9 +129,9 @@
                boxSizing:'border-box' }"
         >
           <div style="margin-top:15px">
-            <div 
-              v-for="event in getEventsToContainer(day)" 
-              :key="event" 
+            <div
+              v-for="event in getEventsToContainer(day)"
+              :key="event"
               @click.stop="vuelCalendarApi.onEventClicked(event)"
               :style="{
                 height:'20px',
@@ -265,7 +265,13 @@
            :style="{
               display:'flex',
               justifyContent:'center',
-              alignItems:'center'}"
+              borderLeft:'solid 1px',
+              borderColor:theme.colors.surface,
+              fontSize:'0.8em',
+              fontWeight:'bolder',
+              alignItems:'center',
+              color:theme.colors.textPrimary
+           }"
       >
 
         {{helper.daysEnumerableFromMonday[day-1]}}
@@ -276,26 +282,35 @@
          :key="day"
          @click="setDateFromMonthCalendar(day)"
          :style="{
-           background: theme.colors.primary,
-           borderColor:theme.colors.surface,
-           borderLeftWidth:'1px',
-           borderBottomWidth:'1px',
-           display:'flex',
-           justifyContent:'center',
-           alignItems:'center',
-           cursor:'pointer'
-         }"
+             background: theme.colors.primary,
+             borderColor: theme.colors.surface,
+             borderLeftWidth: '1px',
+             borderBottomWidth: '1px',
+             display: 'flex',
+             justifyContent: 'center',
+             alignItems: 'center',
+             cursor: 'pointer',
+             position: 'relative'}"
     >
-       <div :style="{
-              backgroundColor:helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!) > 0 ? theme.colors.event : theme.colors.surface,
-              padding:'5px',
-              fontWeight:'bold',
-              borderRadius:'12px',
-              color:theme.colors.textPrimary
-             }"
-             v-text="helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!)"
-       />
+      <div :style="{
+              backgroundColor: helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!) > 0 ? theme.colors.event : theme.colors.surface,
+              padding: '5px',
+              fontWeight: 'bold',
+              borderRadius: '12px',
+              color: theme.colors.textPrimary,
+              position: 'relative'
+         }"
+           v-text="helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!)"
+      />
+
+      <div :style="{position: 'absolute', bottom: 0, left: 0, fontSize:'0.8em', color:theme.colors.textPrimary}">
+
+        {{helper.dateToMonthAndDay(helper.getDayFromFirstDayByAdd(startDateConfigurable!, day - 1,))}}
+
+      </div>
+
     </div>
+
   </div>
   <div  @mousedown.stop.prevent="onResizerMouseDown"
         :style="{
@@ -398,7 +413,10 @@ export default defineComponent({
       vuelCalendarApi:new VuelCalendarOptions(
         this.vuelCalendarOptions,
         this.setNewStartDate,
-        this.setEvents
+        this.setEvents,
+        this.addEvents,
+        this.removeEventsByParam,
+        this.configureEventsByParam
       ),
       rowHeight: 0,
       resizer: {
@@ -406,14 +424,15 @@ export default defineComponent({
         resizedElBottom: null as Number | null,
         resizedEl: null as HTMLDivElement | null,
       },
-      startDateConfigurable:   this.vuelCalendarOptions.startDate,
-      eventsConfigurable:      this.vuelCalendarOptions.events,
+      startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
+      eventsConfigurable:      this.vuelCalendarOptions.events ?? [],
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
       startHourConfigurable:   this.vuelCalendarOptions.startHour ?? 0,
       viewMode:                'days'
     }
   },
-  created(){
+  created()
+  {
     this.$nextTick( () =>
     {
       var containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
@@ -429,16 +448,17 @@ export default defineComponent({
       const clickedDay = this.helper.addToDate(this.startDateConfigurable!, day-1)
       const clickedTime =    this.helper.convertPercentageToTime(percentClicked, this.startHourConfigurable);
       const daysEvents  = this.getEventsToContainer(day)
-      console.log(
-          'click',
-          event.target,
-          el.offsetWidth,
-          clickedWidthFromLeft,
-          percentClicked,
-          clickedDay,
-          clickedTime,
-          daysEvents
-      );
+      this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
+      // console.log(
+      //     'click',
+      //     event.target,
+      //     el.offsetWidth,
+      //     clickedWidthFromLeft,
+      //     percentClicked,
+      //     clickedDay,
+      //     clickedTime,
+      //     daysEvents
+      // );
     },
 
     setViewMode()
@@ -533,6 +553,26 @@ export default defineComponent({
     setEvents(events:[])
     {
         this.eventsConfigurable = events;
+    },
+    addEvents(events:[])
+    {
+      this.eventsConfigurable.push(...events);
+    },
+    removeEventsByParam(param:string, value:any)
+    {
+      this.eventsConfigurable = this.eventsConfigurable.filter(e=>{
+        return e[param] !== value
+      })
+    },
+    configureEventsByParam(param:string, value:any, params:Object)
+    {
+      const pairedEvents = this.eventsConfigurable.filter(e=>e[param] === value);
+      pairedEvents.forEach(pe=>{
+        Object.entries(params).forEach(paramsEntries=>{
+          pe[paramsEntries[0]] = paramsEntries[1]
+        })
+      })
+      console.log('configureventsbyparam', param, value, params)
     },
     getEventsToContainer(day:number)
     {

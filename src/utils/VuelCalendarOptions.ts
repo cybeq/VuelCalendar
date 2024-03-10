@@ -5,9 +5,15 @@ class VuelCalendarOptions{
   onEventClicked:Function = (params:any)=>{
     console.log(params)
   };
+  onDayClicked:Function = (params:any)=>{
+    console.log(params)
+  };
   api?:VuelCalendarApi;
   setNewStartDate?:Function;
   setEvents?:Function;
+  addEvents?:Function;
+  removeEventsByParam?:Function;
+  configureEventsByParam?:Function;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<any> = [];
@@ -15,9 +21,17 @@ class VuelCalendarOptions{
   height?:number = 600;
   lockResize?:boolean = false;
   startHour?:number = 0;
-  constructor(vuelCalendarOptions:VuelCalendarOptions, componentSetNewStartDate:Function, componentSetEvents:Function){
+  constructor(vuelCalendarOptions:VuelCalendarOptions,
+              componentSetNewStartDate:Function,
+              componentSetEvents:Function,
+              componentAddEvents:Function,
+              componentRemoveEventsByParam:Function,
+              componentConfigureEventsByParam:Function){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
+    this.addEvents = componentAddEvents;
+    this.removeEventsByParam = componentRemoveEventsByParam;
+    this.configureEventsByParam = componentConfigureEventsByParam;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
     }
@@ -66,6 +80,14 @@ class VuelCalendarOptions{
         return vuelCalendarOptions.onEventClicked(event);
       }
     }
+
+    if(vuelCalendarOptions.onDayClicked)
+    {
+      this.onDayClicked = (event:any)=>
+      {
+        return vuelCalendarOptions.onDayClicked(event);
+      }
+    }
         
     if(vuelCalendarOptions.events)
     {
@@ -74,7 +96,10 @@ class VuelCalendarOptions{
 
     this.api = new VuelCalendarApi(
       this.setNewStartDate,
-      this.setEvents
+      this.setEvents,
+      this.addEvents,
+      this.removeEventsByParam,
+      this.configureEventsByParam
     );
     
     this.onVuelCalendarApiReady(this.api)
@@ -83,9 +108,15 @@ class VuelCalendarOptions{
 class VuelCalendarApi{
   setDate!:Function;
   setEvents!:Function;
-  constructor(setDate:Function, setEvents:Function){
+  addEvents!:Function;
+  removeEventsByParam!:Function;
+  configureEventsByParam!:Function;
+  constructor(setDate:Function, setEvents:Function, addEvents:Function, removeEventsByParam:Function, configureEventsByParam:Function){
     this.setDate = setDate
     this.setEvents = setEvents
+    this.addEvents = addEvents
+    this.removeEventsByParam = removeEventsByParam;
+    this.configureEventsByParam = configureEventsByParam;
   }
   setNewStartDate = (date:any) =>{
     if(typeof date === 'string'){
@@ -101,7 +132,14 @@ class VuelCalendarApi{
   setNewEvents = (events:Array<any>)=>{
     this.setEvents(events);
     console.log(events, 'events changed');
-    
+  }
+  addNewEvents = (events:Array<any>) =>{
+    this.addEvents(events);
+    console.log(events, 'events has been included')
+  }
+  removeEventsByParamLog = (param:string, value:any) =>{
+    this.removeEventsByParam(param,value)
+    console.log('events removed by param', param, value)
   }
 }
 
