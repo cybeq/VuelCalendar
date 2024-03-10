@@ -1,6 +1,10 @@
 class VuelCalendarOptions{
-  onVuelCalendarApiReady:Function = (params:any) => {}
-  onEventClicked:Function = (params:any)=>{};
+  onVuelCalendarApiReady:Function = (params:any) => {
+    console.log(params)
+  }
+  onEventClicked:Function = (params:any)=>{
+    console.log(params)
+  };
   api?:VuelCalendarApi;
   setNewStartDate?:Function;
   setEvents?:Function;

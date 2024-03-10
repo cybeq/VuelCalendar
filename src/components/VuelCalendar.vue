@@ -118,7 +118,7 @@
         <div :id="`vuelcalendar_day-${day}`"
              v-for="day in daysForwardConfigurable"
              :key="day"
-             @click="onDayClick"
+             @click="onDayClick($event, day)"
              :style="{
                height:`${rowHeight}px`,
                backgroundColor:theme.colors.primary,
@@ -421,19 +421,23 @@ export default defineComponent({
     })
   },
   methods:{
-    onDayClick(event:MouseEvent)
+    onDayClick(event:MouseEvent, day:number)
     {
       const el = (event.currentTarget! as HTMLElement);
       const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
       const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
-      
+      const clickedDay = this.helper.addToDate(this.startDateConfigurable!, day-1)
+      const clickedTime =    this.helper.convertPercentageToTime(percentClicked, this.startHourConfigurable);
+      const daysEvents  = this.getEventsToContainer(day)
       console.log(
           'click',
           event.target,
           el.offsetWidth,
           clickedWidthFromLeft,
           percentClicked,
-          this.helper.convertPercentageToTime(percentClicked, this.startHourConfigurable)
+          clickedDay,
+          clickedTime,
+          daysEvents
       );
     },
 

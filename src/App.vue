@@ -21,7 +21,7 @@ export default defineComponent({
         theme:'light',
         startDate:new Date(),
         daysForward:5,
-        startHour:6,
+        startHour:17,
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
         },

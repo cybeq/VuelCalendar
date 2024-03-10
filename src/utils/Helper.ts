@@ -19,7 +19,7 @@ export class Helper{
   {
     const [hours, minutes] = timeString.split(':')
         .map(Number);
-    const totalMinutes = (hours - startHour) * 60 + minutes;
+    const totalMinutes = Math.max((hours - startHour) * 60 + minutes, 0);
     const totalHours = 24 - startHour;
     const percentage = (totalMinutes / (totalHours * 60)) * 100;
     console.log(
@@ -41,10 +41,14 @@ public convertPercentageToTime( percentage: number, startHour: number = 0 ) : st
 
 public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: string, startHour: number = 0 ) : number
 {
-    const [startHours, startMinutes] = startTimeString.split(':')
+    let [startHours, startMinutes] = startTimeString.split(':')
         .map(Number);
     const [endHours, endMinutes] = endTimeString.split(':')
         .map(Number);
+
+    if(startHour > startHours){
+        startHours = startHour
+    }
 
     let startTotalMinutes = (startHours - startHour) * 60 + startMinutes;
 
@@ -70,10 +74,10 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
         'distance to per',
         percentage
     );
-    
+
     return percentage;
 }
-  
+
   public hours = Array.from(
       {length: 24}, (_, i) => `${i.toString().padStart(2, '0')}`
   )
