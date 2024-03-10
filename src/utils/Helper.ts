@@ -159,10 +159,8 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
 
   public setTimeToDate(date:Date, time:string){
       const [hours, minutes] = time.split(':').map(Number);
-
       date.setHours(hours);
       date.setMinutes(minutes);
-
       return new Date(date);
   }
 }

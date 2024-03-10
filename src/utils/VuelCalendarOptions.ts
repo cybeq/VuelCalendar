@@ -14,6 +14,7 @@ class VuelCalendarOptions{
   addEvents?:Function;
   removeEventsByParam?:Function;
   configureEventsByParam?:Function;
+  onVuelCalendarReadyResolve!:Function;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<any> = [];
@@ -26,7 +27,7 @@ class VuelCalendarOptions{
               componentSetEvents:Function,
               componentAddEvents:Function,
               componentRemoveEventsByParam:Function,
-              componentConfigureEventsByParam:Function){
+              componentConfigureEventsByParam:Function,){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
     this.addEvents = componentAddEvents;
@@ -89,10 +90,13 @@ class VuelCalendarOptions{
       }
     }
         
-    if(vuelCalendarOptions.events)
-    {
-      this.events = vuelCalendarOptions.events;
-    }
+    // if(vuelCalendarOptions.events)
+    // {
+    //   this.events = [];
+    // }else{
+    //   this.events = []
+    // }
+    this.events =[]
 
     this.api = new VuelCalendarApi(
       this.setNewStartDate,
@@ -102,7 +106,11 @@ class VuelCalendarOptions{
       this.configureEventsByParam
     );
     
-    this.onVuelCalendarApiReady(this.api)
+    // this.onVuelCalendarApiReady(this.api)
+    this.onVuelCalendarReadyResolve = () =>{
+      console.log('pawain resolvd')
+      this.onVuelCalendarApiReady(this.api)
+    }
   }
 }
 class VuelCalendarApi{
@@ -130,11 +138,11 @@ class VuelCalendarApi{
     }
   }
   setNewEvents = (events:Array<any>)=>{
-    this.setEvents(events);
+    this.setEvents([...events]);
     console.log(events, 'events changed');
   }
   addNewEvents = (events:Array<any>) =>{
-    this.addEvents(events);
+    this.addEvents([...events]);
     console.log(events, 'events has been included')
   }
   removeEventsByParamLog = (param:string, value:any) =>{

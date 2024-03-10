@@ -367,7 +367,7 @@
 </section>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent, reactive, toRaw} from 'vue';
 import { Helper } from '../utils/Helper';
 import { VuelCalendarOptions } from '../utils/VuelCalendarOptions';
 import type { PropType } from 'vue';
@@ -425,7 +425,7 @@ export default defineComponent({
         resizedEl: null as HTMLDivElement | null,
       },
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
-      eventsConfigurable:      this.vuelCalendarOptions.events ?? [],
+      eventsConfigurable:      [] as any[],
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
       startHourConfigurable:   this.vuelCalendarOptions.startHour ?? 0,
       viewMode:                'days'
@@ -437,6 +437,7 @@ export default defineComponent({
     {
       var containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
       this.rowHeight = (containerHeight / (this.daysForwardConfigurable));
+      this.vuelCalendarApi.onVuelCalendarReadyResolve();
     })
   },
   methods:{
@@ -548,31 +549,40 @@ export default defineComponent({
     },
     setNewStartDate(date:Date)
     {
-      this.startDateConfigurable = date;
+      this.preventResize(()=>this.startDateConfigurable = date);
     },
     setEvents(events:[])
     {
-        this.eventsConfigurable = events;
+      this.preventResize(()=> {
+        this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
+      })
     },
     addEvents(events:[])
     {
-      this.eventsConfigurable.push(...events);
+      this.preventResize(()=> {
+        reactive(structuredClone(toRaw(events))).forEach((event) => {
+          this.eventsConfigurable.push(event);
+        });
+      })
     },
     removeEventsByParam(param:string, value:any)
     {
-      this.eventsConfigurable = this.eventsConfigurable.filter(e=>{
-        return e[param] !== value
+      this.preventResize(()=>{
+        this.eventsConfigurable = this.eventsConfigurable.filter(e=>{
+          return e[param] !== value
+        })
       })
     },
     configureEventsByParam(param:string, value:any, params:Object)
     {
-      const pairedEvents = this.eventsConfigurable.filter(e=>e[param] === value);
-      pairedEvents.forEach(pe=>{
-        Object.entries(params).forEach(paramsEntries=>{
-          pe[paramsEntries[0]] = paramsEntries[1]
+      this.preventResize(()=>{
+        const pairedEvents = this.eventsConfigurable.filter(e=>e[param] === value);
+        pairedEvents.forEach(pe=>{
+          Object.entries(params).forEach(paramsEntries=>{
+            pe[paramsEntries[0]] = paramsEntries[1]
+          })
         })
       })
-      console.log('configureventsbyparam', param, value, params)
     },
     getEventsToContainer(day:number)
     {
@@ -629,8 +639,30 @@ export default defineComponent({
           'nowa data z month calendar',
           date
       );
-      
-    }
+    },
+
+
+    preventResize(method:Function){
+      this.$nextTick(()=>{
+        const els:any[] = []
+        for(let i = 1; i<this.daysForwardConfigurable+1; i++)
+        {
+          const el = document.getElementById(`vuelcalendar_day-${i}`)! as HTMLDivElement
+          els.push({id:el.id, beforeHeight:el.style.height})
+        }
+        method()
+        this.$nextTick(()=>
+        {
+          els.forEach((el:any, index:number)=>{
+            const elAfter = document.getElementById(el.id)! as HTMLDivElement
+            const elLabelAfter = document.getElementById(`day_label-${index+1}`)! as HTMLDivElement
+            elAfter.style.height = el.beforeHeight
+            elLabelAfter.style.height = el.beforeHeight
+          })
+        })
+      })
+
+    },
     /* */
   }
 }) 

@@ -5,7 +5,8 @@
   <input type="number" v-model="num"/>
   <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
   <button @click="configureEventsByParam">Configure Events By param</button>
-  <section class="w-[800px]" >
+  <button @click="changeDaysForward(num)">Change days froward</button>
+  <section class="w-[800px]"  >
     <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
   </section>
 </template>
@@ -37,19 +38,19 @@ export default defineComponent({
         startHour:17,
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
+          api.setEvents( [
+            {
+              id:1,
+              label:'Event #1',
+              data:{},
+              start:new Date(new Date().setHours(8, 0)),
+              end:new Date(new Date().setHours(23, 0)),
+            }
+          ])
+          console.log('ready api', api)
         },
         onDayClicked:this.onDayClicked,
         onEventClicked:this.onEventClicked,
-        removeEventsByParam:this.removeEventsByParam,
-        events:[
-        {
-          id:1,
-          label:'Event #1',
-          data:{},
-          start:new Date(new Date().setHours(8, 0)),
-          end:new Date(new Date().setHours(23, 0)),
-        }
-      ]
       },
       events:[
         {
@@ -57,28 +58,28 @@ export default defineComponent({
           label:'Event #2',
           data:{},
           start:new Date(new Date().setHours(8, 0)),
-          end:new Date(new Date().setHours(23, 0)),  
+          end:new Date(new Date().setHours(23, 0)),
         },
         {
           id:3,
           label:'Event #3',
           data:{},
           start:new Date(new Date().setHours(8, 0)),
-          end:new Date(new Date().setHours(23, 0)),  
+          end:new Date(new Date().setHours(23, 0)),
         },
         {
           id:4,
           label:'Event #4',
           data:{},
           start:new Date(new Date().setHours(8, 0)),
-          end:new Date(new Date().setHours(23, 0)),  
+          end:new Date(new Date().setHours(23, 0)),
         },
             {
           id:5,
           label:'Event #5',
           data:{},
           start:new Date(new Date().setHours(8, 0)),
-          end:new Date(new Date().setHours(23, 0)),  
+          end:new Date(new Date().setHours(23, 0)),
         }
       ]
     }
@@ -87,13 +88,13 @@ export default defineComponent({
     onDateChange(){
         this.calendarApi.setDate(this.date)
         console.log(this.events);
-        
+
     },
     setEvents(){
-      this.calendarApi.setNewEvents(this.events)
+      this.calendarApi.setEvents(this.events)
     },
     addEvents(){
-      this.calendarApi.addNewEvents(this.events)
+      this.calendarApi.addEvents(this.events)
     },
     removeEventsByParam(param:string, value:any){
       this.calendarApi.removeEventsByParamLog(param, value)
@@ -105,7 +106,10 @@ export default defineComponent({
       console.log(day,'day clicked api')
     },
     configureEventsByParam(){
-      this.calendarApi.configureEventsByParam('id', 1, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}})
+      this.calendarApi.configureEventsByParam('id', this.num, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}})
+    },
+    changeDaysForward(){
+
     }
   }
 })
