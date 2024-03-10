@@ -67,6 +67,19 @@ calendarApi.setDate(date);
 
 
 ---------------------------
+### Change timeline start hour
+
+-------------------------
+
+```ts 
+calendarApi.setStartHour(hour);
+```
+- hour: Type of **Number** [min:0, max: 23]
+
+**This function is responsible for changing the startHour to a new hour. If you change this hour, your timeline will set the initial hour to this hour.**
+
+
+---------------------------
 
 ### Set new events
 

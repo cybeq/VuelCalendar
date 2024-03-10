@@ -5,7 +5,7 @@
   <input type="number" v-model="num"/>
   <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
   <button @click="configureEventsByParam">Configure Events By param</button>
-  <button @click="changeDaysForward(num)">Change days froward</button>
+  <button @click="setStartHour(num)">Change days froward</button>
   <section class="w-[800px]"  >
     <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
   </section>
@@ -108,8 +108,8 @@ export default defineComponent({
     configureEventsByParam(){
       this.calendarApi.configureEventsByParam('id', this.num, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}})
     },
-    changeDaysForward(){
-
+    setStartHour(num:number){
+      this.calendarApi.setStartHour(num)
     }
   }
 })

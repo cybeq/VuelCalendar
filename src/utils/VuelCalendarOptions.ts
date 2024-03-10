@@ -15,6 +15,7 @@ class VuelCalendarOptions{
   removeEventsByParam?:Function;
   configureEventsByParam?:Function;
   onVuelCalendarReadyResolve!:Function;
+  setStartHour!:Function;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<any> = [];
@@ -27,12 +28,14 @@ class VuelCalendarOptions{
               componentSetEvents:Function,
               componentAddEvents:Function,
               componentRemoveEventsByParam:Function,
-              componentConfigureEventsByParam:Function,){
+              componentConfigureEventsByParam:Function,
+              componentSetStartHour:Function){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
     this.addEvents = componentAddEvents;
     this.removeEventsByParam = componentRemoveEventsByParam;
     this.configureEventsByParam = componentConfigureEventsByParam;
+    this.setStartHour = componentSetStartHour;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
     }
@@ -103,7 +106,8 @@ class VuelCalendarOptions{
       this.setEvents,
       this.addEvents,
       this.removeEventsByParam,
-      this.configureEventsByParam
+      this.configureEventsByParam,
+      this.setStartHour
     );
     
     // this.onVuelCalendarApiReady(this.api)
@@ -119,12 +123,14 @@ class VuelCalendarApi{
   addEvents!:Function;
   removeEventsByParam!:Function;
   configureEventsByParam!:Function;
-  constructor(setDate:Function, setEvents:Function, addEvents:Function, removeEventsByParam:Function, configureEventsByParam:Function){
+  setStartHour!:Function;
+  constructor(setDate:Function, setEvents:Function, addEvents:Function, removeEventsByParam:Function, configureEventsByParam:Function, setStartHour:Function){
     this.setDate = setDate
     this.setEvents = setEvents
     this.addEvents = addEvents
     this.removeEventsByParam = removeEventsByParam;
     this.configureEventsByParam = configureEventsByParam;
+    this.setStartHour = setStartHour
   }
   setNewStartDate = (date:any) =>{
     if(typeof date === 'string'){
