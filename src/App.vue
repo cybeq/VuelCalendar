@@ -2,6 +2,7 @@
   <input type="date" @change="onDateChange"  v-model="date"/>
   <button @click="setEvents">Set events</button>
   <button @click="addEvents">Add events</button>
+  <button @click="addEvents2">Add XXSE</button>
   <input type="number" v-model="num"/>
   <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
   <button @click="configureEventsByParam">Configure Events By param</button>
@@ -85,30 +86,51 @@ export default defineComponent({
     }
   },
   methods:{
-    onDateChange(){
+    onDateChange()
+    {
         this.calendarApi.setDate(this.date)
-        console.log(this.events);
-
+        console.log(this.calendarApi.setDate(this.date), 'dateChange');
     },
-    setEvents(){
-      this.calendarApi.setEvents(this.events)
+    setEvents()
+    {
+      console.log(this.calendarApi.setEvents(this.events),'setEvents')
     },
-    addEvents(){
+    addEvents()
+    {
       this.calendarApi.addEvents(this.events)
     },
-    removeEventsByParam(param:string, value:any){
-      this.calendarApi.removeEventsByParamLog(param, value)
+    addEvents2(){
+      const es = [];
+      for(let i =0 ; i<5000; i++){
+        es.push(
+          {
+            id:123,
+            label:'Event #123',
+            data:{},
+            start:new Date(new Date().setHours(8, 0)),
+            end:new Date(new Date().setHours(23, 0)),
+          }
+        )
+      }
+      this.calendarApi.addEvents(es )
     },
-    onEventClicked(event:any){
+    removeEventsByParam(param:string, value:any)
+    {
+      console.log(this.calendarApi.removeEventsByParam(param, value),`remove ${param}:${value}`)
+    },
+    onEventClicked(event:any)
+    {
       console.log(event, 'event clicked');
     },
     onDayClicked(day:any){
       console.log(day,'day clicked api')
     },
-    configureEventsByParam(){
-      this.calendarApi.configureEventsByParam('id', this.num, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}})
+    configureEventsByParam()
+    {
+      console.log(this.calendarApi.configureEventsByParam('id', this.num, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}}),'edit','id', this.num, {'end':this.dateY, 'start':this.dateX, data:{id:'xxx'}})
     },
-    setStartHour(num:number){
+    setStartHour(num:number)
+    {
       this.calendarApi.setStartHour(num)
     }
   }

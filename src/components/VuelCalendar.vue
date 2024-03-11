@@ -1,6 +1,7 @@
 <template>
   <div :style="`
             display:flex;
+            position:relative;
             width:100%;
             height:${height! + 50} +'px';
             border-radius:12px`"
@@ -131,7 +132,7 @@
           <div style="margin-top:15px">
             <div
               v-for="event in getEventsToContainer(day)"
-              :key="event"
+              :key="getEventKey(event.id ?? 0)"
               @click.stop="vuelCalendarApi.onEventClicked(event)"
               :style="{
                 height:'20px',
@@ -362,6 +363,7 @@ import {defineComponent, reactive, toRaw} from 'vue';
 import { Helper } from '../utils/Helper';
 import { VuelCalendarOptions } from '../utils/VuelCalendarOptions';
 import type { PropType } from 'vue';
+import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 export default defineComponent({
   setup(){
     const helper = new Helper();
@@ -403,12 +405,13 @@ export default defineComponent({
     return{
       vuelCalendarApi:new VuelCalendarOptions(
         this.vuelCalendarOptions,
-        this.setNewStartDate,
-        this.setEvents,
-        this.addEvents,
-        this.removeEventsByParam,
-        this.configureEventsByParam,
-        this.setStartHour
+        this.setNewStartDate        as (date:Date)=>Date,
+        this.setEvents              as (events:Array<VuelCalendarEvent>) =>Array<VuelCalendarEvent>,
+        this.addEvents              as (events:Array<VuelCalendarEvent>) => Array<VuelCalendarEvent>,
+        this.removeEventsByParam    as (param:string, value:any)         => Array<VuelCalendarEvent>,
+        this.configureEventsByParam as (param:string, value:any, params:VuelCalendarEvent)
+                                                                         => Array<VuelCalendarEvent>,
+        this.setStartHour           as (hour:number)                     => void
       ),
       rowHeight: 0,
       resizer: {
@@ -417,7 +420,7 @@ export default defineComponent({
         resizedEl: null as HTMLDivElement | null,
       },
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
-      eventsConfigurable:      [] as any[],
+      eventsConfigurable:      [] as VuelCalendarEvent[],
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
       startHourConfigurable:   this.vuelCalendarOptions.startHour ?? 0,
       viewMode:                'days'
@@ -427,7 +430,7 @@ export default defineComponent({
   {
     this.$nextTick( () =>
     {
-      var containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
+      const containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
       this.rowHeight = (containerHeight / (this.daysForwardConfigurable));
       this.vuelCalendarApi.onVuelCalendarReadyResolve();
     })
@@ -539,42 +542,62 @@ export default defineComponent({
       newDate.setDate(newDate.getDate() + day - 1);
       return newDate;
     },
-    setNewStartDate(date:Date)
+    setNewStartDate(date:Date):Date
     {
       this.preventResize(()=>this.startDateConfigurable = date);
+      return new Date(date);
     },
-    setEvents(events:[])
+    setEvents(events:[]):Array<VuelCalendarEvent>
     {
-      this.preventResize(()=> {
-        this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
-      })
-    },
-    addEvents(events:[])
-    {
-      this.preventResize(()=> {
-        reactive(structuredClone(toRaw(events))).forEach((event) => {
-          this.eventsConfigurable.push(event);
-        });
-      })
-    },
-    removeEventsByParam(param:string, value:any)
-    {
-      this.preventResize(()=>{
-        this.eventsConfigurable = this.eventsConfigurable.filter(e=>{
-          return e[param] !== value
+      setTimeout(()=>{
+        this.preventResize(()=>
+        {
+          this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
         })
       })
+      return events;
     },
-    configureEventsByParam(param:string, value:any, params:Object)
+    addEvents(events:[]):Array<VuelCalendarEvent>
     {
-      this.preventResize(()=>{
-        const pairedEvents = this.eventsConfigurable.filter(e=>e[param] === value);
-        pairedEvents.forEach(pe=>{
-          Object.entries(params).forEach(paramsEntries=>{
+      setTimeout(()=>{
+        this.preventResize(()=>
+        {
+          reactive(structuredClone(toRaw(events))).forEach((event) =>
+          {
+            this.eventsConfigurable.push(event);
+          });
+        })
+      })
+      return events;
+    },
+    removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
+    {
+      return this.preventResize(()=>{
+        this.eventsConfigurable = this.eventsConfigurable.filter( (e:any) =>
+        {
+          return e[param] !== value
+        })
+        // this.eventsConfigurable.forEach((event:any, index:number) => {
+        //   if (event[param] === value) {
+        //     this.eventsConfigurable.splice(index, 1); // Usuń element o zadanym parametrze i wartości
+        //   }
+        // });
+      }, []) as Array<VuelCalendarEvent>
+    },
+    configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
+    {
+      return this.preventResize(()=>
+      {
+        const pairedEvents = this.eventsConfigurable.filter((e:any)=>e[param] === value);
+
+        pairedEvents.forEach( (pe:any)=>
+        {
+          Object.entries(params).forEach( (paramsEntries:any)=>
+          {
             pe[paramsEntries[0]] = paramsEntries[1]
           })
         })
-      })
+      }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
     },
     setStartHour(hour:number){
       this.startHourConfigurable = hour;
@@ -598,15 +621,14 @@ export default defineComponent({
           divEvents.push(event);
         }
       }
-
-      console.log(
-          'divEvents',
-          divEvents
-      );
+      // console.log(
+      //     'divEvents',
+      //     divEvents
+      // );
       return divEvents;
     },
 
-    getEventMarginLeft( event: any )
+    getEventMarginLeft( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeToPercentage(
           this.helper.getTimeFromDate(event.start),
@@ -614,7 +636,7 @@ export default defineComponent({
       )
     },
 
-    getEventWidth( event:any )
+    getEventWidth( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeDistanceToPercentage(
           this.helper.getTimeFromDate(event.start),
@@ -624,31 +646,35 @@ export default defineComponent({
     },
     setDateFromMonthCalendar( dayToAdd: number )
     {
-      const date = this.helper.getDayFromFirstDayByAdd(
+
+      this.startDateConfigurable
+          = this.helper.getDayFromFirstDayByAdd
+      (
           this.startDateConfigurable!,
           dayToAdd - 1
       );
-      this.startDateConfigurable = date;
       this.viewMode = 'days'
-      console.log(
-          'nowa data z month calendar',
-          date
-      );
+      // console.log(
+      //     'nowa data z month calendar',
+      //     date
+      // );
     },
-
-
-    preventResize(method:Function){
-      this.$nextTick(()=>{
+    preventResize(method:Function, returnable?:any){
+      this.$nextTick( ()=>
+      {
         const els:any[] = []
         for(let i = 1; i<this.daysForwardConfigurable+1; i++)
         {
           const el = document.getElementById(`vuelcalendar_day-${i}`)! as HTMLDivElement
           els.push({id:el.id, beforeHeight:el.style.height})
         }
+
         method()
+
         this.$nextTick(()=>
         {
-          els.forEach((el:any, index:number)=>{
+          els.forEach( (el:any, index:number)=>
+          {
             const elAfter = document.getElementById(el.id)! as HTMLDivElement
             const elLabelAfter = document.getElementById(`day_label-${index+1}`)! as HTMLDivElement
             elAfter.style.height = el.beforeHeight
@@ -656,8 +682,21 @@ export default defineComponent({
           })
         })
       })
-
+      return returnable;
     },
+    getEventKey(id:number|string):string{
+      let randomId = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const charactersLength = characters.length;
+      const array = new Uint32Array(8);
+      crypto.getRandomValues(array);
+
+      for (let i = 0; i < 10; i++) {
+        randomId += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+
+      return id + '-' + randomId;
+    }
     /* */
   }
 }) 

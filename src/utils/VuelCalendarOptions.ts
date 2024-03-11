@@ -1,35 +1,35 @@
+import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
+import {VuelCalendarDay} from "./types/VuelCalendarDay.ts";
+
+
 class VuelCalendarOptions{
-  onVuelCalendarApiReady:Function = (params:any) => {
-    console.log(params)
-  }
-  onEventClicked:Function = (params:any)=>{
-    console.log(params)
-  };
-  onDayClicked:Function = (params:any)=>{
-    console.log(params)
-  };
-  api?:VuelCalendarApi;
-  setNewStartDate?:Function;
-  setEvents?:Function;
-  addEvents?:Function;
-  removeEventsByParam?:Function;
-  configureEventsByParam?:Function;
-  onVuelCalendarReadyResolve!:Function;
-  setStartHour!:Function;
+  readonly onVuelCalendarApiReady!: (api:VuelCalendarApi) => VuelCalendarApi;
+  readonly onEventClicked!: (event:VuelCalendarEvent) => VuelCalendarEvent;
+  readonly onDayClicked!: (day:VuelCalendarDay) => VuelCalendarDay;
+  readonly api!:VuelCalendarApi;
+  readonly setNewStartDate!: (date:Date)=> Date;
+  readonly setEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
+  readonly addEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
+  readonly removeEventsByParam!:(param:string, value:any) => Array<VuelCalendarEvent>;
+  readonly configureEventsByParam!:
+      (param:string, value:any, params:VuelCalendarEvent) => Array<VuelCalendarEvent>;
+
+  readonly onVuelCalendarReadyResolve!:Function;
+  readonly setStartHour!:(hour:number)=>void;
   startDate?:Date = new Date()
   daysForward = 7;
-  events?:Array<any> = [];
+  events?:Array<VuelCalendarEvent> = [];
   theme?:string = 'dark';
   height?:number = 600;
   lockResize?:boolean = false;
   startHour?:number = 0;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
-              componentSetNewStartDate:Function,
-              componentSetEvents:Function,
-              componentAddEvents:Function,
-              componentRemoveEventsByParam:Function,
-              componentConfigureEventsByParam:Function,
-              componentSetStartHour:Function){
+              componentSetNewStartDate:       (date:Date)=> Date ,
+              componentSetEvents:             (events:Array<VuelCalendarEvent>)=> Array<VuelCalendarEvent>,
+              componentAddEvents:             (events:Array<VuelCalendarEvent>) => Array<VuelCalendarEvent>,
+              componentRemoveEventsByParam:   (param:string, value:any)=> Array<VuelCalendarEvent>,
+              componentConfigureEventsByParam:(param:string, value:any, params:VuelCalendarEvent) => Array<VuelCalendarEvent>,
+              componentSetStartHour:          (hour:number)=> void){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
     this.addEvents = componentAddEvents;
@@ -50,7 +50,8 @@ class VuelCalendarOptions{
     }
     if(vuelCalendarOptions.startDate)
     {
-      if(!(vuelCalendarOptions.startDate instanceof Date)){
+      if(!(vuelCalendarOptions.startDate instanceof Date))
+      {
         console.error('Provided startDate must be a type of Date')
         return;
       }
@@ -59,10 +60,12 @@ class VuelCalendarOptions{
     
     if(vuelCalendarOptions.daysForward)
     {
-      if(!( typeof  vuelCalendarOptions.daysForward === 'number')){
+      if(!( typeof  vuelCalendarOptions.daysForward === 'number'))
+      {
           console.error('Provided daysForward must be a type of number')
       }
-      if(vuelCalendarOptions.daysForward < 1){
+      if(vuelCalendarOptions.daysForward < 1)
+      {
         console.error('daysForward must be greater than 0')
         this.daysForward = 1;
       }
@@ -79,7 +82,7 @@ class VuelCalendarOptions{
     
     if(vuelCalendarOptions.onEventClicked)
     {
-      this.onEventClicked = (event:any)=>
+      this.onEventClicked = (event:VuelCalendarEvent)=>
       {
         return vuelCalendarOptions.onEventClicked(event);
       }
@@ -87,18 +90,12 @@ class VuelCalendarOptions{
 
     if(vuelCalendarOptions.onDayClicked)
     {
-      this.onDayClicked = (event:any)=>
+      this.onDayClicked = (day:VuelCalendarDay)=>
       {
-        return vuelCalendarOptions.onDayClicked(event);
+        return vuelCalendarOptions.onDayClicked(day);
       }
     }
-        
-    // if(vuelCalendarOptions.events)
-    // {
-    //   this.events = [];
-    // }else{
-    //   this.events = []
-    // }
+
     this.events =[]
 
     this.api = new VuelCalendarApi(
@@ -109,10 +106,8 @@ class VuelCalendarOptions{
       this.configureEventsByParam,
       this.setStartHour
     );
-    
-    // this.onVuelCalendarApiReady(this.api)
+
     this.onVuelCalendarReadyResolve = () =>{
-      console.log('pawain resolvd')
       this.onVuelCalendarApiReady(this.api)
     }
   }
@@ -124,36 +119,19 @@ class VuelCalendarApi{
   removeEventsByParam!:Function;
   configureEventsByParam!:Function;
   setStartHour!:Function;
-  constructor(setDate:Function, setEvents:Function, addEvents:Function, removeEventsByParam:Function, configureEventsByParam:Function, setStartHour:Function){
+  constructor(setDate:Function,
+              setEvents:Function,
+              addEvents:Function,
+              removeEventsByParam:Function,
+              configureEventsByParam:Function,
+              setStartHour:Function)
+  {
     this.setDate = setDate
     this.setEvents = setEvents
     this.addEvents = addEvents
     this.removeEventsByParam = removeEventsByParam;
     this.configureEventsByParam = configureEventsByParam;
     this.setStartHour = setStartHour
-  }
-  setNewStartDate = (date:any) =>{
-    if(typeof date === 'string'){
-      this.setDate(new Date(date))
-    }
-    else if(date instanceof Date){
-      this.setDate(date)
-    }
-    else {
-      console.warn('Provided date type has not been proper')
-    }
-  }
-  setNewEvents = (events:Array<any>)=>{
-    this.setEvents([...events]);
-    console.log(events, 'events changed');
-  }
-  addNewEvents = (events:Array<any>) =>{
-    this.addEvents([...events]);
-    console.log(events, 'events has been included')
-  }
-  removeEventsByParamLog = (param:string, value:any) =>{
-    this.removeEventsByParam(param,value)
-    console.log('events removed by param', param, value)
   }
 }
 

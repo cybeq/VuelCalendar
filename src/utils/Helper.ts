@@ -26,11 +26,11 @@ export class Helper{
     const totalMinutes = Math.max((hours - startHour) * 60 + minutes, 0);
     const totalHours = 24 - startHour;
     const percentage = (totalMinutes / (totalHours * 60)) * 100;
-    console.log(
-        'time to per',
-        percentage
-    );
-    
+    // console.log(
+    //     'time to per',
+    //     percentage
+    // );
+
     return percentage;
 }
 
@@ -74,10 +74,10 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
 
     const percentage = (timeDistance / ((24 - startHour) * 60)) * 100;
 
-    console.log(
-        'distance to per',
-        percentage
-    );
+    // console.log(
+    //     'distance to per',
+    //     percentage
+    // );
 
     return percentage;
 }
