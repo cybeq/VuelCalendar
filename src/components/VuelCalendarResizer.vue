@@ -1,5 +1,5 @@
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, PropType} from "vue";
 
 export default defineComponent({
   props:{
@@ -20,7 +20,7 @@ export default defineComponent({
       required:true,
     },
     daysForwardConfigurable:{
-      type:Number,
+      type:Number as PropType<number>,
       required:true,
     },
     rowHeight:{
@@ -28,7 +28,7 @@ export default defineComponent({
       required:true,
     },
     monthContainer:{
-      type:Object
+      type:Object as PropType <unknown>
     }
   },
   data(){

@@ -1,7 +1,6 @@
 <script lang="ts">
 import {defineComponent, PropType} from 'vue'
 import {Helper} from "../utils/Helper.ts";
-import type {VuelCalendarDay} from "../utils/types/VuelCalendarDay.ts";
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import VuelCalendarResizer from "./VuelCalendarResizer.vue";
 
@@ -14,7 +13,7 @@ export default defineComponent({
       required:true,
     },
     height:{
-      type:Number,
+      type:Number as PropType<number | any>,
       required:true,
     },
     theme:{
@@ -26,7 +25,7 @@ export default defineComponent({
       required:true,
     },
     setDateFromMonthCalendar:{
-      type:Function as PropType<(day:VuelCalendarDay)=>void>,
+      type:Function as PropType<(day:number)=>void>,
       required:true,
     },
     startDateConfigurable:{
@@ -46,7 +45,7 @@ export default defineComponent({
       required:true,
     },
     setViewMode:{
-      type:Function,
+      type:Function as PropType<() => void>,
       required:true,
     }
   },
