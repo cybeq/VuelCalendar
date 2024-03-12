@@ -26,14 +26,17 @@ This is crucial for the correct functioning of the calendar.
 
 ### TS/JS Object
 ```ts
-calendarApi: {} as VuelCalendarApi,
+import VuelCalendar from 'vuelcalendar';
+import type {IVuelCalendarApi, VuelCalendarOptions, VuelCalendarEvent, VuelCalendarDay} from 'vuelcalendar';
+
+calendarApi: {} as IVuelCalendarApi,
 calendarOptions:{
         height:600, /* The initial height of the calendar*/
         theme:'dark', /* 'dark' and 'light' theme available */
         startDate:new Date(), /* Define the first day being displayed on the calendar */
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
-        onVuelCalendarApiReady:(api:VuelCalendarApi)=>{
+        onVuelCalendarApiReady:(api:IVuelCalendarApi)=>{
           this.calendarApi = api;
           api.setEvents( [
             {
@@ -162,6 +165,7 @@ export type Colors = {
     menuBg?:string
 }
 ```
+4. Types included
 # Upcoming features
 
 1. Lazy loading for events within the container.

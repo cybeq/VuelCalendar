@@ -1,12 +1,31 @@
 import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 import {VuelCalendarDay} from "./types/VuelCalendarDay.ts";
 
-
-class VuelCalendarOptions{
-  onVuelCalendarApiReady!: (api:VuelCalendarApi) => VuelCalendarApi;
+interface IVuelCalendarOptions {
+  onVuelCalendarApiReady: (api: IVuelCalendarApi) => IVuelCalendarApi;
+  onEventClicked: (event: VuelCalendarEvent) => VuelCalendarEvent;
+  onDayClicked: (day: VuelCalendarDay) => VuelCalendarDay;
+  api: IVuelCalendarApi;
+  setNewStartDate: (date: Date) => Date;
+  setEvents: (events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  addEvents: (events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  removeEventsByParam: (param: string, value: any) => VuelCalendarEvent[];
+  configureEventsByParam: (param: string, value: any, params: VuelCalendarEvent) => VuelCalendarEvent[];
+  onVuelCalendarReadyResolve: Function;
+  setStartHour: (hour: number) => void;
+  startDate?: Date;
+  daysForward: number;
+  events?: VuelCalendarEvent[];
+  theme?: string;
+  height?: number;
+  lockResize?: boolean;
+  startHour?: number;
+}
+class VuelCalendarOptions implements IVuelCalendarOptions{
+  onVuelCalendarApiReady!: (api:IVuelCalendarApi) => IVuelCalendarApi;
   onEventClicked!: (event:VuelCalendarEvent) => VuelCalendarEvent;
   onDayClicked!: (day:VuelCalendarDay) => VuelCalendarDay;
-  api!:VuelCalendarApi;
+  api!:IVuelCalendarApi;
   setNewStartDate!: (date:Date)=> Date;
   setEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
   addEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
@@ -74,9 +93,9 @@ class VuelCalendarOptions{
     
     if(vuelCalendarOptions.onVuelCalendarApiReady)
     {
-      this.onVuelCalendarApiReady = (api:VuelCalendarApi)=>
+      this.onVuelCalendarApiReady = (api:IVuelCalendarApi)=>
       {
-        return vuelCalendarOptions.onVuelCalendarApiReady(api)
+        return (vuelCalendarOptions.onVuelCalendarApiReady(api) as IVuelCalendarApi)
       }
     }
     
@@ -105,14 +124,22 @@ class VuelCalendarOptions{
       this.removeEventsByParam,
       this.configureEventsByParam,
       this.setStartHour
-    );
+    ) as IVuelCalendarApi;
 
     this.onVuelCalendarReadyResolve = () =>{
-      this.onVuelCalendarApiReady(this.api)
+      this.onVuelCalendarApiReady(this.api as IVuelCalendarApi)
     }
   }
 }
-class VuelCalendarApi{
+interface IVuelCalendarApi {
+  setDate:Function;
+  setEvents:Function;
+  addEvents:Function;
+  removeEventsByParam:Function;
+  configureEventsByParam:Function;
+  setStartHour:Function;
+}
+class VuelCalendarApi implements IVuelCalendarApi{
   setDate!:Function;
   setEvents!:Function;
   addEvents!:Function;
@@ -135,4 +162,4 @@ class VuelCalendarApi{
   }
 }
 
-export {VuelCalendarApi, VuelCalendarOptions}
+export {VuelCalendarApi, VuelCalendarOptions, type IVuelCalendarApi}
