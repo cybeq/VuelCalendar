@@ -33,7 +33,7 @@ calendarOptions:{
         startDate:new Date(), /* Define the first day being displayed on the calendar */
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
-        onCalendarApiReady:(api:VuelCalendarApi)=>{
+        onVuelCalendarApiReady:(api:VuelCalendarApi)=>{
           this.calendarApi = api;
           api.setEvents( [
             {
