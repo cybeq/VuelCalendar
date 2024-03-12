@@ -1,5 +1,6 @@
 
 ![img.png](img.png)
+https://github.com/cybeq/VuelCalendar
 
 **Updated  12.03.2024 | 20:40 | Read about new features at the end of the document -> v.0.1.3**
 
