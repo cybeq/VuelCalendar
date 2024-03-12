@@ -148,12 +148,11 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
       }, 0);
 
   }
-  public addToDate( date: Date, addDayNumber: number) : Date
-  {
-    const newDate = {...date}
-    newDate.setDate(date.getDate() + addDayNumber);
-    return newDate;
-  }
+    public addToDate(date: Date, addDayNumber: number): Date {
+        const newDate = new Date(date);
+        newDate.setDate(date.getDate() + addDayNumber);
+        return newDate;
+    }
   public findFirstMonday( date: Date )
   {
       let currentDate = new Date(date);
