@@ -7,18 +7,20 @@
             border-radius:12px`"
        v-if="viewMode === 'days'"
   >
-    <nav :style="{
-       position:'relative',
-       overflow:'hidden',
-       background:theme.colors.primary,
-       width:'40px',
-       borderTopLeftRadius:'12px',
-       borderBottomLeftRadius:'12px',
-       paddingTop:'50px'
-    }">
+    <nav class="vuelcalendar-left-corner"
+         :style="{
+           position:'relative',
+           overflow:'hidden',
+           background:theme.colors.primary,
+           width:'40px',
+           borderTopLeftRadius:'12px',
+           borderBottomLeftRadius:'12px',
+           paddingTop:'50px'}"
+    >
       <div 
         v-for="day in daysForwardConfigurable"
         :key="day"
+        class="vuelcalendar-day-label-container"
         :id="`day_label-${day}`"
         :style="{
            overflow:'hidden',
@@ -34,7 +36,8 @@
            borderBottom:'solid 3px',
            borderColor:theme.colors.surface }
         ">
-        <div :style="{
+        <div class="week-day-label"
+             :style="{
                   fontWeight:'bold',
                   display:'flex',
                   justifyContent:'center',
@@ -43,32 +46,31 @@
                   writingMode:'sideways-lr',
                   boxSizing:'border-box'}">
 
-          {{ helper.daysEnumerable[pairDateToContainer(startDateConfigurable!, day).getDay()] }}
+          {{ helper.pairDateToContainer(startDateConfigurable!, day, 'getDayEnumerable') }}
 
         </div>
-        <div :style="{
-          display:'flex',
-          justifyContent:'center',
-          alignItems:'center',
-          backgroundColor:helper.isCurrentDay(pairDateToContainer(startDateConfigurable!, day)) ? theme.colors.highlight : theme.colors.menuBg,
-          writingMode:'sideways-lr',
-          maxWidth:'20px'}
+        <div :class="`vuelcalendar-day-label${isCurrentDay(day) ? '-current':''}`"
+             :style="{
+              display:'flex',
+              justifyContent:'center',
+              alignItems:'center',
+              backgroundColor:isCurrentDay(day) ? theme.colors.highlight : theme.colors.menuBg,
+              writingMode:'sideways-lr',
+              maxWidth:'20px'}
         ">
 
-          {{pairDateToContainer(startDateConfigurable!, day).toLocaleDateString() }}
+          {{helper.pairDateToContainer(startDateConfigurable!, day, 'toLocaleDateString') }}
 
         </div>
        </div>
 
-       <div  @mousedown.stop.prevent="onResizerMouseDown($event, true)"
-             :style="{
-                  width:'100%',
-                  height:'3px',
-                  position:'absolute',
-                  bottom:0,
-                  cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}
-        "/>
+       <VuelCalendarResizer
+          :theme="theme"
+          target-on-sidebar
+          :days-forward-configurable="daysForwardConfigurable"
+          :view-mode="viewMode"
+          :row-height="rowHeight" />
+
     </nav>
     <div :style="{
             width:'100%',
@@ -76,7 +78,8 @@
             overflowY:'hidden',
             overflowX:'auto'
     }">
-    <nav id="timeline" 
+    <nav id="timeline"
+        class="vuelcalendar-timeline"
         :style="{
             height:'50px',
             borderBottom:'solid 2px',
@@ -92,6 +95,7 @@
           <div 
             v-for="hour in helper.getHours(startHourConfigurable)" 
             :key="hour"
+            class="hour"
             :style="{
                 borderLeft: 'solid 1px',
                 borderColor:theme.colors.surface,
@@ -117,6 +121,7 @@
 
     >
         <div :id="`vuelcalendar_day-${day}`"
+             class="vuelcalendar-day"
              v-for="day in daysForwardConfigurable"
              :key="day"
              @click="onDayClick($event, day)"
@@ -130,27 +135,18 @@
                boxSizing:'border-box' }"
         >
           <div style="margin-top:15px">
-            <div
-              v-for="event in getEventsToContainer(day)"
-              :key="getEventKey(event.id ?? 0)"
-              @click.stop="vuelCalendarApi.onEventClicked(event)"
-              :style="{
-                height:'20px',
-                marginTop:'1rem',
-                marginLeft:`${getEventMarginLeft(event)}%`,
-                width:`${getEventWidth(event)}%`,
-                backgroundColor:theme.colors.event,
-                color:theme.colors.textPrimary,
-                borderRadius:'5px',
-                zIndex:3,
-                position:'sticky'}"
-            >
 
-              {{event.label}}
+            <VuelCalendarEventContainer
+                :theme="theme"
+                :helper="helper"
+                :events="getEventsToContainer(day)"
+                :on-event-clicked="vuelCalendarApi.onEventClicked"
+                :start-hour-configurable="startHourConfigurable"
+            />
 
-            </div>
           </div>
-            <div 
+            <div
+                class="vuelcalendar-hour-box-container"
                 :style="{
                     position:'absolute',
                     width:'100%',
@@ -161,6 +157,7 @@
                     height:'100%'}"
             >
                 <div v-for="r in 24-startHourConfigurable"
+                     class="vuelcalendar-hour-box"
                      :key="r"
                      :style="{
                        borderLeft:'solid 1px',
@@ -168,20 +165,18 @@
                        height:'100%'}"
                 />
             </div>
-            <div  @mousedown.stop.prevent="onResizerMouseDown"
-                  :style="{
-                  width:'100%',
-                  height:'3px',
-                  position:'absolute',
-                  zIndex:4,
-                  bottom:0,
-                  cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}"
-            />
+
+            <VuelCalendarResizer
+                :theme="theme"
+                :days-forward-configurable="daysForwardConfigurable"
+                :view-mode="viewMode"
+                :row-height="rowHeight" />
+
           </div>
     </main>
   </div>
-  <nav :style="{
+  <nav  class="vuelcalendar-rightbar"
+        :style="{
           overflow:'hidden',
           position:'relative',
           backgroundColor:theme.colors.primary,
@@ -191,146 +186,8 @@
           borderTopRightRadius:'12px',
           borderBottomRightRadius:'12px'}"
   >
-      <div 
-        :style="{
-            overflow:'hidden',
-            color:theme.colors.textPrimary,
-            boxSizing:'border-box',
-            width:'100%',
-            height:'125px',
-            marginTop:'20px',
-            gridGap:'20px',
-            display:'grid',
-            borderBottom:'solid 3px',
-            borderColor:theme.colors.surface } "
-      >
-        <div  @click="setViewMode"  style="display:flex;justify-content: center;align-items: center; cursor:pointer;">
-          <svg xmlns="http://www.w3.org/2000/svg" :fill="theme.colors.textPrimary" width="25" height="25" viewBox="0 0 24 24"><title>calendar-month</title><path d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z" /></svg>
-        </div>
-      </div>
-       <div  @mousedown.stop.prevent="onResizerMouseDown($event, true)"
-             :style="{
-                  width:'100%',
-                  height:'3px',
-                  position:'absolute',
-                  bottom:0,
-                  cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}"
-       />
-    </nav>
-</div>
-
-<!-- month view -->
-
-<section v-show="viewMode === 'month'"
-         :style="{
-            width:'100%',
-            display:'flex',
-            position:'relative'}"
->
-  <div ref="monthContainer"
-       :style="{
-          width:'100%',
-          boxSizing:'border-box',
-          height: height! + 50 +'px',
-          borderTopLeftRadius:'12px',
-          borderBottomLeftRadius:'12px',
-          overflow: 'auto',
-          position:'relative'}"
-  >
-  <div :style="{
-          display: 'grid',
-          boxSizing: 'border-box',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          width: '100%',
-          height: '100%',
-          minWidth: '400px'}"
-  >
-    <div :style="{
-            display: 'grid',
-            gridTemplateColumns:'repeat(7, 1fr)',
-            width:'100%',
-            height:30 +'px',
-            background:theme.colors.primary,
-            borderBottom:'solid 1px',
-            borderColor:theme.colors.surface,
-            position:'absolute',
-            top:0,
-            zIndex:2}"
-    >
-      <div v-for="day in 7"
-           :key="day"
+      <div class="vuelcalendar-rightbar-item"
            :style="{
-              display:'flex',
-              justifyContent:'center',
-              borderLeft:'solid 1px',
-              borderColor:theme.colors.surface,
-              fontSize:'0.8em',
-              fontWeight:'bolder',
-              alignItems:'center',
-              color:theme.colors.textPrimary
-           }"
-      >
-
-        {{helper.daysEnumerableFromMonday[day-1]}}
-
-      </div>
-    </div>
-    <div v-for="day in 35"
-         :key="day"
-         @click="setDateFromMonthCalendar(day)"
-         :style="{
-             background: theme.colors.primary,
-             borderColor: theme.colors.surface,
-             borderLeftWidth: '1px',
-             borderBottomWidth: '1px',
-             display: 'flex',
-             justifyContent: 'center',
-             alignItems: 'center',
-             cursor: 'pointer',
-             position: 'relative'}"
-    >
-      <div :style="{
-              backgroundColor: helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!) > 0 ? theme.colors.event : theme.colors.surface,
-              padding: '5px',
-              fontWeight: 'bold',
-              borderRadius: '12px',
-              color: theme.colors.textPrimary,
-              position: 'relative'
-         }"
-           v-text="helper.countEventsForDay(startDateConfigurable!, day - 1, eventsConfigurable!)"
-      />
-
-      <div :style="{position: 'absolute', bottom: 0, left: 0, fontSize:'0.8em', color:theme.colors.textPrimary}">
-
-        {{helper.dateToMonthAndDay(helper.getDayFromFirstDayByAdd(startDateConfigurable!, day - 1,))}}
-
-      </div>
-
-    </div>
-
-  </div>
-  <div  @mousedown.stop.prevent="onResizerMouseDown"
-        :style="{
-                  width:'100%',
-                  height:'3px',
-                  position:'absolute',
-                  bottom:0,
-                  cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}"
-  />
-</div>
-<nav :style="{
-        overflow:'hidden',
-        position:'relative',
-        backgroundColor:theme.colors.primary,
-        borderLeft:'solid 1px',
-        borderColor: theme.colors.textPrimary+15,
-        width:'40px',
-        borderTopRightRadius:'12px',
-        borderBottomRightRadius:'12px'}"
->
-      <div :style="{
               overflow:'hidden',
               color:theme.colors.textPrimary,
               boxSizing:'border-box',
@@ -342,21 +199,35 @@
               borderBottom:'solid 3px',
               borderColor:theme.colors.surface } "
       >
-        <div  @click="setViewMode"
-              style="display:flex;justify-content: center;align-items: center; cursor:pointer;">
+        <div  @click="setViewMode"  style="display:flex;justify-content: center;align-items: center; cursor:pointer;">
           <svg xmlns="http://www.w3.org/2000/svg" :fill="theme.colors.textPrimary" width="25" height="25" viewBox="0 0 24 24"><title>calendar-month</title><path d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z" /></svg>
         </div>
       </div>
-       <div  @mousedown.stop.prevent="onResizerMouseDown($event, false, true)"
-             :style="{
-                  width:'100%',
-                  height:'3px',
-                  position:'absolute',
-                  bottom:0,
-                  cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}"/>
+
+      <VuelCalendarResizer
+          :theme="theme"
+          target-on-sidebar
+          :days-forward-configurable="daysForwardConfigurable"
+          :view-mode="viewMode"
+          :row-height="rowHeight" />
+
     </nav>
-</section>
+</div>
+
+<!-- month view -->
+
+<VuelCalendarMonthDisplay
+    :set-view-mode="setViewMode"
+    :days-forward-configurable="daysForwardConfigurable"
+    :row-height="rowHeight"
+    :events-configurable="eventsConfigurable"
+    :start-date-configurable="startDateConfigurable"
+    :set-date-from-month-calendar="setDateFromMonthCalendar"
+    :helper="helper"
+    :theme="theme"
+    :height="height"
+    :view-mode="viewMode"/>
+
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRaw} from 'vue';
@@ -364,7 +235,16 @@ import { Helper } from '../utils/Helper';
 import { VuelCalendarOptions } from '../utils/VuelCalendarOptions';
 import type { PropType } from 'vue';
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
+import VuelCalendarEventContainer from "./VuelCalendarEventContainer.vue";
+import VuelCalendarResizer from "./VuelCalendarResizer.vue";
+import VuelCalendarMonthDisplay from "./VuelCalendarMonthDisplay.vue";
+import {Colors} from "../utils/types/Colors.ts";
 export default defineComponent({
+  components:{
+    VuelCalendarResizer,
+    VuelCalendarEventContainer,
+    VuelCalendarMonthDisplay
+  },
   setup(){
     const helper = new Helper();
     return {
@@ -375,30 +255,54 @@ export default defineComponent({
     vuelCalendarOptions:{
       type: Object as PropType<VuelCalendarOptions>,
       required: true,
+    },
+    colors:{
+      type: Object as PropType<Colors>,
     }
   },
   computed:{
     theme(){
       return{
         colors:{
-        surface: this.vuelCalendarApi.theme === 'light' ?
-            '#fff' : (this.vuelCalendarApi.theme === 'dark' ? '#36373a' : '#fff'),
-        primary:this.vuelCalendarApi.theme === 'light' ?
-            '#f1f1f1' : (this.vuelCalendarApi.theme === 'dark' ? '#242528' : '#f1f1f1'),
-        event:this.vuelCalendarApi.theme === 'light' ?
-            '#7469b6' : (this.vuelCalendarApi.theme === 'dark' ? '#039be5' : '#7469b6'),
-        highlight:this.vuelCalendarApi.theme === 'light' ?
-            '#ad88c6' : (this.vuelCalendarApi.theme === 'dark' ? 'red' : '#ad88c6'),
-        textPrimary:this.vuelCalendarApi.theme === 'light' ?
-            '#000000' : (this.vuelCalendarApi.theme === 'dark' ? '#f5f4f5' : '#000000'),
-        menuBg:this.vuelCalendarApi.theme === 'light' ?
-            '#ffe6e6' : (this.vuelCalendarApi.theme === 'dark' ? '#5b5c5c' : '#ffe6e6'),
+        surface: this.colors?.surface
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#fff' : (this.vuelCalendarApi.theme === 'dark' ? '#36373a' : '#fff')),
+
+        primary: this.colors?.primary
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#f1f1f1' : (this.vuelCalendarApi.theme === 'dark' ? '#242528' : '#f1f1f1')),
+
+        event: this.colors?.event
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#7469b6' : (this.vuelCalendarApi.theme === 'dark' ? '#039be5' : '#7469b6')),
+
+        highlight: this.colors?.highlight
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#ad88c6' : (this.vuelCalendarApi.theme === 'dark' ? 'red' : '#ad88c6')),
+
+        textPrimary: this.colors?.textPrimary
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#000000' : (this.vuelCalendarApi.theme === 'dark' ? '#f5f4f5' : '#000000')),
+
+        menuBg: this.colors?.menuBg
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+            '#ffe6e6' : (this.vuelCalendarApi.theme === 'dark' ? '#5b5c5c' : '#ffe6e6')),
         },
+
         lockResize:this.vuelCalendarApi.lockResize
       }
     },
     height(){
       return this.vuelCalendarApi.height! < 200 ? 200 : this.vuelCalendarApi.height
+    },
+    isCurrentDay(){
+      return (day:number)  => this.helper.isCurrentDay(this.startDateConfigurable, day);
     }
   },
   data(){
@@ -463,85 +367,6 @@ export default defineComponent({
           'month' : 'days'
     },
 
-    onResizerMouseDown( event:MouseEvent,
-                        targetOnSidebar:boolean = false,
-                        targetOnMonthSideBar = false )
-    {
-        this.resizer.isResizing = true;
-        let parentEl = (event.target! as HTMLDivElement).parentElement! as HTMLDivElement;
-        if(targetOnSidebar)
-        {
-          parentEl = document.getElementById(`vuelcalendar_day-${this.daysForwardConfigurable}`)! as HTMLDivElement;
-        }
-        if(targetOnMonthSideBar)
-        {
-          parentEl = this.$refs.monthContainer as HTMLDivElement
-        }
-        this.resizer.resizedElBottom = parentEl.getBoundingClientRect().bottom;
-        this.resizer.resizedEl = parentEl;
-        document.addEventListener(
-            'mousemove',
-            this.onResizerMouseMove
-        )
-        document.addEventListener(
-            'mouseup',
-            this.onResizerMouseUp
-        )
-    },
-
-    onResizerMouseUp()
-    {
-        this.resizer.isResizing      = false;
-        this.resizer.resizedElBottom = null;
-        this.resizer.resizedEl       = null;
-        document.removeEventListener(
-            'mousemove',
-            this.onResizerMouseMove
-        )
-        document.removeEventListener(
-            'mouseup',
-            this.onResizerMouseUp
-        )
-    },
-    onResizerMouseMove( event: MouseEvent )
-    {
-      if (!this.resizer.isResizing)
-      {
-        return;
-      }
-      const el = (this.resizer.resizedEl! as HTMLDivElement);
-      const dayNumber = el.id.split('-')[1];
-      const dayLabelElement = document.getElementById(`day_label-${dayNumber}`);
-      const deltaY = event.clientY;
-      const newHeight = (deltaY - el.getBoundingClientRect().top)
-
-      if(this.viewMode === 'month' && newHeight < this.rowHeight*this.daysForwardConfigurable)
-      {
-        el.style.height = this.rowHeight*this.daysForwardConfigurable + 30 +'px'
-        return;
-      }
-
-      if(newHeight < this.rowHeight)
-      {
-        el.style.height = this.rowHeight + 'px';
-        if(dayLabelElement && !this.theme.lockResize)
-        {
-          dayLabelElement!.style.height = this.rowHeight +'px'
-        }
-        return;
-      }
-      el.style.height = newHeight + 'px';
-      if(dayLabelElement && !this.theme.lockResize)
-      {
-        dayLabelElement!.style.height = newHeight +'px'
-      }
-    },
-    pairDateToContainer( startDate: Date, day: number)
-    {
-      const newDate = new Date(startDate);
-      newDate.setDate(newDate.getDate() + day - 1);
-      return newDate;
-    },
     setNewStartDate(date:Date):Date
     {
       this.preventResize(()=>this.startDateConfigurable = date);
@@ -627,23 +452,6 @@ export default defineComponent({
       // );
       return divEvents;
     },
-
-    getEventMarginLeft( event: VuelCalendarEvent )
-    {
-      return this.helper.convertTimeToPercentage(
-          this.helper.getTimeFromDate(event.start),
-          this.startHourConfigurable
-      )
-    },
-
-    getEventWidth( event: VuelCalendarEvent )
-    {
-      return this.helper.convertTimeDistanceToPercentage(
-          this.helper.getTimeFromDate(event.start),
-          this.helper.getTimeFromDate(event.end),
-          this.startHourConfigurable
-      )
-    },
     setDateFromMonthCalendar( dayToAdd: number )
     {
 
@@ -666,7 +474,10 @@ export default defineComponent({
         for(let i = 1; i<this.daysForwardConfigurable+1; i++)
         {
           const el = document.getElementById(`vuelcalendar_day-${i}`)! as HTMLDivElement
-          els.push({id:el.id, beforeHeight:el.style.height})
+          if(el)
+          {
+            els.push({id:el.id, beforeHeight:el.style.height})
+          }
         }
 
         method()
@@ -677,26 +488,19 @@ export default defineComponent({
           {
             const elAfter = document.getElementById(el.id)! as HTMLDivElement
             const elLabelAfter = document.getElementById(`day_label-${index+1}`)! as HTMLDivElement
-            elAfter.style.height = el.beforeHeight
-            elLabelAfter.style.height = el.beforeHeight
+            if(elAfter)
+            {
+              elAfter.style.height = el.beforeHeight
+            }
+            if(elLabelAfter)
+            {
+              elLabelAfter.style.height = el.beforeHeight
+            }
           })
         })
       })
       return returnable;
     },
-    getEventKey(id:number|string):string{
-      let randomId = '';
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      const charactersLength = characters.length;
-      const array = new Uint32Array(8);
-      crypto.getRandomValues(array);
-
-      for (let i = 0; i < 10; i++) {
-        randomId += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-
-      return id + '-' + randomId;
-    }
     /* */
   }
 }) 

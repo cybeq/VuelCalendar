@@ -1,17 +1,19 @@
 
+![img.png](img.png)
+
+**Updated  12.03.2024 | 20:40 | Read about new features at the end of the document -> v.0.1.3**
 
 ## How to Use
-
 ### Vue
 ````html
 <section class="w-[800px]">
-   <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
+   <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" :colors="colors" ></VuelCalendar>
 </section>
 /* These settings will cause the calendar to extend the document downward when expanding the timeline downwards. */
 ````
 ````html
 <section class="w-[800px] max-h[600px] overflow-auto">
-   <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" ></VuelCalendar>
+   <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" :colors="colors"></VuelCalendar>
 </section>
 /* 
 If you enforce height through styling, you must also set overflow!!.
@@ -105,21 +107,21 @@ calendarApi.addEvents(events);
 ### Remove events by param
 
 ```ts 
-calendarApi.removeEventsByParamLog(param, value);
+calendarApi.removeEventsByParam(param, value);
 ```
 - param: Type of **String**
 - value: Type of **any**
 
 **This function is responsible for removing the selected event. For example, by sending the parameter string 'id' with the value 5, we will remove the event with id === 5**
 ````js
-calendarApi.removeEventsByParamLog('id', 5);
+calendarApi.removeEventsByParam('id', 5);
 /* event with id 5 has been removed */
 ````
 ---------------------------
 ### Edit events by param
 
 ```ts 
-calendarApicalendarApi.configureEventsByParam(param, value, object);
+calendarApi.configureEventsByParam(param, value, object);
 ```
 - param: Type of **String**
 - value: Type of **any**
@@ -140,3 +142,30 @@ calendarApi.configureEventsByParam(
 /* params has been changed to event id === 5 */
 ````
 
+------------------
+
+
+# Features and updates
+### 12.03.2024 | 20:40
+1. Performance improvements were achieved by decomposing into multiple components and relieving the DOM tree through standardizing functions and incorporating them into computed properties.
+
+2. ***Classes*** for DOM elements to make theme more customizable has been added
+
+3. Added the Colors prop, which defines colors for theme styles as parent entities.
+```ts
+export type Colors = {
+    surface?:string;
+    primary?:string
+    event?:string
+    highlight?:string
+    textPrimary?:string
+    menuBg?:string
+}
+```
+# Upcoming features
+
+1. Lazy loading for events within the container.
+
+2. Calendar rotation for choosing between two modes: Horizontal (current) and Vertical.
+
+3. More performance improvement

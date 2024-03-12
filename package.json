@@ -1,14 +1,30 @@
 {
   "name": "vuelcalendar",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "0.1.01",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
+  "files": [
+    "dist"
+  ],
+  "rules": {
+    "no-unused-vars": "off"
+  },
+  "main": "./dist/vuel-calendar.cjs",
+  "module": "./dist/vuel-calendar.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vuel-calendar.js",
+      "require": "./dist/vuel-calendar.cjs"
+    }
+  },
   "dependencies": {
+    "vite-plugin-dts": "^3.7.3",
     "vue": "^3.3.8"
   },
   "devDependencies": {

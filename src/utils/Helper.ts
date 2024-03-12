@@ -5,7 +5,8 @@ export class Helper{
   public monthsEnumerable: string[] = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
-    ];
+  ];
+
   public getTimeFromDate( date: Date ) : string
   {
     const hours = date.getHours()
@@ -91,15 +92,31 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
     return this.hours.slice(startHourConfigurable);
   }
 
-  public isCurrentDay(startDate:Date)
+  public isCurrentDay(startDateConfigurable?:Date,  day?:number)
   {
     const today = new Date();
 
-    return startDate.getDate() === today.getDate() &&
-           startDate.getMonth() === today.getMonth() &&
-           startDate.getFullYear() === today.getFullYear();
-  }
+    const startDate = this.pairDateToContainer(startDateConfigurable!, day!)
 
+    return (startDate! as Date).getDate() === today.getDate() &&
+           (startDate! as Date).getMonth() === today.getMonth() &&
+           (startDate! as Date).getFullYear() === today.getFullYear();
+  }
+  public pairDateToContainer( startDate: Date, day: number, convert?:string): Date | string | number
+  {
+        const newDate = new Date(startDate);
+        newDate.setDate(newDate.getDate() + day - 1);
+        switch(convert){
+            case 'toLocaleDateString':
+                return newDate.toLocaleDateString();
+            case 'getDay':
+                return newDate.getDay();
+            case 'getDayEnumerable':
+                return this.daysEnumerable[newDate.getDay()];
+            default:
+                return newDate;
+        }
+  }
   public firstDayOfMonthByDate( data: Date ) : Date
   {
     return new Date(data.getFullYear(), data.getMonth(), 1);
@@ -114,17 +131,22 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
   }
   public countEventsForDay( date: Date, addDayNumber: number, events: Array<any>) : number
   {
-    return events.filter( event =>
-    {
-      const startWithoutTime = new Date(event.start);
-      startWithoutTime.setHours(0, 0, 0, 0); 
-      const endWithoutTime = new Date(event.end);
-      endWithoutTime.setHours(0, 0, 0, 0); 
-      const todayWithoutTime = new Date(this.getDayFromFirstDayByAdd(date, addDayNumber));
-      todayWithoutTime.setHours(0, 0, 0, 0); 
-      return startWithoutTime.getTime() === todayWithoutTime.getTime() || endWithoutTime.getTime() === todayWithoutTime.getTime();
-    })
-        .length;
+      const targetDate = new Date(this.getDayFromFirstDayByAdd(date, addDayNumber));
+      targetDate.setHours(0, 0, 0, 0);
+
+      return events.reduce((accumulator, event) => {
+          const startWithoutTime = new Date(event.start);
+          startWithoutTime.setHours(0, 0, 0, 0);
+          const endWithoutTime = new Date(event.end);
+          endWithoutTime.setHours(0, 0, 0, 0);
+
+          if (startWithoutTime.getTime() === targetDate.getTime() || endWithoutTime.getTime() === targetDate.getTime()) {
+              return accumulator + 1;
+          } else {
+              return accumulator;
+          }
+      }, 0);
+
   }
   public addToDate( date: Date, addDayNumber: number) : Date
   {
@@ -155,6 +177,9 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
       const day: number = date.getDate();
       const formattedDay: string = ("0" + day).slice(-2);
       return `${this.monthsEnumerable[monthIndex]} ${formattedDay}`;
+  }
+  public dateToMonthAndDayContainer(startDate:Date, day:number){
+      return this.dateToMonthAndDay(this.getDayFromFirstDayByAdd(startDate, day))
   }
 
   public setTimeToDate(date:Date, time:string){

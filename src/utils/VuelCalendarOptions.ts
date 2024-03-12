@@ -3,19 +3,19 @@ import {VuelCalendarDay} from "./types/VuelCalendarDay.ts";
 
 
 class VuelCalendarOptions{
-  readonly onVuelCalendarApiReady!: (api:VuelCalendarApi) => VuelCalendarApi;
-  readonly onEventClicked!: (event:VuelCalendarEvent) => VuelCalendarEvent;
-  readonly onDayClicked!: (day:VuelCalendarDay) => VuelCalendarDay;
-  readonly api!:VuelCalendarApi;
-  readonly setNewStartDate!: (date:Date)=> Date;
-  readonly setEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
-  readonly addEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
-  readonly removeEventsByParam!:(param:string, value:any) => Array<VuelCalendarEvent>;
-  readonly configureEventsByParam!:
+  onVuelCalendarApiReady!: (api:VuelCalendarApi) => VuelCalendarApi;
+  onEventClicked!: (event:VuelCalendarEvent) => VuelCalendarEvent;
+  onDayClicked!: (day:VuelCalendarDay) => VuelCalendarDay;
+  api!:VuelCalendarApi;
+  setNewStartDate!: (date:Date)=> Date;
+  setEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
+  addEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
+  removeEventsByParam!:(param:string, value:any) => Array<VuelCalendarEvent>;
+  configureEventsByParam!:
       (param:string, value:any, params:VuelCalendarEvent) => Array<VuelCalendarEvent>;
 
-  readonly onVuelCalendarReadyResolve!:Function;
-  readonly setStartHour!:(hour:number)=>void;
+  onVuelCalendarReadyResolve!:Function;
+  setStartHour!:(hour:number)=>void;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<VuelCalendarEvent> = [];
