@@ -43,7 +43,9 @@
                   justifyContent:'center',
                   alignItems:'center',
                   maxWidth:'20px',
-                  writingMode:'sideways-lr',
+                  'writing-mode': 'vertical-lr',
+                  'unicode-bidi': 'plaintext',
+                  'text-orientation': 'mixed',
                   boxSizing:'border-box'}">
 
           {{ helper.pairDateToContainer(startDateConfigurable!, day, 'getDayEnumerable') }}
@@ -55,7 +57,9 @@
               justifyContent:'center',
               alignItems:'center',
               backgroundColor:isCurrentDay(day) ? theme.colors.highlight : theme.colors.menuBg,
-              writingMode:'sideways-lr',
+              'writing-mode': 'vertical-lr',
+              'unicode-bidi': 'plaintext',
+              'text-orientation': 'mixed',
               maxWidth:'20px'}
         ">
 
