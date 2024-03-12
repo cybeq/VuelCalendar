@@ -371,9 +371,12 @@ export default defineComponent({
           'month' : 'days'
     },
 
-    setNewStartDate(date:Date):Date
+    setNewStartDate(date:Date | string):Date
     {
-      this.preventResize(()=>this.startDateConfigurable = date);
+      if(typeof date ===  "string" ){
+        date = new Date(date);
+      }
+      this.preventResize(()=>this.startDateConfigurable = date as Date);
       return new Date(date);
     },
     setEvents(events:[]):Array<VuelCalendarEvent>
