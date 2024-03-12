@@ -25,18 +25,52 @@ This is crucial for the correct functioning of the calendar.
 ````
 
 ### TS/JS Object
+#### COMPOSITION API
+```ts
+const calendarApi = ref<IVuelCalendarApi | undefined>(undefined);
+
+const vuelCalendarOptions = ref<IVuelCalendarOptions>({
+    height:600, /* The initial height of the calendar*/
+    theme:'dark', /* 'dark' and 'light' theme available */
+    startDate:new Date(), /* Define the first day being displayed on the calendar */
+    daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
+    startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
+    onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
+        calendarApi.value = api;
+        api.setEvents([
+            {
+                id: 1,
+                label: 'Event #1',
+                data: {},
+                start: new Date(new Date().setHours(8, 0)),
+                end: new Date(new Date().setHours(23, 0)),
+            },
+        ]); /* after API is ready you can set new Events to the calendar */
+    },
+    onDayClicked:(day:VuelCalendarDay)=>
+    {
+        /* The function returns the day that was clicked, along with the time and date on the timeline, as well as the events that belong to this day.*/
+    },
+    onEventClicked:(event:VuelCalendarEvent)=>
+    {
+        /* The function returns the event that was clicked, along with the time and date of start and end, as well as the data:any that belong to this event.*/
+    },
+});
+```
+
+#### OPTIONS API
 ```ts
 import VuelCalendar from 'vuelcalendar';
 import type {IVuelCalendarApi, VuelCalendarOptions, VuelCalendarEvent, VuelCalendarDay} from 'vuelcalendar';
 
-calendarApi: {} as IVuelCalendarApi,
+calendarApi: {} as any, /* options api fix for this type will be available in the futue, now its recommended to use it as any */
 calendarOptions:{
         height:600, /* The initial height of the calendar*/
         theme:'dark', /* 'dark' and 'light' theme available */
         startDate:new Date(), /* Define the first day being displayed on the calendar */
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
-        onVuelCalendarApiReady:(api:IVuelCalendarApi)=>{
+        onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
           api.setEvents( [
             {
@@ -64,7 +98,7 @@ calendarOptions:{
 -------------------------
 
 ```ts 
-calendarApi.setDate(date);
+calendarApi!.setDate(date);
 ```
 - date: Type of **Date**
 
@@ -77,7 +111,7 @@ calendarApi.setDate(date);
 -------------------------
 
 ```ts 
-calendarApi.setStartHour(hour);
+calendarApi!.setStartHour(hour);
 ```
 - hour: Type of **Number** [min:0, max: 23]
 
