@@ -5,6 +5,13 @@ https://github.com/cybeq/VuelCalendar
 **Updated  13.03.2024 | 16:00 | Read about new features at the end of the document -> v.0.1.4**
 
 ## How to Use
+
+:point_down:
+```js
+npm install vuecalendar
+```
+:point_up_2:
+
 ### Vue
 ````html
 <section class="w-[800px]">
