@@ -4,5 +4,6 @@ export type Colors = {
     event?:string
     highlight?:string
     textPrimary?:string
-    menuBg?:string
+    menuBg?:string,
+    dragging?:string
 }

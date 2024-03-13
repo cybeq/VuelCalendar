@@ -2,6 +2,7 @@
 import {defineComponent, PropType} from "vue";
 import type {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import type {Helper} from "../utils/Helper.ts";
+import {onDragEnd, onDragStart} from "../utils/dragHandlers.ts";
 
 export default defineComponent({
   props:{
@@ -28,6 +29,14 @@ export default defineComponent({
     renderer:{
       type:String as PropType<string | undefined>,
       default:undefined
+    },
+    clone:{
+      type:Function,
+      required:true
+    },
+    draggableEvents:{
+      type:Boolean,
+      default:false
     }
   },
   methods:{
@@ -45,6 +54,7 @@ export default defineComponent({
 
       return id + '-' + randomId;
     },
+
     getEventMarginLeft( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeToPercentage(
@@ -61,6 +71,9 @@ export default defineComponent({
           this.startHourConfigurable
       )
     },
+
+    onDragStart,
+    onDragEnd,
   }
 
 })
@@ -83,19 +96,23 @@ export default defineComponent({
       color:theme.colors.textPrimary,
       borderRadius:'5px',
       zIndex:3,
+      transition:'opacity 0.2s ease',
       position:'sticky'}"
   >
-    <div v-if="!renderer"> {{event.label}}</div>
-    <div v-if="renderer"
-         style="width:100%;height:100%"
+    <div :draggable="draggableEvents" style="user-select: none;"
+         @dragstart.stop="onDragStart($event, event, clone)"
+         @dragend="onDragEnd($event, clone)"
     >
-      <component
-          :is="renderer"
-          :event="event"/>
+      <div v-if="!renderer"> {{event.label}}</div>
+      <div v-if="renderer"
+           style="width:100%;height:100%"
+      >
+        <component
+            :is="renderer"
+            :event="event"/>
 
+      </div>
     </div>
-
-
   </div>
 </template>
 

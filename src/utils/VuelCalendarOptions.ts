@@ -1,9 +1,11 @@
 import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 import {VuelCalendarDay} from "./types/VuelCalendarDay.ts";
+import {VuelCalendarDrop} from "./types/VuelCalendarDrop.ts";
 
 interface IVuelCalendarOptions {
   onVuelCalendarApiReady?: (api: IVuelCalendarApi) => void;
   onEventClicked?: (event: VuelCalendarEvent) => void;
+  onEventDropped?:(day:VuelCalendarDrop) => void;
   onDayClicked?: (day: VuelCalendarDay) => void;
   api?: IVuelCalendarApi;
   setNewStartDate?: (date: Date) => Date;
@@ -18,6 +20,7 @@ interface IVuelCalendarOptions {
   events?: VuelCalendarEvent[];
   theme?: string;
   height?: number;
+  draggableEvents?:boolean;
   lockResize?: boolean;
   startHour?: number;
   renderer?:string;
@@ -26,6 +29,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   onVuelCalendarApiReady!: (api:IVuelCalendarApi) => void;
   onEventClicked!: (event:VuelCalendarEvent) => void;
   onDayClicked!: (day:VuelCalendarDay) => void;
+  onEventDropped!:(day:VuelCalendarDrop) => void;
   api!:IVuelCalendarApi;
   setNewStartDate!: (date:Date)=> Date;
   setEvents!: (events:Array<VuelCalendarEvent>)  => Array<VuelCalendarEvent> ;
@@ -41,6 +45,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   events?:Array<VuelCalendarEvent> = [];
   theme?:string = 'dark';
   height?:number = 600;
+  draggableEvents?:boolean = false;
   lockResize?:boolean = false;
   startHour?:number = 0;
   renderer?:string;
@@ -59,6 +64,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     this.setStartHour = componentSetStartHour;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
+    }
+    if(vuelCalendarOptions.draggableEvents){
+      this.draggableEvents = vuelCalendarOptions.draggableEvents
     }
     if(vuelCalendarOptions.renderer){
       this.renderer = vuelCalendarOptions.renderer
@@ -109,6 +117,13 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
       this.onEventClicked = (event:VuelCalendarEvent)=>
       {
          vuelCalendarOptions.onEventClicked(event);
+      }
+    }
+    if(vuelCalendarOptions.onEventDropped)
+    {
+      this.onEventDropped = (dropped:VuelCalendarDrop)=>
+      {
+        vuelCalendarOptions.onEventDropped(dropped);
       }
     }
 

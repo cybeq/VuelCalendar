@@ -1,9 +1,8 @@
 @font-face {
-  font-family: 'Mulish';
-  src: url('/fonts/Mulish-VariableFont.ttf') format('truetype');
+  font-family: MulishVuel;
+  src:url(../public/fonts/Mulish-VariableFont.ttf);
+
 }
-
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.vuelcalendar-c1-container, .vuelcalendar-c1-container *{
+  font-family: 'MulishVuel', sans-serif;
+}

@@ -6,6 +6,6 @@ import type {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import type {VuelCalendarOptions} from "../utils/VuelCalendarOptions.ts";
 import type {Colors} from "../utils/types/Colors.ts";
 import type {IVuelCalendarOptions} from "../utils/VuelCalendarOptions.ts";
-
+import '../index.css';
 export type {IVuelCalendarApi,IVuelCalendarOptions, VuelCalendarDay, VuelCalendarEvent, VuelCalendarOptions, Colors}
 export default VuelCalendar

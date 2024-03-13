@@ -1,5 +1,6 @@
 <template>
-  <div :style="`
+  <div class="vuelcalendar-c1-container"
+       :style="`
             display:flex;
             position:relative;
             width:100%;
@@ -17,7 +18,7 @@
            borderBottomLeftRadius:'12px',
            paddingTop:'50px'}"
     >
-      <div 
+      <div
         v-for="day in daysForwardConfigurable"
         :key="day"
         class="vuelcalendar-day-label-container"
@@ -33,7 +34,7 @@
            background:theme.colors.primary,
            width:'100%',
            height:rowHeight +'px',
-           borderBottom:'solid 3px',
+           borderTop:'solid 3px',
            borderColor:theme.colors.surface }
         ">
         <div class="week-day-label"
@@ -96,8 +97,8 @@
             display:'grid',
             gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`}
     ">
-          <div 
-            v-for="hour in helper.getHours(startHourConfigurable)" 
+          <div
+            v-for="hour in helper.getHours(startHourConfigurable)"
             :key="hour"
             class="hour"
             :style="{
@@ -111,7 +112,7 @@
             <span> {{ hour }} </span> <span :style="{fontSize:'0.8em',marginTop:'-3px'}"> 00 </span>
 
           </div>
-    </nav> 
+    </nav>
 
     <main ref="container"
           :style="{
@@ -129,6 +130,10 @@
              v-for="day in daysForwardConfigurable"
              :key="day"
              @click="onDayClick($event, day)"
+             @dragover.prevent.stop="onDragOver($event, dragClone,bgBackup,theme.colors.dragging, `vuelcalendar_day-${day}`)"
+             @dragleave.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
+             @dragend.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
+             @drop.prevent.stop="onDrop($event, day, bgBackup,`vuelcalendar_day-${day}`)"
              :style="{
                height:`${rowHeight}px`,
                backgroundColor:theme.colors.primary,
@@ -144,6 +149,8 @@
                 :theme="theme"
                 :helper="helper"
                 :renderer="vuelCalendarOptions.renderer"
+                :clone="clone"
+                :draggable-events="vuelCalendarOptions.draggableEvents"
                 :events="getEventsToContainer(day)"
                 :on-event-clicked="vuelCalendarApi.onEventClicked"
                 :start-hour-configurable="startHourConfigurable"
@@ -244,6 +251,7 @@ import VuelCalendarEventContainer from "./VuelCalendarEventContainer.vue";
 import VuelCalendarResizer from "./VuelCalendarResizer.vue";
 import VuelCalendarMonthDisplay from "./VuelCalendarMonthDisplay.vue";
 import {Colors} from "../utils/types/Colors.ts";
+import {getClickAndDropData, onDragLeave, onDragOver} from "../utils/dragHandlers.ts";
 export default defineComponent({
   components:{
     VuelCalendarResizer,
@@ -298,6 +306,11 @@ export default defineComponent({
             ??
             (this.vuelCalendarApi.theme === 'light' ?
             '#ffe6e6' : (this.vuelCalendarApi.theme === 'dark' ? '#5b5c5c' : '#ffe6e6')),
+
+        dragging: this.colors?.dragging
+            ??
+            (this.vuelCalendarApi.theme === 'light' ?
+                '#fff4e6' : (this.vuelCalendarApi.theme === 'dark' ? '#3d3e51' : '#fff4e6')),
         },
 
         lockResize:this.vuelCalendarApi.lockResize
@@ -332,7 +345,12 @@ export default defineComponent({
       eventsConfigurable:      [] as VuelCalendarEvent[],
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
       startHourConfigurable:   this.vuelCalendarOptions.startHour ?? 0,
-      viewMode:                'days'
+      viewMode:                'days',
+
+      dragClone:undefined as HTMLDivElement | undefined,
+      dragEvent:undefined as VuelCalendarEvent | undefined,
+      bodyOverflowState:undefined as undefined | string,
+      bgBackup:undefined as string |undefined,
     }
   },
   created()
@@ -342,28 +360,29 @@ export default defineComponent({
       const containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
       this.rowHeight = (containerHeight / (this.daysForwardConfigurable));
       this.vuelCalendarApi.onVuelCalendarReadyResolve();
+      this.bgBackup = (document.querySelector('.vuelcalendar-day')as HTMLDivElement)!.style .backgroundColor;
     })
   },
   methods:{
+    clone(method:string, el?:HTMLDivElement, event?:VuelCalendarEvent){switch(method){case "append":this.dragClone = el;this.dragEvent = event;this.bodyOverflowState = document.body.style.overflow;document.body.style.overflow="hidden";document.body.appendChild(this.dragClone!);break;case "remove":document.body.style.overflow = this.bodyOverflowState!;this.bodyOverflowState = undefined;document.body.removeChild(this.dragClone!);this.dragClone = undefined;this.dragEvent = undefined;break;}},
+    onDragOver,
+    onDragLeave,
+    onDrop(event:DragEvent, day:number, bgBackup:string | undefined, id:string){
+      const container = document.getElementById(id);
+      if(container && bgBackup){
+        container.style.backgroundColor=bgBackup
+      }
+      const { clickedDay, clickedTime, daysEvents }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
+      this.vuelCalendarApi.onEventDropped(
+          {clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents, event:this.dragEvent }
+      )
+    },
     onDayClick(event:MouseEvent, day:number)
     {
-      const el = (event.currentTarget! as HTMLElement);
-      const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
-      const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
-      const clickedDay = this.helper.addToDate(this.startDateConfigurable!, day-1)
-      const clickedTime =    this.helper.convertPercentageToTime(percentClicked, this.startHourConfigurable);
-      const daysEvents  = this.getEventsToContainer(day)
+      const { clickedDay, clickedTime, daysEvents }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
       this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
-      // console.log(
-      //     'click',
-      //     event.target,
-      //     el.offsetWidth,
-      //     clickedWidthFromLeft,
-      //     percentClicked,
-      //     clickedDay,
-      //     clickedTime,
-      //     daysEvents
-      // );
     },
 
     setViewMode()
@@ -380,6 +399,7 @@ export default defineComponent({
       this.preventResize(()=>this.startDateConfigurable = date as Date);
       return new Date(date);
     },
+
     setEvents(events:[]):Array<VuelCalendarEvent>
     {
       setTimeout(()=>{
@@ -390,6 +410,7 @@ export default defineComponent({
       })
       return events;
     },
+
     addEvents(events:[]):Array<VuelCalendarEvent>
     {
       setTimeout(()=>{
@@ -403,6 +424,7 @@ export default defineComponent({
       })
       return events;
     },
+
     removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>{
@@ -417,6 +439,7 @@ export default defineComponent({
         // });
       }, []) as Array<VuelCalendarEvent>
     },
+
     configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>
@@ -432,9 +455,11 @@ export default defineComponent({
         })
       }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
     },
+
     setStartHour(hour:number){
       this.startHourConfigurable = hour;
     },
+
     getEventsToContainer(day:number)
     {
       const newDate = new Date(this.startDateConfigurable!);
@@ -460,6 +485,7 @@ export default defineComponent({
       // );
       return divEvents;
     },
+
     setDateFromMonthCalendar( dayToAdd: number )
     {
 
@@ -475,6 +501,7 @@ export default defineComponent({
       //     date
       // );
     },
+
     preventResize(method:Function, returnable?:any){
       this.$nextTick( ()=>
       {
@@ -511,8 +538,5 @@ export default defineComponent({
     },
     /* */
   }
-}) 
+})
 </script>
-<style>
-
-</style>

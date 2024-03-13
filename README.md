@@ -6,7 +6,7 @@ https://www.npmjs.com/package/vuelcalendar
 https://github.com/cybeq/VuelCalendar
 
 
-**Updated  13.03.2024 | 16:00 | Read about new features at the end of the document -> v.0.1.4**
+**Updated  13.03.2024 | 21:15 | Read about new features at the end of the document -> v.0.2**
 ## About
 VuelCalendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
 
@@ -63,7 +63,8 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     startDate:new Date(), /* Define the first day being displayed on the calendar */
     daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
     startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
-    renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
+    renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/,
+    draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
     onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
         calendarApi.value = api;
         api.setEvents([
@@ -84,6 +85,11 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     {
         /* The function returns the event that was clicked, along with the time and date of start and end, as well as the data:any that belong to this event.*/
     },
+    onEventDropped:(event:VuelCalendarDrop)=>
+    {
+        /* property draggableEvents must be set to true in VuelCalendarOptions */
+        /* The function returns the drop object(VuelCalendarEvent&VuelCalendarDay&MousEvent) that was being dragged, along with the time and date on timeline.*/
+    },
 });
 ```
 
@@ -100,6 +106,7 @@ calendarOptions:{
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
         renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
+        draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
           api.setEvents( [
@@ -119,6 +126,11 @@ calendarOptions:{
         onEventClicked:(event:VuelCalendarEvent)=>
         {
            /* The function returns the event that was clicked, along with the time and date of start and end, as well as the data:any that belong to this event.*/
+        },
+        onEventDropped:(event:VuelCalendarDrop)=>
+        {
+            /* property draggableEvents must be set to true in VuelCalendarOptions */
+            /* The function returns the drop object(VuelCalendarEvent&VuelCalendarDay&MousEvent) that was being dragged, along with the time and date on timeline.*/
         },
 ```
 # API functions
@@ -213,7 +225,22 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
-
+### 13.03.2024 | 21:15
+1. Drag & Drop Functionality 
+- Example usage:
+```js
+vuelCalendarOptions: {
+...
+draggableEvents:true
+}
+```
+```js
+onEventDropped:(event:VuelCalendarDrop)=>
+{
+    /* property draggableEvents must be set to true in VuelCalendarOptions */
+    /* The function returns the drop object(VuelCalendarEvent&VuelCalendarDay&MousEvent) that was being dragged, along with the time and date on timeline.*/
+}
+```
 ### 13.03.2024 | 16:00
 1. A parameter 'Renderer' has been added to the VuelCalendarOptions object.
 - This is a component that allows using a custom component inside an event container.
@@ -265,7 +292,8 @@ export type Colors = {
     event?:string
     highlight?:string
     textPrimary?:string
-    menuBg?:string
+    menuBg?:string,
+    dragging?:string,
 }
 ```
 4. Types included
@@ -277,4 +305,5 @@ export type Colors = {
 
 3. More performance improvement
 
-4. Drag & Drop
+4. ~~Drag & Drop~~ <- 13.03.2024
+5. Time bar following the mouse
