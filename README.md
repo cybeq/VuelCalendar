@@ -7,6 +7,22 @@ https://github.com/cybeq/VuelCalendar
 
 
 **Updated  13.03.2024 | 16:00 | Read about new features at the end of the document -> v.0.1.4**
+## About
+VuelCalendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
+
+This calendar tool serves as a robust platform for organizing events and managing time efficiently. Users can seamlessly navigate through dates, allocate events with precision, and customize the display to suit their specific needs. Whether it's for personal scheduling, project management, or team coordination, VuelCalendar provides a user-friendly interface coupled with powerful functionalities.
+
+Key features of VuelCalendar include:
+
+- Event Management: Users can effortlessly add, edit, move, and delete events directly on the timeline, streamlining the process of organizing schedules.
+
+- Customizable Timeline: The timeline display can be configured to accommodate different date ranges, time intervals, and styles, ensuring flexibility in visualizing schedules.
+
+- Date Range Selection: Users can specify date ranges to focus on specific periods, making it easier to manage schedules within desired timeframes.
+
+- Configurable Event Properties: Users can define various properties for events, such as title, description, duration, and color coding, for enhanced organization and clarity.
+
+- Integration Capabilities: VuelCalendar can be integrated with other applications and platforms, allowing for seamless data exchange and collaboration.
 
 ## How to Use
 
@@ -260,3 +276,5 @@ export type Colors = {
 2. Calendar rotation for choosing between two modes: Horizontal (current) and Vertical.
 
 3. More performance improvement
+
+4. Drag & Drop
