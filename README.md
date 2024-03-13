@@ -8,7 +8,7 @@ https://github.com/cybeq/VuelCalendar
 
 :point_down:
 ```js
-npm install vuecalendar
+npm install vuelcalendar
 ```
 :point_up_2:
 
