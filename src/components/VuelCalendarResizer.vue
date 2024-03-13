@@ -126,6 +126,7 @@ export default defineComponent({
                   height:'3px',
                   position:'absolute',
                   bottom:0,
+                  zIndex:5,
                   cursor:'ns-resize',
                   backgroundColor: theme.colors.surface}
         "/>

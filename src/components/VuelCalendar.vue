@@ -143,6 +143,7 @@
             <VuelCalendarEventContainer
                 :theme="theme"
                 :helper="helper"
+                :renderer="vuelCalendarOptions.renderer"
                 :events="getEventsToContainer(day)"
                 :on-event-clicked="vuelCalendarApi.onEventClicked"
                 :start-hour-configurable="startHourConfigurable"
@@ -286,7 +287,7 @@ export default defineComponent({
         highlight: this.colors?.highlight
             ??
             (this.vuelCalendarApi.theme === 'light' ?
-            '#ad88c6' : (this.vuelCalendarApi.theme === 'dark' ? 'red' : '#ad88c6')),
+            '#ad88c6' : (this.vuelCalendarApi.theme === 'dark' ? '#438789' : '#ad88c6')),
 
         textPrimary: this.colors?.textPrimary
             ??

@@ -1,7 +1,7 @@
 {
   "name": "vuelcalendar",
   "private": false,
-  "version": "0.1.36",
+  "version": "0.1.4",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -17,7 +17,10 @@
     "scheduling",
     "planning",
     "v-calendar",
-    "vue-calendar"
+    "vue-calendar",
+    "eventer",
+    "managing events",
+    "timeline"
   ],
   "files": [
     "dist"

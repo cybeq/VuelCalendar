@@ -24,6 +24,10 @@ export default defineComponent({
     theme:{
       type:Object as any,
       required:true,
+    },
+    renderer:{
+      type:String as PropType<string | undefined>,
+      default:undefined
     }
   },
   methods:{
@@ -69,17 +73,28 @@ export default defineComponent({
     :key="getEventKey(event.id ?? 0)"
     @click.stop="onEventClicked(event)"
     :style="{
-      height:'20px',
+      height: renderer ?'unset':'20px',
+      minHeight:'20px',
       marginTop:'1rem',
       marginLeft:`${getEventMarginLeft(event)}%`,
       width:`${getEventWidth(event)}%`,
+      maxWidth:`${getEventWidth(event)}%`,
       backgroundColor:theme.colors.event,
       color:theme.colors.textPrimary,
       borderRadius:'5px',
       zIndex:3,
       position:'sticky'}"
   >
-                  {{event.label}}
+    <div v-if="!renderer"> {{event.label}}</div>
+    <div v-if="renderer"
+         style="width:100%;height:100%"
+    >
+      <component
+          :is="renderer"
+          :event="event"/>
+
+    </div>
+
 
   </div>
 </template>

@@ -2,7 +2,7 @@
 ![img.png](img.png)
 https://github.com/cybeq/VuelCalendar
 
-**Updated  12.03.2024 | 20:40 | Read about new features at the end of the document -> v.0.1.3**
+**Updated  13.03.2024 | 16:00 | Read about new features at the end of the document -> v.0.1.4**
 
 ## How to Use
 ### Vue
@@ -71,6 +71,7 @@ calendarOptions:{
         startDate:new Date(), /* Define the first day being displayed on the calendar */
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
+        renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
           api.setEvents( [
@@ -184,6 +185,45 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+
+### 13.03.2024 | 16:00
+1. A parameter 'Renderer' has been added to the VuelCalendarOptions object.
+- This is a component that allows using a custom component inside an event container.
+- Example usage:
+```js
+/* main.ts */
+app.component('ExampleRenderer', ExampleRenderer)
+```
+```js
+vuelCalendarOptions: {
+...
+renderer:'ExampleRenderer'
+}
+```
+```js
+/* ExampleRenderer.vue */
+export default defineComponent({
+  name:"ExampleRenderer",
+  props:{
+    event:{
+      type:Object as PropType<VuelCalendarEvent>,
+    } /* this the full Event<VuelCalendarEvent> object passed to your rendering component */
+  }
+})
+</script>
+
+<template>
+<div :style="`min-height:50px; background:${event.data.color}; display:flex; padding-inline:3px; align-items:center`">
+ <div>
+   <img :src="event.data.img" style="width:25px; border-radius:30px; margin-right:20px;"/>
+ </div> 
+ <p>
+   {{event.label}}
+ </p>
+</div>
+</template>
+
+```
 ### 12.03.2024 | 20:40
 1. Performance improvements were achieved by decomposing into multiple components and relieving the DOM tree through standardizing functions and incorporating them into computed properties.
 

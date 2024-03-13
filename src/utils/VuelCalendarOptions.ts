@@ -20,6 +20,7 @@ interface IVuelCalendarOptions {
   height?: number;
   lockResize?: boolean;
   startHour?: number;
+  renderer?:string;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
   onVuelCalendarApiReady!: (api:IVuelCalendarApi) => void;
@@ -42,6 +43,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   height?:number = 600;
   lockResize?:boolean = false;
   startHour?:number = 0;
+  renderer?:string;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
               componentSetNewStartDate:       (date:Date)=> Date ,
               componentSetEvents:             (events:Array<VuelCalendarEvent>)=> Array<VuelCalendarEvent>,
@@ -57,6 +59,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     this.setStartHour = componentSetStartHour;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
+    }
+    if(vuelCalendarOptions.renderer){
+      this.renderer = vuelCalendarOptions.renderer
     }
     if(vuelCalendarOptions.startHour){
       this.startHour = vuelCalendarOptions.startHour
