@@ -1,6 +1,10 @@
 
 ![img.png](img.png)
+
+https://www.npmjs.com/package/vuelcalendar
+
 https://github.com/cybeq/VuelCalendar
+
 
 **Updated  13.03.2024 | 16:00 | Read about new features at the end of the document -> v.0.1.4**
 
