@@ -1,14 +1,5 @@
-
-![img.png](img.png)
-
-https://www.npmjs.com/package/vuelcalendar
-
-https://github.com/cybeq/VuelCalendar
-
-
-**Updated  13.03.2024 | 21:15 | Read about new features at the end of the document -> v.0.2**
-## About
-VuelCalendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
+## VuelCalendar
+This Vue Calendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
 
 This calendar tool serves as a robust platform for organizing events and managing time efficiently. Users can seamlessly navigate through dates, allocate events with precision, and customize the display to suit their specific needs. Whether it's for personal scheduling, project management, or team coordination, VuelCalendar provides a user-friendly interface coupled with powerful functionalities.
 
@@ -23,6 +14,16 @@ Key features of VuelCalendar include:
 - Configurable Event Properties: Users can define various properties for events, such as title, description, duration, and color coding, for enhanced organization and clarity.
 
 - Integration Capabilities: VuelCalendar can be integrated with other applications and platforms, allowing for seamless data exchange and collaboration.
+
+
+![img.png](img.png)
+
+https://www.npmjs.com/package/vuelcalendar
+
+https://github.com/cybeq/VuelCalendar
+
+
+**Updated  13.03.2024 | 21:15 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
