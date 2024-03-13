@@ -43,6 +43,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     startDate:new Date(), /* Define the first day being displayed on the calendar */
     daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
     startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
+    renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
     onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
         calendarApi.value = api;
         api.setEvents([
