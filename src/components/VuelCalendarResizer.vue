@@ -123,12 +123,12 @@ export default defineComponent({
         class="vuelcalendar-resizer"
         :style="{
                   width:'100%',
-                  height:'3px',
+                  height: targetOnSidebar ? '6px' : '3px',
                   position:'absolute',
                   bottom:0,
                   zIndex:5,
                   cursor:'ns-resize',
-                  backgroundColor: theme.colors.surface}
+                  backgroundColor: targetOnSidebar ? 'transparent' : theme.colors.surface}
         "/>
 </template>
 

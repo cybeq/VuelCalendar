@@ -71,7 +71,13 @@ export default defineComponent({
               boxSizing:'border-box',
               height: height! + 50 +'px',
               borderTopLeftRadius:'12px',
+              borderTopRightRadius:'12px',
               borderBottomLeftRadius:'12px',
+              borderBottomRightRadius:'12px',
+              borderTop:'solid 2px',
+              borderRight:'solid 2px',
+              borderLeft:'solid 2px',
+              borderColor:theme.colors.surface,
               overflow: 'auto',
               position:'relative'}"
       >
@@ -88,7 +94,7 @@ export default defineComponent({
                 display: 'grid',
                 gridTemplateColumns:'repeat(7, 1fr)',
                 width:'100%',
-                height:30 +'px',
+                height:50 +'px',
                 background:theme.colors.primary,
                 borderBottom:'solid 1px',
                 borderColor:theme.colors.surface,
@@ -121,9 +127,9 @@ export default defineComponent({
              @click="setDateFromMonthCalendar(day)"
              :style="{
                  background: theme.colors.primary,
-                 borderColor: theme.colors.surface,
-                 borderLeftWidth: '1px',
-                 borderBottomWidth: '1px',
+                 borderLeft: 'solid 1px',
+                 borderBottom: 'solid 1px',
+                 borderColor:theme.colors.surface,
                  display: 'flex',
                  justifyContent: 'center',
                  alignItems: 'center',
@@ -142,7 +148,7 @@ export default defineComponent({
                v-text="countEventsForDay(day - 1)"
           />
 
-          <div class="vuelcalendar-month-datelabel" :style="{position: 'absolute', bottom: 0, left: 0, fontSize:'0.8em', color:theme.colors.textPrimary}">
+          <div class="vuelcalendar-month-datelabel" :style="{position: 'absolute', bottom: '5px', left: '5px', fontSize:'0.8em', color:theme.colors.textPrimary}">
 
             {{helper.dateToMonthAndDayContainer(startDateConfigurable!, day - 1,)}}
 
@@ -159,41 +165,7 @@ export default defineComponent({
           :row-height="rowHeight" />
 
       </div>
-      <nav :style="{
-            overflow:'hidden',
-            position:'relative',
-            backgroundColor:theme.colors.primary,
-            borderLeft:'solid 1px',
-            borderColor: theme.colors.textPrimary+15,
-            width:'40px',
-            borderTopRightRadius:'12px',
-            borderBottomRightRadius:'12px'}"
-      >
-          <div :style="{
-                  overflow:'hidden',
-                  color:theme.colors.textPrimary,
-                  boxSizing:'border-box',
-                  width:'100%',
-                  height:'125px',
-                  marginTop:'20px',
-                  gridGap:'20px',
-                  display:'grid',
-                  borderBottom:'solid 3px',
-                  borderColor:theme.colors.surface } "
-          >
-            <div  @click="setViewMode"
-                  style="display:flex;justify-content: center;align-items: center; cursor:pointer;">
-              <svg xmlns="http://www.w3.org/2000/svg" :fill="theme.colors.textPrimary" width="25" height="25" viewBox="0 0 24 24"><title>calendar-month</title><path d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z" /></svg>
-            </div>
-          </div>
-          <VuelCalendarResizer
-              :theme="theme"
-              target-on-month-sidebar
-              :month-container="$refs.monthContainer"
-              :days-forward-configurable="daysForwardConfigurable"
-              :view-mode="viewMode"
-              :row-height="rowHeight" />
-        </nav>
+
   </section>
 </template>
 

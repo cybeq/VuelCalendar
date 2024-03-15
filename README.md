@@ -23,7 +23,7 @@ https://www.npmjs.com/package/vuelcalendar
 https://github.com/cybeq/VuelCalendar
 
 
-**Updated  13.03.2024 | 21:15 | Read about new features at the end of the document -> v.0.2**
+**Updated  15.03.2024 | 19:42 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
@@ -162,6 +162,18 @@ calendarApi!.setStartHour(hour);
 
 
 ---------------------------
+### Switch view mode ( days <=> month )
+
+-------------------------
+
+```ts 
+calendarApi.switchViewMode();
+```
+
+**This function is responsible for switching the calendar view mode from daily to monthly and vice versa.**
+
+
+---------------------------
 
 ### Set new events
 
@@ -226,6 +238,10 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+### 15.03.2024 | 19:45
+- Tiny borders style modification + calendarApi.setViewMode() method included, ugly bar removed.
+
+
 ### 13.03.2024 | 21:15
 1. Drag & Drop Functionality 
 - Example usage:

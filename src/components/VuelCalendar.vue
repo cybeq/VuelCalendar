@@ -4,6 +4,8 @@
             display:flex;
             position:relative;
             width:100%;
+            border-top-right-radius:'12px',
+            borderBottomRightRadius:'12px',
             height:${height! + 50} +'px';
             border-radius:12px`"
        v-if="viewMode === 'days'"
@@ -16,8 +18,12 @@
            width:'40px',
            borderTopLeftRadius:'12px',
            borderBottomLeftRadius:'12px',
-           paddingTop:'50px'}"
+           borderTop:'solid 2px',
+           borderLeft:'solid 2px',
+           borderColor:theme.colors.surface,
+           }"
     >
+      <div :style="{height:'50px',minHeight: '50px', maxHeight: '50px',borderBottom:'solid 2px',borderColor:theme.colors.surface }"/>
       <div
         v-for="day in daysForwardConfigurable"
         :key="day"
@@ -34,7 +40,8 @@
            background:theme.colors.primary,
            width:'100%',
            height:rowHeight +'px',
-           borderTop:'solid 3px',
+           borderBottom:'solid 3px',
+
            borderColor:theme.colors.surface }
         ">
         <div class="week-day-label"
@@ -81,7 +88,11 @@
             width:'100%',
             height:'100%',
             overflowY:'hidden',
-            overflowX:'auto'
+            overflowX:'auto',
+            borderTopRightRadius:'12px',
+            borderBottomRightRadius:'12px',
+            borderRight:'solid 2px',
+            borderColor:theme.colors.surface,
     }">
     <nav id="timeline"
         class="vuelcalendar-timeline"
@@ -89,6 +100,7 @@
             height:'50px',
             borderBottom:'solid 2px',
             borderTop:'solid 2px',
+            borderTopRightRadius:'12px',
             width:'100%',
             overflow:'hidden',
             minWidth:'1200px',
@@ -119,6 +131,7 @@
               minHeight: height + 'px',
               maxHeight:theme.lockResize ? height +'px' : 'unset',
               width:'100%',
+              borderBottomRightRadius:'12px',
               height:'100%',
               boxSizing:'border-box',
               minWidth:'1200px',
@@ -187,43 +200,17 @@
           </div>
     </main>
   </div>
-  <nav  class="vuelcalendar-rightbar"
+    <VuelCalendarResizer
         :style="{
-          overflow:'hidden',
-          position:'relative',
-          backgroundColor:theme.colors.primary,
-          borderLeft:'solid 1px',
-          borderColor: theme.colors.textPrimary+15,
-          width:'40px',
-          borderTopRightRadius:'12px',
-          borderBottomRightRadius:'12px'}"
-  >
-      <div class="vuelcalendar-rightbar-item"
-           :style="{
-              overflow:'hidden',
-              color:theme.colors.textPrimary,
-              boxSizing:'border-box',
-              width:'100%',
-              height:'125px',
-              marginTop:'20px',
-              gridGap:'20px',
-              display:'grid',
-              borderBottom:'solid 3px',
-              borderColor:theme.colors.surface } "
-      >
-        <div  @click="setViewMode"  style="display:flex;justify-content: center;align-items: center; cursor:pointer;">
-          <svg xmlns="http://www.w3.org/2000/svg" :fill="theme.colors.textPrimary" width="25" height="25" viewBox="0 0 24 24"><title>calendar-month</title><path d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z" /></svg>
-        </div>
-      </div>
+           borderBottomLeftRadius:'12px',
+           borderBottomRightRadius:'12px',
 
-      <VuelCalendarResizer
-          :theme="theme"
-          target-on-sidebar
-          :days-forward-configurable="daysForwardConfigurable"
-          :view-mode="viewMode"
-          :row-height="rowHeight" />
-
-    </nav>
+        }"
+        :theme="theme"
+        target-on-sidebar
+        :days-forward-configurable="daysForwardConfigurable"
+        :view-mode="viewMode"
+        :row-height="rowHeight" />
 </div>
 
 <!-- month view -->
@@ -333,7 +320,8 @@ export default defineComponent({
         this.removeEventsByParam    as (param:string, value:any)         => Array<VuelCalendarEvent>,
         this.configureEventsByParam as (param:string, value:any, params:VuelCalendarEvent)
                                                                          => Array<VuelCalendarEvent>,
-        this.setStartHour           as (hour:number)                     => void
+        this.setStartHour           as (hour:number)                     => void,
+        this.setViewMode            as ()                                => void,
       ),
       rowHeight: 0,
       resizer: {
