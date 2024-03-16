@@ -12,7 +12,7 @@ const onDragStart = (e:DragEvent, event:VuelCalendarEvent, cloneFunction:Functio
     const clone = ((e.target as HTMLElement).parentElement as HTMLElement).cloneNode(true) as HTMLDivElement;
     clone.style.opacity='1'
     clone.style.zIndex='6'
-    clone.style.position = 'absolute';
+    clone.style.position="fixed";
     cloneFunction('append',clone, event);
 };
 const onDragEnd = (e:DragEvent, cloneFunction:Function) =>{
@@ -30,8 +30,10 @@ const onDragOver = (event:DragEvent, dragClone:HTMLDivElement | undefined,  bgBa
     if(dragClone) {
         const x = event.clientX;
         const y = event.clientY;
-        dragClone!.style.left = x + 'px';
-        dragClone!.style.top = y + 'px';
+        dragClone!.style.left = '0';
+        dragClone!.style.top = '0';
+        dragClone!.style.marginLeft = x + 'px';
+        dragClone!.style.marginTop = y + 'px';
     }
 }
 

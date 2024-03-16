@@ -41,7 +41,7 @@ export default defineComponent({
     draggableEvents:{
       type:Boolean,
       default:false
-    }
+    },
   },
   methods:{
     getEventKey(id:number|string):string
@@ -71,8 +71,8 @@ export default defineComponent({
     getEventWidth( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeDistanceToPercentage(
-          this.helper.getTimeFromDate(event.start!),
-          this.helper.getTimeFromDate(event.end!),
+          event.start,
+          event.end,
           this.startHourConfigurable,
           this.endHourConfigurable
       )

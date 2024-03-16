@@ -379,8 +379,25 @@ export default defineComponent({
       }
       const { clickedDay, clickedTime, daysEvents }
           = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.endHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
+      const droppedDate = this.helper.setTimeToDate(clickedDay,clickedTime);
+
+
+      const previousEnd = new Date(this.dragEvent!.end);
+      const previousStart = new Date(this.dragEvent!.start);
+      const newStart = new Date(droppedDate);
+      let newEnd = new Date(previousEnd);
+
+      const timeDifferenceMilliseconds = newStart.getTime() - previousStart.getTime();
+      const daysDifference = Math.round(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24));
+
+      const hourDifference = newStart.getHours() - previousStart.getHours();
+      const minutesDifference = newStart.getMinutes() - previousStart.getMinutes();
+
+      newEnd = this.helper.addToDate(new Date(new Date(newEnd.setHours(previousEnd.getHours() + hourDifference))
+          .setMinutes(previousEnd.getMinutes()+minutesDifference)), daysDifference)
+
       this.vuelCalendarApi.onEventDropped(
-          {clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents, event:this.dragEvent }
+          {clickEvent:event, date:droppedDate, time:clickedTime, events:daysEvents, event:this.dragEvent!, endDateCorrection:newEnd }
       )
     },
     onDayClick(event:MouseEvent, day:number)

@@ -16,14 +16,8 @@ Key features of VuelCalendar include:
 - Integration Capabilities: VuelCalendar can be integrated with other applications and platforms, allowing for seamless data exchange and collaboration.
 
 
-![img.png](img.png)
 
-https://www.npmjs.com/package/vuelcalendar
-
-https://github.com/cybeq/VuelCalendar
-
-
-**Updated  16.03.2024 | 11:30 | Read about new features at the end of the document -> v.0.2**
+**Updated  16.03.2024 | 19:10 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
@@ -278,7 +272,9 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
-
+### 16.03.2024 | 19:10
+1. Corrected functionality of drag & drop. parameter 'endDateCorrection' has been included to VuelCalendarDrop object passed to onEventDrop() function.
+-  The 'endDateCorrection' parameter is responsible for providing the end time after the shift. When your event is being moved, for example, 2.5 hours forward or backward, this parameter gives you the end date of the event after the shift, in order to provide you with the correct duration of the item in case you want to use it in onDrop to utilize configureEventsByParam and change the start and end as if you were moving it along the timeline.
 ### 16.03.2024 | 11:30
 1. Added a new function to the API: setTimeRange -> from now on, you can set the time range on the timeline (from 00 to 24).
 ````js

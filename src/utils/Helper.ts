@@ -42,8 +42,16 @@ public convertPercentageToTime( percentage: number, startHour: number = 0, endHo
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: string, startHour: number = 0, endHour:number = 24 ) : number
+public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: number = 0, endHour:number = 24 ) : number
 {
+    const startDateWithoutTime = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDateWithoutTime = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+    if (endDateWithoutTime.getTime() > startDateWithoutTime.getTime()) {
+        return 100;
+    }
+    const startTimeString = this.getTimeFromDate(start)
+    const endTimeString = this.getTimeFromDate(end)
     let [startHours, startMinutes] = startTimeString.split(':')
         .map(Number);
     const [endHours, endMinutes] = endTimeString.split(':')
