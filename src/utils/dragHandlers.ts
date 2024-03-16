@@ -35,12 +35,12 @@ const onDragOver = (event:DragEvent, dragClone:HTMLDivElement | undefined,  bgBa
     }
 }
 
-const getClickAndDropData = (event:MouseEvent|DragEvent, day:number, helper:Helper, startHourConfigurable:number, startDateConfigurable:Date, getEventsToContainer:Function) =>{
+const getClickAndDropData = (event:MouseEvent|DragEvent, day:number, helper:Helper, startHourConfigurable:number, endHourConfigurable:number=24, startDateConfigurable:Date, getEventsToContainer:Function) =>{
     const el = (event.currentTarget! as HTMLElement);
     const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
     const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
     const clickedDay = helper.addToDate(startDateConfigurable!, day-1)
-    const clickedTime =    helper.convertPercentageToTime(percentClicked, startHourConfigurable);
+    const clickedTime =    helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
     const daysEvents  = getEventsToContainer(day)
     return {el,clickedWidthFromLeft, percentClicked, clickedDay, clickedTime, daysEvents}
 }

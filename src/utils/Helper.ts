@@ -20,31 +20,29 @@ export class Helper{
     return `${hours}:${minutes}`;
   }
 
-  public convertTimeToPercentage( timeString: string, startHour: number = 0 ) : number
+  public convertTimeToPercentage( timeString: string, startHour: number = 0, endHour:number = 24 ) : number
   {
     const [hours, minutes] = timeString.split(':')
         .map(Number);
     const totalMinutes = Math.max((hours - startHour) * 60 + minutes, 0);
-    const totalHours = 24 - startHour;
-    const percentage = (totalMinutes / (totalHours * 60)) * 100;
+    const totalHours = endHour - startHour;
+    return (totalMinutes / (totalHours * 60)) * 100;
     // console.log(
     //     'time to per',
     //     percentage
     // );
-
-    return percentage;
 }
 
-public convertPercentageToTime( percentage: number, startHour: number = 0 ) : string
+public convertPercentageToTime( percentage: number, startHour: number = 0, endHour:number = 0 ) : string
 {
-    const totalMinutes = percentage * (24 - startHour) * 60 / 100;
+    const totalMinutes = percentage * (endHour - startHour) * 60 / 100;
     const hours = Math.floor(totalMinutes / 60) + startHour;
     const minutes = Math.floor(totalMinutes % 60);
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: string, startHour: number = 0 ) : number
+public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: string, startHour: number = 0, endHour:number = 24 ) : number
 {
     let [startHours, startMinutes] = startTimeString.split(':')
         .map(Number);
@@ -60,36 +58,36 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
     let endTotalMinutes = (endHours - startHour) * 60 + endMinutes;
 
     if (startTotalMinutes < 0) {
-        startTotalMinutes += (24 - startHour) * 60;
+        startTotalMinutes += (endHour - startHour) * 60;
     }
 
     if (endTotalMinutes < 0) {
-        endTotalMinutes += (24 - startHour) * 60;
+        endTotalMinutes += (endHour - startHour) * 60;
     }
 
     let timeDistance = endTotalMinutes - startTotalMinutes;
 
     if (timeDistance < 0) {
-        timeDistance += (24 - startHour) * 60;
+        timeDistance += (endHour - startHour) * 60;
     }
 
-    const percentage = (timeDistance / ((24 - startHour) * 60)) * 100;
+    return (timeDistance / ((endHour - startHour) * 60)) * 100;
 
     // console.log(
     //     'distance to per',
     //     percentage
     // );
 
-    return percentage;
+
 }
 
   public hours = Array.from(
       {length: 24}, (_, i) => `${i.toString().padStart(2, '0')}`
   )
 
-  public getHours( startHourConfigurable: number = 0 )
+  public getHours( startHourConfigurable: number = 0, endHourConfigurable:number = 24 )
   {
-    return this.hours.slice(startHourConfigurable);
+    return this.hours.slice(startHourConfigurable, endHourConfigurable);
   }
 
   public isCurrentDay(startDateConfigurable?:Date,  day?:number)
@@ -160,7 +158,6 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
             return 1;
         }
         if (endDate < startDate) {
-            console.log('pazdzierz')
             return 1;
         }
 

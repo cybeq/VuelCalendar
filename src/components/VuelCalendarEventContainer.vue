@@ -22,6 +22,10 @@ export default defineComponent({
       type:Number,
       required:true,
     },
+    endHourConfigurable:{
+      type:Number,
+      required:true,
+    },
     theme:{
       type:Object as any,
       required:true,
@@ -58,17 +62,19 @@ export default defineComponent({
     getEventMarginLeft( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeToPercentage(
-          this.helper.getTimeFromDate(event.start),
-          this.startHourConfigurable
+          this.helper.getTimeFromDate(event.start!),
+          this.startHourConfigurable,
+          this.endHourConfigurable
       )
     },
 
     getEventWidth( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeDistanceToPercentage(
-          this.helper.getTimeFromDate(event.start),
-          this.helper.getTimeFromDate(event.end),
-          this.startHourConfigurable
+          this.helper.getTimeFromDate(event.start!),
+          this.helper.getTimeFromDate(event.end!),
+          this.startHourConfigurable,
+          this.endHourConfigurable
       )
     },
 
@@ -94,6 +100,7 @@ export default defineComponent({
       maxWidth:`${getEventWidth(event)}%`,
       backgroundColor:theme.colors.event,
       color:theme.colors.textPrimary,
+      overflow:'hidden',
       borderRadius:'5px',
       zIndex:3,
       transition:'opacity 0.2s ease',

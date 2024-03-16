@@ -23,7 +23,7 @@ https://www.npmjs.com/package/vuelcalendar
 https://github.com/cybeq/VuelCalendar
 
 
-**Updated  15.03.2024 | 19:42 | Read about new features at the end of the document -> v.0.2**
+**Updated  16.03.2024 | 11:30 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
@@ -106,6 +106,7 @@ calendarOptions:{
         startDate:new Date(), /* Define the first day being displayed on the calendar */
         daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
         startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
+        endHour:24, /* Minimum 1, Max 24, Must be greater than startHour */
         renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
         draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
         onVuelCalendarApiReady:(api:any)=>{
@@ -159,6 +160,19 @@ calendarApi!.setStartHour(hour);
 - hour: Type of **Number** [min:0, max: 23]
 
 **This function is responsible for changing the startHour to a new hour. If you change this hour, your timeline will set the initial hour to this hour.**
+
+
+---------------------------
+### Change timeline end hour
+
+-------------------------
+
+```ts 
+calendarApi!.setEndHour(hour);
+```
+- hour: Type of **Number** [min:0, max: 24]
+
+**This function is responsible for changing the endHour to a new hour. If you change this hour, your timeline will set the end hour of timeline to this hour.**
 
 
 ---------------------------
@@ -264,6 +278,20 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+
+### 16.03.2024 | 11:30
+1. Added a new function to the API: setTimeRange -> from now on, you can set the time range on the timeline (from 00 to 24).
+````js
+calendarApi.setTimeRange(6, 13) /* startHour has been set to 6:00 and endHour to 13:00 */
+````
+2. Added a new function to the API: setDateRange -> from now on, you can set the date range on the timeline (e.g., from 15.04.2022 to 20.04.2022).
+````js
+calendarApi.setDateRange(new Date(2024-12-03), new Date(2024-12-19))
+````
+3. Added a new function to the API: setEndHour -> from now on, you can set the end hour (e.g., set the end hour to 23:00).
+````js
+calendarApi.setEndHour(14) /* timeline will end on 14:00 */
+````
 ### 15.03.2024 | 19:45
 - Tiny borders style modification + calendarApi.setViewMode() method included, ugly bar removed.
 

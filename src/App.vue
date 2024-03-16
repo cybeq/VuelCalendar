@@ -11,11 +11,16 @@
   <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
   <button @click="configureEventsByParam">Configure Events By param</button>
   <button @click="setStartHour(num)">Set start hour</button>
+  <button @click="calendarApi?.setEndHour(num)">Set end hour</button>
   <button @click="calendarApi?.setDaysForward(num)">Set days forward</button>
   <br/><br/>
   <input type="date" v-model="dateRangeStart"/>
   <input type="date" v-model="dateRangeEnd"/>
   <button @click="calendarApi?.setDateRange(dateRangeStart, dateRangeEnd)">Set date range</button>
+  <br/>
+  <input type="number" v-model="timeStart" />
+  <input type="number" v-model="timeEnd" />
+  <button @click="calendarApi?.setTimeRange(timeStart, timeEnd)">Set time range</button>
   <br/><br/>
   <section >
     <VuelCalendar :vuelCalendarOptions="vuelCalendarOptions" />
@@ -31,8 +36,13 @@ import m1 from './test-files/m1.png';
 import m2 from './test-files/m2.png';
 import m3 from './test-files/m3.png';
 import {Colors} from "./utils/types/Colors.ts";
+import {VuelCalendarDrop} from "./utils/types/VuelCalendarDrop.ts";
 
 const num = ref(1);
+
+const timeStart = ref(1);
+const timeEnd = ref(23);
+
 const date = ref(new Date());
 
 const dateRangeStart = ref(new Date());
@@ -53,7 +63,9 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   startDate: new Date(),
   daysForward: 5,
   startHour: 8,
+  endHour:29,
   renderer:'ExampleRenderer',
+  draggableEvents:true,
   onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
     calendarApi.value = api;
     api.setEvents([
@@ -69,6 +81,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   },
   onDayClicked: onDayClicked,
   onEventClicked: onEventClicked,
+  onEventDropped:onEventDropped
 });
 
 const events = [
@@ -156,6 +169,9 @@ function onEventClicked(event: any) {
 
 function onDayClicked(day: any) {
   console.log(day, 'day clicked api');
+}
+function onEventDropped(dropped: VuelCalendarDrop) {
+  console.log(dropped, 'event dropped api');
 }
 
 function configureEventsByParam() {

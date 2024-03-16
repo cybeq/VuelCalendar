@@ -107,10 +107,10 @@
             backgroundColor: theme.colors.primary,
             borderColor:theme.colors.surface,
             display:'grid',
-            gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`}
+            gridTemplateColumns:`repeat(${endHourConfigurable-startHourConfigurable},1fr)`}
     ">
           <div
-            v-for="hour in helper.getHours(startHourConfigurable)"
+            v-for="hour in helper.getHours(startHourConfigurable, endHourConfigurable)"
             :key="hour"
             class="hour"
             :style="{
@@ -167,6 +167,7 @@
                 :events="getEventsToContainer(day)"
                 :on-event-clicked="vuelCalendarApi.onEventClicked"
                 :start-hour-configurable="startHourConfigurable"
+                :end-hour-configurable="endHourConfigurable"
             />
 
           </div>
@@ -177,11 +178,11 @@
                     width:'100%',
                     top:'0',
                     display:'grid',
-                    gridTemplateColumns:`repeat(${24-startHourConfigurable},1fr)`,
+                    gridTemplateColumns:`repeat(${endHourConfigurable-startHourConfigurable},1fr)`,
                     pointerEvents:'none',
                     height:'100%'}"
             >
-                <div v-for="r in 24-startHourConfigurable"
+                <div v-for="r in endHourConfigurable-startHourConfigurable"
                      class="vuelcalendar-hour-box"
                      :key="r"
                      :style="{
@@ -241,9 +242,9 @@ import {Colors} from "../utils/types/Colors.ts";
 import {getClickAndDropData, onDragLeave, onDragOver} from "../utils/dragHandlers.ts";
 import {
   AddEvents, ConfigureEventsByParam,
-  RemoveEventsByParam, SetDateRange, SetDaysForward,
+  RemoveEventsByParam, SetDateRange, SetDaysForward, SetEndHour,
   SetEvents,
-  SetStartDate, SetStartHour, SwitchViewMode
+  SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
 } from "../utils/types/function-types/apiFunctionsTypes.ts";
 export default defineComponent({
   components:{
@@ -329,6 +330,8 @@ export default defineComponent({
         this.setViewMode as SwitchViewMode,
         this.setDaysForward as SetDaysForward,
         this.setDateRange as SetDateRange,
+        this.setEndHour as SetEndHour,
+        this.setTimeRange as SetTimeRange,
       ),
       rowHeight: 0,
       resizer: {
@@ -339,7 +342,10 @@ export default defineComponent({
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
       eventsConfigurable:      [] as VuelCalendarEvent[],
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
-      startHourConfigurable:   this.vuelCalendarOptions.startHour ?? 0,
+
+      startHourConfigurable:   (this.vuelCalendarOptions.startHour ?? 0) < 1 ? 0 : (this.vuelCalendarOptions.startHour ?? 0),
+      endHourConfigurable:     (this.vuelCalendarOptions.endHour ?? 24) > 24 ? 24 :(this.vuelCalendarOptions.endHour ?? 24),
+
       viewMode:                'days',
 
       dragClone:undefined as HTMLDivElement | undefined,
@@ -359,6 +365,7 @@ export default defineComponent({
       }
       this.vuelCalendarApi.onVuelCalendarReadyResolve();
       this.bgBackup = (document.querySelector('.vuelcalendar-day')as HTMLDivElement)!.style .backgroundColor;
+      console.log('end hour set', this.endHourConfigurable)
     })
   },
   methods:{
@@ -371,7 +378,7 @@ export default defineComponent({
         container.style.backgroundColor=bgBackup
       }
       const { clickedDay, clickedTime, daysEvents }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.endHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
       this.vuelCalendarApi.onEventDropped(
           {clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents, event:this.dragEvent }
       )
@@ -379,7 +386,7 @@ export default defineComponent({
     onDayClick(event:MouseEvent, day:number)
     {
       const { clickedDay, clickedTime, daysEvents }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
       this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
 
@@ -414,7 +421,6 @@ export default defineComponent({
       if(typeof endDate ===  "string" ){
         endDate = new Date(endDate);
       }
-      console.log('date range', startDate, endDate)
       const timeDifference = this.helper.getDaysDifference(startDate, endDate);
       this.setDaysForward(timeDifference)
       this.setNewStartDate(startDate);
@@ -475,10 +481,44 @@ export default defineComponent({
       }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
     },
 
-    setStartHour(hour:number){
+    setStartHour(hour:number)
+    {
+      if(hour > this.endHourConfigurable || hour === this.endHourConfigurable){
+        this.startHourConfigurable = this.endHourConfigurable -1;
+        return;
+      }
+      if(hour > 23){
+        this.startHourConfigurable = 23;
+        return;
+      }
+      if(hour < 0){
+        this.startHourConfigurable = 0;
+        return;
+      }
       this.startHourConfigurable = hour;
     },
 
+    setEndHour(hour:number)
+    {
+      if(hour < this.startHourConfigurable || hour === this.startHourConfigurable){
+        this.endHourConfigurable = this.startHourConfigurable +1;
+        return;
+      }
+      if(hour > 24){
+        this.endHourConfigurable = 24;
+        return;
+      }
+      if(hour < 0){
+        this.endHourConfigurable = 0;
+        return;
+      }
+      this.endHourConfigurable = hour;
+    },
+    setTimeRange(startHour:number, endHour:number)
+    {
+      this.setStartHour(startHour)
+      this.setEndHour(endHour)
+    },
     getEventsToContainer(day:number)
     {
       const newDate = new Date(this.startDateConfigurable!);
