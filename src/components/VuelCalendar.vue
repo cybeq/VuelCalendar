@@ -322,6 +322,8 @@ export default defineComponent({
                                                                          => Array<VuelCalendarEvent>,
         this.setStartHour           as (hour:number)                     => void,
         this.setViewMode            as ()                                => void,
+        this.setDaysForward         as (days:number)                     => void,
+        this.setDateRange           as (startDate:Date|string, endDate:Date|string) => void,
       ),
       rowHeight: 0,
       resizer: {
@@ -347,6 +349,9 @@ export default defineComponent({
     {
       const containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
       this.rowHeight = (containerHeight / (this.daysForwardConfigurable));
+      if(this.rowHeight < 100){
+        this.rowHeight = 100;
+      }
       this.vuelCalendarApi.onVuelCalendarReadyResolve();
       this.bgBackup = (document.querySelector('.vuelcalendar-day')as HTMLDivElement)!.style .backgroundColor;
     })
@@ -387,7 +392,28 @@ export default defineComponent({
       this.preventResize(()=>this.startDateConfigurable = date as Date);
       return new Date(date);
     },
-
+    setDaysForward(days:number){
+      if( days < 1){
+        this.daysForwardConfigurable = 1;
+      }
+      this.daysForwardConfigurable = days;
+      this.rowHeight = this.height! / days
+      if(this.rowHeight < 100){
+        this.rowHeight = 100
+      }
+    },
+    setDateRange(startDate:Date|string, endDate:Date|string){
+      if(typeof startDate ===  "string" ){
+        startDate = new Date(startDate);
+      }
+      if(typeof endDate ===  "string" ){
+        endDate = new Date(endDate);
+      }
+      console.log('date range', startDate, endDate)
+      const timeDifference = this.helper.getDaysDifference(startDate, endDate);
+      this.setDaysForward(timeDifference)
+      this.setNewStartDate(startDate);
+    },
     setEvents(events:[]):Array<VuelCalendarEvent>
     {
       setTimeout(()=>{

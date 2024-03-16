@@ -162,6 +162,32 @@ calendarApi!.setStartHour(hour);
 
 
 ---------------------------
+
+### Set date range 
+
+-------------------------
+
+```ts 
+calendarApi!.setDateRange(startDate:Date, endDate:Date);
+```
+
+**This function is responsible for  setting a specific date range on calendar**
+
+
+---------------------------
+
+### Set days forward
+
+-------------------------
+
+```ts 
+calendarApi!.setDaysForward(days:Number);
+```
+days: Type of **Number** [min:1] = 1 means a one day on timeline
+**This function is responsible for  setting a days forward on time line**
+
+
+---------------------------
 ### Switch view mode ( days <=> month )
 
 -------------------------

@@ -25,6 +25,8 @@ interface IVuelCalendarOptions {
   lockResize?: boolean;
   startHour?: number;
   renderer?:string;
+  setDaysForward?:(days:number) => void;
+  setDateRange?:(startDate:Date|string, endDate:Date|string) => void;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
   onVuelCalendarApiReady!: (api:IVuelCalendarApi) => void;
@@ -42,6 +44,8 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
 
   onVuelCalendarReadyResolve!:Function;
   setStartHour!:(hour:number)=>void;
+  setDaysForward!:(days:number) => void;
+  setDateRange!:(startDate:Date|string, endDate:Date|string) => void;
   startDate?:Date = new Date()
   daysForward = 7;
   events?:Array<VuelCalendarEvent> = [];
@@ -58,7 +62,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
               componentRemoveEventsByParam:   (param:string, value:any)=> Array<VuelCalendarEvent>,
               componentConfigureEventsByParam:(param:string, value:any, params:VuelCalendarEvent) => Array<VuelCalendarEvent>,
               componentSetStartHour:          (hour:number)=> void,
-              componentSetViewMode:           ()          => void
+              componentSetViewMode:           ()          => void,
+              componentSetDaysForward:        (days:number)=> void,
+              componentSetDateRange:          (startDate:Date|string, endDate:Date|string) => void
               ){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
@@ -67,6 +73,8 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     this.configureEventsByParam = componentConfigureEventsByParam;
     this.setStartHour = componentSetStartHour;
     this.setViewMode = componentSetViewMode;
+    this.setDaysForward = componentSetDaysForward
+    this.setDateRange = componentSetDateRange
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
     }
@@ -150,6 +158,8 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
       this.configureEventsByParam,
       this.setStartHour,
       this.setViewMode,
+      this.setDaysForward,
+      this.setDateRange
     ) as IVuelCalendarApi;
 
     this.onVuelCalendarReadyResolve = () =>{
@@ -158,29 +168,36 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   }
 }
 interface IVuelCalendarApi {
-  setDate:Function;
-  setEvents:Function;
-  addEvents:Function;
-  removeEventsByParam:Function;
-  configureEventsByParam:Function;
-  setStartHour:Function;
-  switchViewMode:Function;
+  setDate:(date: Date) => Date;
+  setEvents:(events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  addEvents:(events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  removeEventsByParam:(param: string, value: any) => VuelCalendarEvent[];
+  configureEventsByParam:(param: string, value: any, params: VuelCalendarEvent) => VuelCalendarEvent[];
+  setStartHour:(hour: number) => void;
+  switchViewMode:() => void;
+  setDaysForward:(days:number) => void;
+  setDateRange:(startDate:Date|string, endDate:Date|string) => void;
 }
 class VuelCalendarApi implements IVuelCalendarApi{
-  setDate!:Function;
-  setEvents!:Function;
-  addEvents!:Function;
-  removeEventsByParam!:Function;
-  configureEventsByParam!:Function;
-  setStartHour!:Function;
-  switchViewMode!:Function;
-  constructor(setDate:Function,
-              setEvents:Function,
-              addEvents:Function,
-              removeEventsByParam:Function,
-              configureEventsByParam:Function,
-              setStartHour:Function,
-              setViewMode:Function)
+  setDate!:(date: Date) => Date;
+  setEvents!:(events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  addEvents!:(events: VuelCalendarEvent[]) => VuelCalendarEvent[];
+  removeEventsByParam!:(param: string, value: any) => VuelCalendarEvent[];
+  configureEventsByParam!:(param: string, value: any, params: VuelCalendarEvent) => VuelCalendarEvent[];
+  setStartHour!:(hour: number) => void;
+  switchViewMode!:() => void;
+  setDaysForward!:(days:number) => void;
+  setDateRange!:(startDate:Date|string, endDate:Date|string) => void;
+  constructor(setDate:(date: Date) => Date,
+              setEvents:(events: VuelCalendarEvent[]) => VuelCalendarEvent[],
+              addEvents:(events: VuelCalendarEvent[]) => VuelCalendarEvent[],
+              removeEventsByParam:(param: string, value: any) => VuelCalendarEvent[],
+              configureEventsByParam:(param: string, value: any, params: VuelCalendarEvent) => VuelCalendarEvent[],
+              setStartHour:(hour: number) => void,
+              setViewMode:() => void,
+              setDaysForward:(days:number) => void,
+              setDateRange:(startDate:Date|string, endDate:Date|string) => void
+              )
   {
     this.setDate = setDate
     this.setEvents = setEvents
@@ -189,6 +206,8 @@ class VuelCalendarApi implements IVuelCalendarApi{
     this.configureEventsByParam = configureEventsByParam;
     this.setStartHour = setStartHour
     this.switchViewMode = setViewMode
+    this.setDaysForward = setDaysForward
+    this.setDateRange = setDateRange
   }
 }
 

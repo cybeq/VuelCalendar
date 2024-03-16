@@ -148,10 +148,26 @@ public convertTimeDistanceToPercentage( startTimeString: string, endTimeString: 
       }, 0);
 
   }
-    public addToDate(date: Date, addDayNumber: number): Date {
-        const newDate = new Date(date);
-        newDate.setDate(date.getDate() + addDayNumber);
-        return newDate;
+  public addToDate(date: Date, addDayNumber: number): Date {
+      const newDate = new Date(date);
+      newDate.setDate(date.getDate() + addDayNumber);
+      return newDate;
+  }
+    public getDaysDifference(startDate: Date, endDate: Date): number {
+        if (startDate.getFullYear() === endDate.getFullYear() &&
+            startDate.getMonth() === endDate.getMonth() &&
+            startDate.getDate() === endDate.getDate()) {
+            return 1;
+        }
+        if (endDate < startDate) {
+            console.log('pazdzierz')
+            return 1;
+        }
+
+        const differenceInTime = endDate.getTime() - startDate.getTime();
+        const differenceInDays = Math.round(differenceInTime / (1000 * 3600 * 24));
+
+        return differenceInDays+1;
     }
   public findFirstMonday( date: Date )
   {
