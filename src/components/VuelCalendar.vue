@@ -239,6 +239,12 @@ import VuelCalendarResizer from "./VuelCalendarResizer.vue";
 import VuelCalendarMonthDisplay from "./VuelCalendarMonthDisplay.vue";
 import {Colors} from "../utils/types/Colors.ts";
 import {getClickAndDropData, onDragLeave, onDragOver} from "../utils/dragHandlers.ts";
+import {
+  AddEvents, ConfigureEventsByParam,
+  RemoveEventsByParam, SetDateRange, SetDaysForward,
+  SetEvents,
+  SetStartDate, SetStartHour, SwitchViewMode
+} from "../utils/types/function-types/apiFunctionsTypes.ts";
 export default defineComponent({
   components:{
     VuelCalendarResizer,
@@ -314,16 +320,15 @@ export default defineComponent({
     return{
       vuelCalendarApi:new VuelCalendarOptions(
         this.vuelCalendarOptions,
-        this.setNewStartDate        as (date:Date)=>Date,
-        this.setEvents              as (events:Array<VuelCalendarEvent>) =>Array<VuelCalendarEvent>,
-        this.addEvents              as (events:Array<VuelCalendarEvent>) => Array<VuelCalendarEvent>,
-        this.removeEventsByParam    as (param:string, value:any)         => Array<VuelCalendarEvent>,
-        this.configureEventsByParam as (param:string, value:any, params:VuelCalendarEvent)
-                                                                         => Array<VuelCalendarEvent>,
-        this.setStartHour           as (hour:number)                     => void,
-        this.setViewMode            as ()                                => void,
-        this.setDaysForward         as (days:number)                     => void,
-        this.setDateRange           as (startDate:Date|string, endDate:Date|string) => void,
+        this.setNewStartDate as SetStartDate,
+        this.setEvents as SetEvents,
+        this.addEvents as AddEvents,
+        this.removeEventsByParam as RemoveEventsByParam,
+        this.configureEventsByParam as ConfigureEventsByParam,
+        this.setStartHour as SetStartHour,
+        this.setViewMode as SwitchViewMode,
+        this.setDaysForward as SetDaysForward,
+        this.setDateRange as SetDateRange,
       ),
       rowHeight: 0,
       resizer: {
@@ -484,13 +489,15 @@ export default defineComponent({
 
       for (const event of events)
       {
-        const eventDate = new Date(event.start);
-        if (
-          eventDate.getDate() === targetDate.getDate() &&
-          eventDate.getMonth() === targetDate.getMonth() &&
-          eventDate.getFullYear() === targetDate.getFullYear()
-        ) {
-          divEvents.push(event);
+        if(event.start) {
+          const eventDate = new Date(event.start);
+          if (
+              eventDate.getDate() === targetDate.getDate() &&
+              eventDate.getMonth() === targetDate.getMonth() &&
+              eventDate.getFullYear() === targetDate.getFullYear()
+          ) {
+            divEvents.push(event);
+          }
         }
       }
       // console.log(
