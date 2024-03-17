@@ -143,6 +143,7 @@
              v-for="day in daysForwardConfigurable"
              :key="day"
              @click="onDayClick($event, day)"
+             @dblclick="onDayDblClick($event, day)"
              @dragover.prevent.stop="onDragOver($event, dragClone,bgBackup,theme.colors.dragging, `vuelcalendar_day-${day}`)"
              @dragleave.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
              @dragend.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
@@ -406,7 +407,12 @@ export default defineComponent({
           = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
       this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
-
+    onDayDblClick(event:MouseEvent, day:number)
+    {
+      const { clickedDay, clickedTime, daysEvents }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+      this.vuelCalendarApi.onDayDblClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
+    },
     setViewMode()
     {
       this.viewMode = this.viewMode === 'days' ?

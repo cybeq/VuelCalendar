@@ -58,6 +58,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     startDate:new Date(), /* Define the first day being displayed on the calendar */
     daysForward:5, /* Minimum 1, this parameter defines how many days after the start day should be displayed */
     startHour:17, /* Minimum 0, Max 23, define time from 'startHour' to 23:59 */
+    endHour:24, /* Minimum 1, Max 24, Must be greater than startHour */
     renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/,
     draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
     onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
@@ -75,6 +76,10 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     onDayClicked:(day:VuelCalendarDay)=>
     {
         /* The function returns the day that was clicked, along with the time and date on the timeline, as well as the events that belong to this day.*/
+    },
+    onDayDblClicked:(day:VuelCalendarDay)=>
+    {
+        /* The function returns the day that was double clicked, along with the time and date on the timeline, as well as the events that belong to this day.*/
     },
     onEventClicked:(event:VuelCalendarEvent)=>
     {
@@ -118,6 +123,10 @@ calendarOptions:{
         onDayClicked:(day:VuelCalendarDay)=>
         { 
             /* The function returns the day that was clicked, along with the time and date on the timeline, as well as the events that belong to this day.*/
+        },
+        onDayDblClicked:(day:VuelCalendarDay)=>
+        {
+            /* The function returns the day that was double clicked, along with the time and date on the timeline, as well as the events that belong to this day.*/
         },
         onEventClicked:(event:VuelCalendarEvent)=>
         {
@@ -183,6 +192,22 @@ calendarApi!.setDateRange(startDate:Date, endDate:Date);
 
 
 ---------------------------
+
+### Set time range
+
+-------------------------
+
+```ts 
+calendarApi!.setDateRange(startHour:number, endHour:number);
+/* set the start and hour on timeline */
+```
+startHour: min0, max 24
+endHour: min:0, max24
+**This function is responsible for  setting a specific time range on calendar**
+
+
+---------------------------
+
 
 ### Set days forward
 
@@ -272,6 +297,8 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+### 16.03.2024 | 19:40
+1. Function onDayDoubleClicked(similiar to onDayClicked) has been included
 ### 16.03.2024 | 19:10
 1. Corrected functionality of drag & drop. parameter 'endDateCorrection' has been included to VuelCalendarDrop object passed to onEventDrop() function.
 -  The 'endDateCorrection' parameter is responsible for providing the end time after the shift. When your event is being moved, for example, 2.5 hours forward or backward, this parameter gives you the end date of the event after the shift, in order to provide you with the correct duration of the item in case you want to use it in onDrop to utilize configureEventsByParam and change the start and end as if you were moving it along the timeline.

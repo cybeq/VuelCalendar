@@ -14,6 +14,7 @@ interface IVuelCalendarOptions {
   onEventClicked?: (event: VuelCalendarEvent) => void;
   onEventDropped?:(day:VuelCalendarDrop) => void;
   onDayClicked?: (day: VuelCalendarDay) => void;
+  onDayDblClicked?: (day: VuelCalendarDay) => void;
   api?: IVuelCalendarApi;
   setNewStartDate?: SetStartDate;
   setEvents?: SetEvents;
@@ -42,6 +43,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   onVuelCalendarApiReady!: (api:IVuelCalendarApi) => void;
   onEventClicked!: (event:VuelCalendarEvent) => void;
   onDayClicked!: (day:VuelCalendarDay) => void;
+  onDayDblClicked!: (day:VuelCalendarDay) => void;
   onEventDropped!:(day:VuelCalendarDrop) => void;
   api!:IVuelCalendarApi;
   setNewStartDate!: SetStartDate;
@@ -167,7 +169,13 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
          vuelCalendarOptions.onDayClicked(day);
       }
     }
-
+    if(vuelCalendarOptions.onDayDblClicked)
+    {
+      this.onDayDblClicked = (day:VuelCalendarDay)=>
+      {
+        vuelCalendarOptions.onDayDblClicked(day);
+      }
+    }
     this.events =[]
 
     this.api = new VuelCalendarApi(
