@@ -1,3 +1,5 @@
+import {DateUltra} from "./DateUltra.ts";
+
 export class Helper{
 
   public daysEnumerable = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -6,7 +8,7 @@ export class Helper{
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
   ];
-
+  dateUltra = new DateUltra();
   public getTimeFromDate( date: Date ) : string
   {
     const hours = date.getHours()
@@ -44,49 +46,33 @@ public convertPercentageToTime( percentage: number, startHour: number = 0, endHo
 
 public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: number = 0, endHour:number = 24 ) : number
 {
-    const startDateWithoutTime = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-    const endDateWithoutTime = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    const startTimelineMilis = startHour * 3600 * 1000;
+    const endTimelineMilis = endHour * 3600 * 1000;
+    const timeLineDuration = (endTimelineMilis - startTimelineMilis)
 
-    if (endDateWithoutTime.getTime() > startDateWithoutTime.getTime()) {
-        return 100;
+    const startHourEventMilis = start.getHours() * 3600 * 1000;
+    const startMinuteEventMilis = start.getMinutes() * 60 * 1000;
+    const startSecondEventMilis = start.getSeconds() * 1000;
+    const startEventMilis = startHourEventMilis + startMinuteEventMilis + startSecondEventMilis;
+
+    const endHourEventMilis = end.getHours() * 3600 * 1000;
+    const endMinuteEventMilis = end.getMinutes() * 60 * 1000;
+    const endSecondEventMilis = end.getSeconds() * 1000;
+    const endEventMilis = endHourEventMilis + endMinuteEventMilis + endSecondEventMilis;
+
+    let eventDuration = end.getTime() - start.getTime();
+
+    if(startTimelineMilis > startEventMilis){
+       eventDuration -= (startTimelineMilis - startEventMilis)
     }
-    const startTimeString = this.getTimeFromDate(start)
-    const endTimeString = this.getTimeFromDate(end)
-    let [startHours, startMinutes] = startTimeString.split(':')
-        .map(Number);
-    const [endHours, endMinutes] = endTimeString.split(':')
-        .map(Number);
-
-    if(startHour > startHours){
-        startHours = startHour
-    }
-
-    let startTotalMinutes = (startHours - startHour) * 60 + startMinutes;
-
-    let endTotalMinutes = (endHours - startHour) * 60 + endMinutes;
-
-    if (startTotalMinutes < 0) {
-        startTotalMinutes += (endHour - startHour) * 60;
+    if(startTimelineMilis > endEventMilis){
+        eventDuration = 0
     }
 
-    if (endTotalMinutes < 0) {
-        endTotalMinutes += (endHour - startHour) * 60;
-    }
 
-    let timeDistance = endTotalMinutes - startTotalMinutes;
+    let percentage =  (eventDuration / timeLineDuration) * 100;
 
-    if (timeDistance < 0) {
-        timeDistance += (endHour - startHour) * 60;
-    }
-
-    return (timeDistance / ((endHour - startHour) * 60)) * 100;
-
-    // console.log(
-    //     'distance to per',
-    //     percentage
-    // );
-
-
+    return percentage;
 }
 
   public hours = Array.from(

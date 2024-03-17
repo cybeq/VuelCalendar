@@ -162,6 +162,7 @@
             <VuelCalendarEventContainer
                 :theme="theme"
                 :helper="helper"
+                :loopedDay="day"
                 :renderer="vuelCalendarOptions.renderer"
                 :clone="clone"
                 :draggable-events="vuelCalendarOptions.draggableEvents"
@@ -169,6 +170,7 @@
                 :on-event-clicked="vuelCalendarApi.onEventClicked"
                 :start-hour-configurable="startHourConfigurable"
                 :end-hour-configurable="endHourConfigurable"
+                :start-date-configurable="startDateConfigurable"
             />
 
           </div>
@@ -247,6 +249,7 @@ import {
   SetEvents,
   SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
 } from "../utils/types/function-types/apiFunctionsTypes.ts";
+import {DateUltra} from "../utils/DateUltra.ts";
 export default defineComponent({
   components:{
     VuelCalendarResizer,
@@ -255,8 +258,10 @@ export default defineComponent({
   },
   setup(){
     const helper = new Helper();
+    const dateUltra = new DateUltra();
     return {
-      helper
+      helper,
+      dateUltra
     }
   },
   props:{
@@ -396,7 +401,7 @@ export default defineComponent({
 
       newEnd = this.helper.addToDate(new Date(new Date(newEnd.setHours(previousEnd.getHours() + hourDifference))
           .setMinutes(previousEnd.getMinutes()+minutesDifference)), daysDifference)
-
+      console.log('date correction' , newEnd)
       this.vuelCalendarApi.onEventDropped(
           {clickEvent:event, date:droppedDate, time:clickedTime, events:daysEvents, event:this.dragEvent!, endDateCorrection:newEnd }
       )
@@ -553,12 +558,17 @@ export default defineComponent({
       for (const event of events)
       {
         if(event.start) {
-          const eventDate = new Date(event.start);
           if (
-              eventDate.getDate() === targetDate.getDate() &&
-              eventDate.getMonth() === targetDate.getMonth() &&
-              eventDate.getFullYear() === targetDate.getFullYear()
-          ) {
+              (this.dateUltra.isSameDate(event.start, targetDate))
+              ||
+              (this.dateUltra.isSameDate(event.end, targetDate))
+              ||
+              (
+                  this.dateUltra.isLowerDate(targetDate, event.end)
+                  && this.dateUltra.isBiggerDate(targetDate, event.start)
+              )
+          )
+          {
             divEvents.push(event);
           }
         }

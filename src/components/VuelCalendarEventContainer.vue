@@ -42,6 +42,14 @@ export default defineComponent({
       type:Boolean,
       default:false
     },
+    loopedDay:{
+      type:Number,
+      required:true
+    },
+    startDateConfigurable:{
+      type:Date,
+      required:true,
+    }
   },
   methods:{
     getEventKey(id:number|string):string
