@@ -22,18 +22,6 @@ export class Helper{
     return `${hours}:${minutes}`;
   }
 
-  public convertTimeToPercentage( timeString: string, startHour: number = 0, endHour:number = 24 ) : number
-  {
-    const [hours, minutes] = timeString.split(':')
-        .map(Number);
-    const totalMinutes = Math.max((hours - startHour) * 60 + minutes, 0);
-    const totalHours = endHour - startHour;
-    return (totalMinutes / (totalHours * 60)) * 100;
-    // console.log(
-    //     'time to per',
-    //     percentage
-    // );
-}
 
 public convertPercentageToTime( percentage: number, startHour: number = 0, endHour:number = 0 ) : string
 {
@@ -44,8 +32,29 @@ public convertPercentageToTime( percentage: number, startHour: number = 0, endHo
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: number = 0, endHour:number = 24 ) : number
+    public convertTimeToPercentage( timeString: string, startHour: number = 0, endHour:number = 24,start:Date, startDate:Date, loopedDay:number ) : number
+    {
+        const currentDay = this.dateUltra.addDays(startDate, loopedDay-1);
+
+        let [hours, minutes] = timeString.split(':')
+            .map(Number);
+        if(!this.dateUltra.isSameDate(currentDay, start)){
+            [hours, minutes] = "00:00".split(':')
+                .map(Number);
+        }
+        const totalMinutes = Math.max((hours - startHour) * 60 + minutes, 0);
+        const totalHours = endHour - startHour;
+        return (totalMinutes / (totalHours * 60)) * 100;
+        // console.log(
+        //     'time to per',
+        //     percentage
+        // );
+    }
+
+public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: number = 0, endHour:number = 24, startDate:Date, loopedDay:number ) : number
 {
+    const currentDay = this.dateUltra.addDays(startDate, loopedDay-1);
+
     const startTimelineMilis = startHour * 3600 * 1000;
     const endTimelineMilis = endHour * 3600 * 1000;
     const timeLineDuration = (endTimelineMilis - startTimelineMilis)
@@ -60,15 +69,30 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
     const endSecondEventMilis = end.getSeconds() * 1000;
     const endEventMilis = endHourEventMilis + endMinuteEventMilis + endSecondEventMilis;
 
+    if(!this.dateUltra.isSameDate(currentDay, end) && !this.dateUltra.isSameDate(currentDay, start)){
+        return 100;
+    }
+
     let eventDuration = end.getTime() - start.getTime();
 
-    if(startTimelineMilis > startEventMilis){
+    if(startTimelineMilis > startEventMilis && this.dateUltra.isSameDate(currentDay, start)){
        eventDuration -= (startTimelineMilis - startEventMilis)
     }
-    if(startTimelineMilis > endEventMilis){
-        eventDuration = 0
+
+    if(startTimelineMilis > endEventMilis && this.dateUltra.isSameDate(currentDay, end)){
+        eventDuration = 0;
     }
 
+
+
+    if(this.dateUltra.isSameDate(currentDay, end) && !this.dateUltra.isSameDate(currentDay, start)){
+        let nd = new Date(new Date().setHours(24 + (startHour) ,0,0));
+        const _end = new Date(new Date(end).setDate(nd.getDate()))
+        eventDuration = _end.getTime() - nd.getTime();
+        if(startTimelineMilis > endEventMilis ){
+            eventDuration = 0;
+        }
+    }
 
     let percentage =  (eventDuration / timeLineDuration) * 100;
 

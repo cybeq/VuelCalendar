@@ -62,7 +62,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   lockResize: false,
   startDate: new Date(),
   daysForward: 5,
-  startHour: 3,
+  startHour: 0,
   endHour:29,
   renderer:'ExampleRenderer',
   draggableEvents:true,
@@ -74,7 +74,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
         label: 'Event #1',
         data: {},
         start: new Date(new Date(new Date().setHours(8, 0)).setDate(18)),
-        end: new Date(new Date(new Date().setHours(18, 2)).setDate(18)),
+        end: new Date(new Date(new Date().setHours(18, 2)).setDate(19)),
       },
     ]);
     console.log('ready api', api);

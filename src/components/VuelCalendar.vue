@@ -371,7 +371,6 @@ export default defineComponent({
       }
       this.vuelCalendarApi.onVuelCalendarReadyResolve();
       this.bgBackup = (document.querySelector('.vuelcalendar-day')as HTMLDivElement)!.style .backgroundColor;
-      console.log('end hour set', this.endHourConfigurable)
     })
   },
   methods:{
@@ -391,19 +390,20 @@ export default defineComponent({
       const previousEnd = new Date(this.dragEvent!.end);
       const previousStart = new Date(this.dragEvent!.start);
       const newStart = new Date(droppedDate);
-      let newEnd = new Date(previousEnd);
 
       const timeDifferenceMilliseconds = newStart.getTime() - previousStart.getTime();
       const daysDifference = Math.round(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24));
-
+      // console.log('days difference matter', daysDifference)
       const hourDifference = newStart.getHours() - previousStart.getHours();
+      // console.log('hour difference matter', hourDifference)
       const minutesDifference = newStart.getMinutes() - previousStart.getMinutes();
 
-      newEnd = this.helper.addToDate(new Date(new Date(newEnd.setHours(previousEnd.getHours() + hourDifference))
-          .setMinutes(previousEnd.getMinutes()+minutesDifference)), daysDifference)
-      console.log('date correction' , newEnd)
+
+      let endDateCorrection = this.dateUltra.addHrMinSec(previousEnd, hourDifference + (daysDifference*24), minutesDifference, 0);
+      // endDateCorrection = this.dateUltra.addDays(endDateCorrection, daysDifference)
+
       this.vuelCalendarApi.onEventDropped(
-          {clickEvent:event, date:droppedDate, time:clickedTime, events:daysEvents, event:this.dragEvent!, endDateCorrection:newEnd }
+          {clickEvent:event, date:droppedDate, time:clickedTime, events:daysEvents, event:this.dragEvent!, endDateCorrection }
       )
     },
     onDayClick(event:MouseEvent, day:number)

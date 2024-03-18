@@ -72,7 +72,10 @@ export default defineComponent({
       return this.helper.convertTimeToPercentage(
           this.helper.getTimeFromDate(event.start!),
           this.startHourConfigurable,
-          this.endHourConfigurable
+          this.endHourConfigurable,
+          event.start,
+          this.startDateConfigurable,
+          this.loopedDay
       )
     },
 
@@ -82,7 +85,9 @@ export default defineComponent({
           event.start,
           event.end,
           this.startHourConfigurable,
-          this.endHourConfigurable
+          this.endHourConfigurable,
+          this.startDateConfigurable,
+          this.loopedDay
       )
     },
 
