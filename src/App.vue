@@ -37,6 +37,7 @@ import m2 from './test-files/m2.png';
 import m3 from './test-files/m3.png';
 import {Colors} from "./utils/types/Colors.ts";
 import {VuelCalendarDrop} from "./utils/types/VuelCalendarDrop.ts";
+import {VuelCalendarResize} from "./utils/types/VuelCalendarResize.ts";
 
 const num = ref(1);
 
@@ -64,6 +65,7 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   daysForward: 5,
   startHour: 0,
   endHour:29,
+  resizableEvents:true,
   renderer:'ExampleRenderer',
   draggableEvents:true,
   onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
@@ -82,7 +84,9 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   onDayClicked: onDayClicked,
   onEventClicked: onEventClicked,
   onEventDropped:onEventDropped,
-  onDayDblClicked:onDayDblClicked
+  onDayDblClicked:onDayDblClicked,
+  onEventEndResized:onEventEndResized,
+  onEventStartResized:onEventStartResized,
 });
 
 const events = [
@@ -175,11 +179,23 @@ function onDayDblClicked(day: any) {
   console.log(day, 'day dbl clicked api');
 }
 function onEventDropped(dropped: VuelCalendarDrop) {
-
-  calendarApi.value.configureEventsByParam('id', dropped.event.id!, {
-    start: dropped.date,
-    end: dropped.endDateCorrection
-  });
+  // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
+  //   start: dropped.date,
+  //   end: dropped.endDateCorrection
+  // });
+  dropped.accept()
+}
+function onEventEndResized(resized:VuelCalendarResize){
+  // calendarApi.value!.configureEventsByParam('id', resized.event.id, {
+  //   end: resized.newDateTime
+  // });
+  resized.accept()
+}
+function onEventStartResized(resized:VuelCalendarResize){
+  // calendarApi.value!.configureEventsByParam('id', resized.event.id, {
+  //   start: resized.newDateTime
+  // });
+  resized.accept()
 }
 
 function configureEventsByParam() {

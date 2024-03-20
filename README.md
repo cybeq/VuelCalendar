@@ -27,7 +27,7 @@ Key features of VuelCalendar include:
 
 
 
-**Updated  18.03.2024 | 15:41 | Read about new features at the end of the document -> v.0.2**
+**Updated  20.03.2024 | 15:41 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
@@ -71,6 +71,8 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
     endHour:24, /* Minimum 1, Max 24, Must be greater than startHour */
     renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/,
     draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
+    /* set if you want to implement resizable events -> onEventStartResized(resized:VuelCalendarResize); onEventEndResized(resized:VuelCalendarResize); -< then implement these methods to operate on resized events on timeline */
+    resizableEvents:true,
     onVuelCalendarApiReady: (api: IVuelCalendarApi) => {
         calendarApi.value = api;
         api.setEvents([
@@ -118,6 +120,8 @@ calendarOptions:{
         endHour:24, /* Minimum 1, Max 24, Must be greater than startHour */
         renderer:'ExampleRender', /* example vue component to use as renderer for event container (read about Renderers below)*/
         draggableEvents:true, /* set if you want to implement draggable events -> onEventDropped(drop:VuelCalendarDrop) -< then implement this method to catch dropped events on timeline */
+        /* set if you want to implement resizable events -> onEventStartResized(resized:VuelCalendarResize); onEventEndResized(resized:VuelCalendarResize); -< then implement these methods to operate on resized events on timeline */
+        resizableEvents:true,
         onVuelCalendarApiReady:(api:any)=>{
           this.calendarApi = api;
           api.setEvents( [
@@ -307,6 +311,15 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+### 20.03.2024 | 15:41
+1. From now on, you can resize events on timeline in end and start time and date.
+#### to use pass 'resizableEvents = true' to vuelCalendarOptions and implement methods:
+```js
+onEventStartResized:(resized:VuelCalendarResize)=>{}
+onEventEndResized:(resized:VuelCalendarResize)=>{}
+```
+details: https://vuelcomponents.github.io/
+
 ### 18.03.2024 | 15:41
 1. From now on, you can set events spanning over multiple days. The issue with random errors in 'endDateCorrection' for onEventDropped has also been resolved. Wow :)
 

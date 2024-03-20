@@ -8,6 +8,7 @@ import {
   SetEvents,
   SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
 } from "./types/function-types/apiFunctionsTypes.ts";
+import {VuelCalendarResize} from "./types/VuelCalendarResize.ts";
 
 interface IVuelCalendarOptions {
   onVuelCalendarApiReady?: (api: IVuelCalendarApi) => void;
@@ -15,6 +16,8 @@ interface IVuelCalendarOptions {
   onEventDropped?:(day:VuelCalendarDrop) => void;
   onDayClicked?: (day: VuelCalendarDay) => void;
   onDayDblClicked?: (day: VuelCalendarDay) => void;
+  onEventStartResized?: (event:VuelCalendarResize) => void;
+  onEventEndResized?: (event:VuelCalendarResize) => void;
   api?: IVuelCalendarApi;
   setNewStartDate?: SetStartDate;
   setEvents?: SetEvents;
@@ -31,6 +34,7 @@ interface IVuelCalendarOptions {
   theme?: string;
   height?: number;
   draggableEvents?:boolean;
+  resizableEvents?:boolean;
   lockResize?: boolean;
   startHour?: number;
   endHour?:number;
@@ -45,15 +49,15 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   onDayClicked!: (day:VuelCalendarDay) => void;
   onDayDblClicked!: (day:VuelCalendarDay) => void;
   onEventDropped!:(day:VuelCalendarDrop) => void;
+  onEventStartResized!: (event:VuelCalendarResize) => void;
+  onEventEndResized!: (event:VuelCalendarResize) => void;
   api!:IVuelCalendarApi;
   setNewStartDate!: SetStartDate;
   setEvents!: SetEvents ;
   addEvents!: AddEvents ;
   setViewMode!: SwitchViewMode;
   removeEventsByParam!:(param:string, value:any) => Array<VuelCalendarEvent>;
-  configureEventsByParam!:
-      (param:string, value:any, params:VuelCalendarEvent) => Array<VuelCalendarEvent>;
-
+  configureEventsByParam!:ConfigureEventsByParam;
   onVuelCalendarReadyResolve!:Function;
   setStartHour!:SetStartHour;
   setEndHour!:SetEndHour
@@ -66,6 +70,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   theme?:string = 'dark';
   height?:number = 600;
   draggableEvents?:boolean = false;
+  resizableEvents?:boolean = false;
   lockResize?:boolean = false;
   startHour?:number = 0;
   endHour?:number = 24;
@@ -99,6 +104,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     }
     if(vuelCalendarOptions.draggableEvents){
       this.draggableEvents = vuelCalendarOptions.draggableEvents
+    }
+    if(vuelCalendarOptions.resizableEvents){
+      this.resizableEvents = vuelCalendarOptions.resizableEvents
     }
     if(vuelCalendarOptions.renderer){
       this.renderer = vuelCalendarOptions.renderer
@@ -174,6 +182,20 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
       this.onDayDblClicked = (day:VuelCalendarDay)=>
       {
         vuelCalendarOptions.onDayDblClicked(day);
+      }
+    }
+    if(vuelCalendarOptions.onEventStartResized)
+    {
+      this.onEventStartResized = (resized:VuelCalendarResize)=>
+      {
+        vuelCalendarOptions.onEventStartResized(resized);
+      }
+    }
+    if(vuelCalendarOptions.onEventEndResized)
+    {
+      this.onEventEndResized = (resized:VuelCalendarResize)=>
+      {
+        vuelCalendarOptions.onEventEndResized(resized);
       }
     }
     this.events =[]

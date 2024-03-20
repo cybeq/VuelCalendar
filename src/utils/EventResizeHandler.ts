@@ -1,5 +1,6 @@
 import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 import {DateUltra} from "./DateUltra.ts";
+import {VuelCalendarResize} from "./types/VuelCalendarResize.ts";
 
 export class EventResizeHandler {
     endDateBackup?:Date;
@@ -17,7 +18,7 @@ export class EventResizeHandler {
         this.startEvent!.start = newDateTime;
     }
     public onEventStartResizeEnd(){
-        this.startEvent!.start = this.startDateBackup!;
+        // this.startEvent!.start = this.startDateBackup!;
         this.startDateBackup = undefined;
         this.startEvent = undefined;
     }
@@ -30,17 +31,38 @@ export class EventResizeHandler {
         this.endEvent!.end = newDateTime;
     }
     public onEventEndResizeEnd(){
-        this.endEvent!.end = this.endDateBackup!;
+        // this.endEvent!.end = this.endDateBackup!;
         this.endDateBackup = undefined;
         this.endEvent = undefined;
     }
-    public onEventEndResizeDrop(date:Date, time:string){
+    public onEventEndResizeDrop(date:Date, time:string, apiCall:(resized:VuelCalendarResize) => void){
         const newDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
-        console.log('end resize drop,', newDateTime, time);
+        apiCall({
+            event:this.endEvent!,
+            newDateTime,
+            oldDateTime:this.endDateBackup!,
+            accept:()=>{
+                this.endEvent!.end = newDateTime
+            },
+            decline:()=>{
+                this.endEvent!.end = this.endDateBackup!
+            }
+        })
     }
-    public onEventStartResizeDrop(date:Date, time:string){
+    public onEventStartResizeDrop(date:Date, time:string, apiCall:(resized:VuelCalendarResize) => void){
         const newDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
-        console.log('start resize drop,', newDateTime, time);
+        apiCall({
+            event:this.startEvent!,
+            newDateTime,
+            oldDateTime:this.startDateBackup!,
+            accept:()=>{
+                this.startEvent!.start = newDateTime
+            },
+            decline:()=>{
+                this.startEvent!.start = this.startDateBackup!
+            }
+
+        });
     }
 
 }

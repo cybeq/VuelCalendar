@@ -20,7 +20,10 @@ const onDragEnd = (e:DragEvent, cloneFunction:Function) =>{
     cloneFunction('remove');
 }
 
-const onDragOver = (event:DragEvent, dragClone:HTMLDivElement | undefined,  bgBackup:undefined|string, draggingColor:string, id:string) =>{
+const onDragOver = (event:DragEvent, dragClone:HTMLDivElement | undefined,  bgBackup:undefined|string, draggingColor:string, id:string, dragEvent?:VuelCalendarEvent) =>{
+    if(!dragEvent){
+        return;
+    }
     event.preventDefault();
     event.stopPropagation();
     const container = document.getElementById(id);

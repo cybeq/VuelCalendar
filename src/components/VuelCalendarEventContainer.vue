@@ -62,6 +62,10 @@ export default defineComponent({
       type:Boolean,
       default:false
     },
+    resizableEvents:{
+      type:Boolean,
+      default:false
+    },
     loopedDay:{
       type:Number,
       required:true
@@ -144,10 +148,10 @@ export default defineComponent({
         left:0,
         width:'5px',
         height:'100%',
-        backgroundColor:'red',
-        cursor:'ew-resize',
+        backgroundColor:'transparent',
+        cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
-       :draggable="true"
+       :draggable="resizableEvents"
         @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event)"
         @dragend="eventResizeHandler.onEventStartResizeEnd"
        v-if="isSameDay(event.start)"
@@ -157,10 +161,10 @@ export default defineComponent({
         right:0,
         width:'5px',
         height:'100%',
-        backgroundColor:'red',
-        cursor:'ew-resize',
+        backgroundColor:'transparent',
+        cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
-        :draggable="true"
+        :draggable="resizableEvents"
         @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event)"
         @dragend="eventResizeHandler.onEventEndResizeEnd"
         v-if="isSameDay(event.end)"

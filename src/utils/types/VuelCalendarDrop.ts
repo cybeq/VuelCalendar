@@ -7,4 +7,6 @@ export type VuelCalendarDrop = {
     events:Array<VuelCalendarEvent>
     event:VuelCalendarEvent;
     endDateCorrection:Date;
+    accept:()=>void;
+    decline:()=>void;
 }

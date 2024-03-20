@@ -7,6 +7,8 @@ import type {VuelCalendarOptions} from "../utils/VuelCalendarOptions.ts";
 import type {Colors} from "../utils/types/Colors.ts";
 import type {IVuelCalendarOptions} from "../utils/VuelCalendarOptions.ts";
 import type {VuelCalendarDrop} from "../utils/types/VuelCalendarDrop.ts";
+import type {VuelCalendarEventConfigure} from "../utils/types/VuelCalendarEventConfigure.ts";
+import type {VuelCalendarResize} from "../utils/types/VuelCalendarResize.ts";
 import '../index.css';
 import type {
     SetStartDate,
@@ -28,9 +30,11 @@ export type {
     IVuelCalendarOptions,
     VuelCalendarDay,
     VuelCalendarEvent,
+    VuelCalendarEventConfigure,
     VuelCalendarOptions,
     Colors,
-    VuelCalendarDrop
+    VuelCalendarDrop,
+    VuelCalendarResize
 }
 export type {
     SetStartDate,
