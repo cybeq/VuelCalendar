@@ -10,7 +10,6 @@ export default defineComponent({
   setup(){
     return {
       dateUltra:new DateUltra(),
-      eventResizeHandler:new EventResizeHandler(),
     }
   },
   computed:{
@@ -23,6 +22,10 @@ export default defineComponent({
     },
   },
   props:{
+    eventResizeHandler:{
+      type:Object as PropType<EventResizeHandler>,
+      required:true,
+    },
     onEventClicked:{
       type:Function,
       required:true,
@@ -136,11 +139,7 @@ export default defineComponent({
       transition:'opacity 0.2s ease',
       position:'sticky'}"
   >
-    <div :draggable="draggableEvents" style="user-select: none;"
-         @dragstart.stop="onDragStart($event, event, clone)"
-         @dragend="onDragEnd($event, clone)"
-    >
-      <div :style="{
+    <div :style="{
         position:'absolute',
         left:0,
         width:'5px',
@@ -148,9 +147,12 @@ export default defineComponent({
         backgroundColor:'red',
         cursor:'ew-resize',
         }"
-        v-if="isSameDay(event.start)"
-      />
-      <div :style="{
+       :draggable="true"
+        @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event)"
+        @dragend="eventResizeHandler.onEventStartResizeEnd"
+       v-if="isSameDay(event.start)"
+    />
+    <div :style="{
         position:'absolute',
         right:0,
         width:'5px',
@@ -158,8 +160,15 @@ export default defineComponent({
         backgroundColor:'red',
         cursor:'ew-resize',
         }"
+        :draggable="true"
+        @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event)"
+        @dragend="eventResizeHandler.onEventEndResizeEnd"
         v-if="isSameDay(event.end)"
-      />
+    />
+    <div :draggable="draggableEvents" style="user-select: none;"
+         @dragstart.stop="onDragStart($event, event, clone)"
+         @dragend="onDragEnd($event, clone)"
+    >
       <div v-if="!renderer"> {{event.label}}</div>
       <div v-if="renderer"
            style="width:100%;height:100%"

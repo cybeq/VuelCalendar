@@ -144,10 +144,20 @@
              :key="day"
              @click="onDayClick($event, day)"
              @dblclick="onDayDblClick($event, day)"
-             @dragover.prevent.stop="onDragOver($event, dragClone,bgBackup,theme.colors.dragging, `vuelcalendar_day-${day}`)"
+             @dragover.prevent.stop="
+             ($event)=> {
+               onDragOver($event, dragClone,bgBackup,theme.colors.dragging, `vuelcalendar_day-${day}`);
+               onEventEndResizeDragOver($event, day);
+               onEventStartResizeDragOver($event, day);
+             }
+              "
              @dragleave.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
              @dragend.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
-             @drop.prevent.stop="onDrop($event, day, bgBackup,`vuelcalendar_day-${day}`)"
+             @drop.prevent.stop="($event)=>{
+               onDrop($event, day, bgBackup,`vuelcalendar_day-${day}`);
+               onEventStartResizeDrop($event, day);
+               onEventEndResizeDrop($event, day);
+             }"
              :style="{
                height:`${rowHeight}px`,
                backgroundColor:theme.colors.primary,
@@ -171,6 +181,7 @@
                 :start-hour-configurable="startHourConfigurable"
                 :end-hour-configurable="endHourConfigurable"
                 :start-date-configurable="startDateConfigurable"
+                :event-resize-handler="eventResizeHandler"
             />
 
           </div>
@@ -250,6 +261,7 @@ import {
   SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
 } from "../utils/types/function-types/apiFunctionsTypes.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
+import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 export default defineComponent({
   components:{
     VuelCalendarResizer,
@@ -259,9 +271,11 @@ export default defineComponent({
   setup(){
     const helper = new Helper();
     const dateUltra = new DateUltra();
+    const eventResizeHandler = new EventResizeHandler()
     return {
       helper,
-      dateUltra
+      dateUltra,
+      eventResizeHandler
     }
   },
   props:{
@@ -378,6 +392,9 @@ export default defineComponent({
     onDragOver,
     onDragLeave,
     onDrop(event:DragEvent, day:number, bgBackup:string | undefined, id:string){
+      if(!this.dragEvent){
+        return;
+      }
       const container = document.getElementById(id);
       if(container && bgBackup){
         container.style.backgroundColor=bgBackup
@@ -418,6 +435,50 @@ export default defineComponent({
       const { clickedDay, clickedTime, daysEvents }
           = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
       this.vuelCalendarApi.onDayDblClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
+    },
+    onEventEndResizeDragOver(event:MouseEvent, day:number){
+      if(this.dragEvent){
+        return;
+      }
+      if(!this.eventResizeHandler.endEvent){
+        return;
+      }
+      const { clickedDay, clickedTime }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+      this.eventResizeHandler.onEventEndResizeDayOver(clickedDay, clickedTime);
+    },
+    onEventStartResizeDragOver(event:MouseEvent, day:number){
+      if(this.dragEvent){
+        return;
+      }
+      if(!this.eventResizeHandler.startEvent){
+        return;
+      }
+      const { clickedDay, clickedTime }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+      this.eventResizeHandler.onEventStartResizeDayOver(clickedDay, clickedTime);
+    },
+    onEventStartResizeDrop(event:MouseEvent, day:number){
+      if(this.dragEvent){
+        return;
+      }
+      if(!this.eventResizeHandler.startEvent){
+        return;
+      }
+      const { clickedDay, clickedTime }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+      this.eventResizeHandler.onEventStartResizeDrop(clickedDay, clickedTime)
+    },
+    onEventEndResizeDrop(event:MouseEvent, day:number){
+      if(this.dragEvent){
+        return;
+      }
+      if(!this.eventResizeHandler.endEvent){
+        return;
+      }
+      const { clickedDay, clickedTime }
+          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+      this.eventResizeHandler.onEventEndResizeDrop(clickedDay, clickedTime)
     },
     setViewMode()
     {

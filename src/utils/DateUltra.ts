@@ -56,6 +56,11 @@ export class DateUltra{
         _date = new Date(_date.setMinutes(_date.getMinutes() + minutes));
         _date = new Date(_date.setSeconds(_date.getSeconds() + seconds));
         return _date;
-
+    }
+    public setTimeToDateWithTimeString(date:Date, timeString:string){
+        const _date = new Date(date);
+        const [hours, minutes] = timeString.split(':')
+            .map(Number);
+        return new Date(_date.setHours(hours,minutes));
     }
 }
