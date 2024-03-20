@@ -392,14 +392,15 @@ export default defineComponent({
       const newStart = new Date(droppedDate);
 
       const timeDifferenceMilliseconds = newStart.getTime() - previousStart.getTime();
-      const daysDifference = Math.round(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24));
-      // console.log('days difference matter', daysDifference)
-      const hourDifference = newStart.getHours() - previousStart.getHours();
-      // console.log('hour difference matter', hourDifference)
-      const minutesDifference = newStart.getMinutes() - previousStart.getMinutes();
-
-
-      let endDateCorrection = this.dateUltra.addHrMinSec(previousEnd, hourDifference + (daysDifference*24), minutesDifference, 0);
+      const endDateCorrection = new Date(previousEnd.getTime() + timeDifferenceMilliseconds);
+      // const daysDifference = Math.round(timeDifferenceMilliseconds / (1000 * 60 * 60 * 24));
+      // // console.log('days difference matter', daysDifference)
+      // const hourDifference = newStart.getHours() - previousStart.getHours();
+      // // console.log('hour difference matter', hourDifference)
+      // const minutesDifference = newStart.getMinutes() - previousStart.getMinutes();
+      //
+      //
+      // let endDateCorrection = this.dateUltra.addHrMinSec(previousEnd, hourDifference + (daysDifference*24), minutesDifference, 0);
       // endDateCorrection = this.dateUltra.addDays(endDateCorrection, daysDifference)
 
       this.vuelCalendarApi.onEventDropped(

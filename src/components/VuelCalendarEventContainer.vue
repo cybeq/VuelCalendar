@@ -3,8 +3,25 @@ import {defineComponent, PropType} from "vue";
 import type {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import type {Helper} from "../utils/Helper.ts";
 import {onDragEnd, onDragStart} from "../utils/dragHandlers.ts";
+import {DateUltra} from "../utils/DateUltra.ts";
+import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 
 export default defineComponent({
+  setup(){
+    return {
+      dateUltra:new DateUltra(),
+      eventResizeHandler:new EventResizeHandler(),
+    }
+  },
+  computed:{
+    isSameDay(){
+      return (date:Date)  =>
+          this.dateUltra.isSameDate(
+              this.dateUltra.addDays(this.startDateConfigurable, this.loopedDay-1),
+              date
+          );
+    },
+  },
   props:{
     onEventClicked:{
       type:Function,
@@ -123,6 +140,26 @@ export default defineComponent({
          @dragstart.stop="onDragStart($event, event, clone)"
          @dragend="onDragEnd($event, clone)"
     >
+      <div :style="{
+        position:'absolute',
+        left:0,
+        width:'5px',
+        height:'100%',
+        backgroundColor:'red',
+        cursor:'ew-resize',
+        }"
+        v-if="isSameDay(event.start)"
+      />
+      <div :style="{
+        position:'absolute',
+        right:0,
+        width:'5px',
+        height:'100%',
+        backgroundColor:'red',
+        cursor:'ew-resize',
+        }"
+        v-if="isSameDay(event.end)"
+      />
       <div v-if="!renderer"> {{event.label}}</div>
       <div v-if="renderer"
            style="width:100%;height:100%"

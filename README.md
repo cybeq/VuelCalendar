@@ -1,4 +1,14 @@
 ## VuelCalendar
+
+**[Since 19.03.2024]**
+*All new features, issues, fixes, updates and **DOCS** will be available at below link*
+* Component preview 
+* Docs
+## **https://vuelcomponents.github.io/**
+
+----------------------------
+
+
 This Vue Calendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
 
 This calendar tool serves as a robust platform for organizing events and managing time efficiently. Users can seamlessly navigate through dates, allocate events with precision, and customize the display to suit their specific needs. Whether it's for personal scheduling, project management, or team coordination, VuelCalendar provides a user-friendly interface coupled with powerful functionalities.
@@ -17,7 +27,7 @@ Key features of VuelCalendar include:
 
 
 
-**Updated  16.03.2024 | 19:10 | Read about new features at the end of the document -> v.0.2**
+**Updated  18.03.2024 | 15:41 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 
@@ -297,6 +307,9 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+### 18.03.2024 | 15:41
+1. From now on, you can set events spanning over multiple days. The issue with random errors in 'endDateCorrection' for onEventDropped has also been resolved. Wow :)
+
 ### 16.03.2024 | 19:40
 1. Function onDayDoubleClicked(similiar to onDayClicked) has been included
 ### 16.03.2024 | 19:10
