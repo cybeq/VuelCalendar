@@ -160,7 +160,6 @@ export default defineComponent({
   <div
     class="vuelcalendar-event"
     v-for="event in getEventsToContainer(loopedDay)"
-    :key="event.id ?? ''"
     @click.stop="onEventClicked(event)"
     :style="{
       height: renderer ?'unset':'20px',
@@ -180,6 +179,7 @@ export default defineComponent({
     <VuelCalendarEventSingle :start-date-configurable="startDateConfigurable"
                        :looped-day="loopedDay"
                        :clone="clone"
+                       :key="event.id"
                        :renderer="renderer"
                        :draggable-events="draggableEvents"
                        :resizable-events="resizableEvents"

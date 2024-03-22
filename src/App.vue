@@ -132,6 +132,16 @@ const events = [
     start: new Date(new Date().setHours(8, 0)),
     end: new Date(new Date().setHours(23, 0)),
   },
+  {
+    id: 6,
+    label: 'UmcaHUJEEECsiek Jerzyna ze Szczecina',
+    data: {
+      img:m3,
+      color:'#438789'
+    },
+    start: new Date(new Date().setHours(8, 0)),
+    end: new Date(new Date().setHours(23, 0)),
+  },
 ];
 const calendarColors:Colors = {
       surface: '#334155',
@@ -156,7 +166,7 @@ function addEvents2() {
   const es = [];
   for (let i = 0; i < 1000; i++) {
     es.push({
-      id: 123,
+      id: 100 +i,
       label: 'Event #123',
       data: {},
       start: new Date(new Date().setHours(8, 0)),
@@ -181,11 +191,11 @@ function onDayDblClicked(day: any) {
   console.log(day, 'day dbl clicked api');
 }
 function onEventDropped(dropped: VuelCalendarDrop) {
-  // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
-  //   start: dropped.date,
-  //   end: dropped.endDateCorrection
-  // });
-  dropped.accept()
+  calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
+    start: dropped.date,
+    end: dropped.endDateCorrection
+  });
+  dropped.decline()
 }
 function onEventEndResized(resized:VuelCalendarResize){
   // calendarApi.value!.configureEventsByParam('id', resized.event.id, {

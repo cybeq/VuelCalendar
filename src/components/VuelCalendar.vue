@@ -633,6 +633,13 @@ export default defineComponent({
     removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>{
+
+
+        this.eventsConfigurableSplit = this.eventsConfigurableSplit.map((array:any) => {
+          return array.filter((e:any) => e[param] !== value);
+        });
+
+
         this.eventsConfigurable = this.eventsConfigurable.filter( (e:any) =>
         {
           return e[param] !== value
@@ -650,8 +657,17 @@ export default defineComponent({
       return this.preventResize(()=>
       {
         const pairedEvents = this.eventsConfigurable.filter((e:any)=>e[param] === value);
+        const flattenSplit = this.eventsConfigurableSplit.flat().filter((e:any)=>e[param] === value);
 
         pairedEvents.forEach( (pe:any)=>
+        {
+          Object.entries(params).forEach( (paramsEntries:any)=>
+          {
+            pe[paramsEntries[0]] = paramsEntries[1]
+          })
+        })
+
+        flattenSplit.forEach( (pe:any)=>
         {
           Object.entries(params).forEach( (paramsEntries:any)=>
           {

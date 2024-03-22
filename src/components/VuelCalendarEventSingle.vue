@@ -92,6 +92,7 @@ export default defineComponent({
   <div :draggable="draggableEvents" style="user-select: none;"
        @dragstart.stop="eventDragHandler.onDragStart($event, event, clone)"
        @dragend="eventDragHandler.onDragEnd($event, clone)"
+       :key="event.id"
   >
     <div v-if="!renderer"> {{event.label}}</div>
     <div v-if="renderer"

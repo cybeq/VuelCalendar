@@ -313,6 +313,11 @@ calendarApi.configureEventsByParam(
 
 
 # Features and updates
+### 22.03.2024 | 17:01
+- **Great performance update**
+
+- ***Calendar is ready to work on thousands of events***
+- A lot of features has appeared. Visit the site to look at changes.
 ### 20.03.2024 | 15:41
 1. From now on, you can resize events on timeline in end and start time and date.
 #### to use pass 'resizableEvents = true' to vuelCalendarOptions and implement methods:
