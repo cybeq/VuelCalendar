@@ -2,9 +2,9 @@
 import {defineComponent, PropType} from "vue";
 import type {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import type {Helper} from "../utils/Helper.ts";
-import {onDragEnd, onDragStart} from "../utils/dragHandlers.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
+import {EventDragHandler} from "../utils/EventDragHandler.ts";
 
 export default defineComponent({
   setup(){
@@ -73,7 +73,11 @@ export default defineComponent({
     startDateConfigurable:{
       type:Date,
       required:true,
-    }
+    },
+    eventDragHandler:{
+      type:Object as PropType<EventDragHandler>,
+      required:true
+    },
   },
   methods:{
     getEventKey(id:number|string):string
@@ -114,11 +118,7 @@ export default defineComponent({
           this.loopedDay
       )
     },
-
-    onDragStart,
-    onDragEnd,
   }
-
 })
 </script>
 
@@ -170,8 +170,8 @@ export default defineComponent({
         v-if="isSameDay(event.end)"
     />
     <div :draggable="draggableEvents" style="user-select: none;"
-         @dragstart.stop="onDragStart($event, event, clone)"
-         @dragend="onDragEnd($event, clone)"
+         @dragstart.stop="eventDragHandler.onDragStart($event, event, clone)"
+         @dragend="eventDragHandler.onDragEnd($event, clone)"
     >
       <div v-if="!renderer"> {{event.label}}</div>
       <div v-if="renderer"

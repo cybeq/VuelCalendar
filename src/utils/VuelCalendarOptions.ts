@@ -9,6 +9,7 @@ import {
   SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
 } from "./types/function-types/apiFunctionsTypes.ts";
 import {VuelCalendarResize} from "./types/VuelCalendarResize.ts";
+import {Logger} from "./Logger.ts";
 
 interface IVuelCalendarOptions {
   onVuelCalendarApiReady?: (api: IVuelCalendarApi) => void;
@@ -42,15 +43,18 @@ interface IVuelCalendarOptions {
   setDaysForward?:SetDaysForward;
   setDateRange?:SetDateRange;
   setTimeRange?:SetTimeRange;
+  showCursorTime?:boolean;
+  throwErrors?:boolean;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
-  onVuelCalendarApiReady!: (api:IVuelCalendarApi) => void;
-  onEventClicked!: (event:VuelCalendarEvent) => void;
-  onDayClicked!: (day:VuelCalendarDay) => void;
-  onDayDblClicked!: (day:VuelCalendarDay) => void;
-  onEventDropped!:(day:VuelCalendarDrop) => void;
-  onEventStartResized!: (event:VuelCalendarResize) => void;
-  onEventEndResized!: (event:VuelCalendarResize) => void;
+  logger:Logger = new Logger();
+  onVuelCalendarApiReady: (api:IVuelCalendarApi) => void = this.logger.undefinedEvent('onVuelCalendarApiReady');
+  onEventClicked: (event:VuelCalendarEvent) => void = this.logger.undefinedEvent('onEventClicked');
+  onDayClicked: (day:VuelCalendarDay) => void = this.logger.undefinedEvent('onDayClicked');
+  onDayDblClicked: (day:VuelCalendarDay) => void = this.logger.undefinedEvent('onDayDblClicked');
+  onEventDropped:(day:VuelCalendarDrop) => void = this.logger.undefinedEvent('onEventDropped');
+  onEventStartResized: (event:VuelCalendarResize) => void = this.logger.undefinedEvent('onEventStartResized');
+  onEventEndResized: (event:VuelCalendarResize) => void = this.logger.undefinedEvent('onEventEndResized');
   api!:IVuelCalendarApi;
   setNewStartDate!: SetStartDate;
   setEvents!: SetEvents ;
@@ -75,6 +79,8 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   startHour?:number = 0;
   endHour?:number = 24;
   renderer?:string;
+  showCursorTime?: boolean = false;
+  throwErrors?:boolean = false;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
               componentSetNewStartDate: SetStartDate ,
               componentSetEvents: SetEvents,
@@ -122,6 +128,12 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     }
     if(vuelCalendarOptions.theme){
       this.theme = vuelCalendarOptions.theme
+    }
+    if(vuelCalendarOptions.showCursorTime){
+      this.showCursorTime = vuelCalendarOptions.showCursorTime
+    }
+    if(vuelCalendarOptions.throwErrors){
+      this.throwErrors = vuelCalendarOptions.throwErrors
     }
     if(vuelCalendarOptions.startDate)
     {

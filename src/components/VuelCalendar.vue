@@ -1,4 +1,8 @@
 <template>
+  <VuelCalendarMouseTime ref="timeOnMouseCmp"
+                         :theme="theme"
+                         :show-cursor-time="vuelCalendarOptions.showCursorTime"
+                         :mouse-time-handler="mouseTimeHandler"/>
   <div class="vuelcalendar-c1-container"
        :style="`
             display:flex;
@@ -145,18 +149,21 @@
              @click="onDayClick($event, day)"
              @dblclick="onDayDblClick($event, day)"
              @dragover.prevent.stop="
-             ($event)=> {
-               onDragOver($event, dragClone,bgBackup,theme.colors.dragging, `vuelcalendar_day-${day}`, dragEvent);
-               onEventEndResizeDragOver($event, day);
-               onEventStartResizeDragOver($event, day);
+             (e)=> {
+               mouseTimeMove(e);
+               onDragOver(e,day);
+               onEventEndResizeDragOver(e, day);
+               onEventStartResizeDragOver(e, day);
              }
               "
-             @dragleave.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
-             @dragend.prevent.stop="onDragLeave(bgBackup, `vuelcalendar_day-${day}`)"
-             @drop.prevent.stop="($event)=>{
-               onDrop($event, day, bgBackup,`vuelcalendar_day-${day}`);
-               onEventStartResizeDrop($event, day);
-               onEventEndResizeDrop($event, day);
+             @mousemove="mouseTimeMove"
+             @mouseout="mouseTimeOut"
+             @dragleave.prevent.stop="onDragLeave(day)"
+             @dragend.prevent.stop="onDragLeave(day)"
+             @drop.prevent.stop="(e)=>{
+               onDrop(e, day, bgBackup,`vuelcalendar_day-${day}`);
+               onEventStartResizeDrop(e, day);
+               onEventEndResizeDrop(e, day);
              }"
              :style="{
                height:`${rowHeight}px`,
@@ -183,6 +190,7 @@
                 :end-hour-configurable="endHourConfigurable"
                 :start-date-configurable="startDateConfigurable"
                 :event-resize-handler="eventResizeHandler"
+                :event-drag-handler="eventDragHandler"
             />
 
           </div>
@@ -254,7 +262,6 @@ import VuelCalendarEventContainer from "./VuelCalendarEventContainer.vue";
 import VuelCalendarResizer from "./VuelCalendarResizer.vue";
 import VuelCalendarMonthDisplay from "./VuelCalendarMonthDisplay.vue";
 import {Colors} from "../utils/types/Colors.ts";
-import {getClickAndDropData, onDragLeave, onDragOver} from "../utils/dragHandlers.ts";
 import {
   AddEvents, ConfigureEventsByParam,
   RemoveEventsByParam, SetDateRange, SetDaysForward, SetEndHour,
@@ -263,20 +270,31 @@ import {
 } from "../utils/types/function-types/apiFunctionsTypes.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
+import {MouseTimeHandler} from "../utils/MouseTimeHandler.ts";
+import {EventDragHandler} from "../utils/EventDragHandler.ts";
+import VuelCalendarMouseTime from "./VuelCalendarMouseTime.vue";
+import {Logger} from "../utils/Logger.ts";
 export default defineComponent({
   components:{
+    VuelCalendarMouseTime,
     VuelCalendarResizer,
     VuelCalendarEventContainer,
     VuelCalendarMonthDisplay
   },
-  setup(){
+  setup(props:any){
+    const logger = new Logger(props.vuelCalendarOptions.throwErrors);
     const helper = new Helper();
     const dateUltra = new DateUltra();
-    const eventResizeHandler = new EventResizeHandler()
+    const eventResizeHandler = new EventResizeHandler(logger);
+    const mouseTimeHandler = reactive(new MouseTimeHandler(helper));
+    const eventDragHandler = (new EventDragHandler())
     return {
       helper,
       dateUltra,
-      eventResizeHandler
+      eventResizeHandler,
+      mouseTimeHandler,
+      eventDragHandler,
+      logger
     }
   },
   props:{
@@ -389,9 +407,36 @@ export default defineComponent({
     })
   },
   methods:{
+    mouseTimeMove(event:MouseEvent){
+      if(!this.vuelCalendarOptions.showCursorTime){
+        return;
+      }
+      const cmp = this.$refs.timeOnMouseCmp as any;
+      if(!cmp){
+        return;
+      }
+      const div = cmp.$refs.timeOnMouse;
+      if(!div){
+        return;
+      }
+      this.mouseTimeHandler.move(event, div as HTMLDivElement, this.startHourConfigurable, this.endHourConfigurable)
+    },
+    mouseTimeOut(){
+      if(!this.vuelCalendarOptions.showCursorTime){
+        return;
+      }
+      this.mouseTimeHandler.out()
+    },
     clone(method:string, el?:HTMLDivElement, event?:VuelCalendarEvent){switch(method){case "append":this.dragClone = el;this.dragEvent = event;this.bodyOverflowState = document.body.style.overflow;document.body.style.overflow="hidden";document.body.appendChild(this.dragClone!);break;case "remove":document.body.style.overflow = this.bodyOverflowState!;this.bodyOverflowState = undefined;document.body.removeChild(this.dragClone!);this.dragClone = undefined;this.dragEvent = undefined;break;}},
-    onDragOver,
-    onDragLeave,
+    onDragOver(e:DragEvent, day:number){
+      this.eventDragHandler.onDragOver(
+          e, this.dragClone,this.bgBackup,this.theme.colors.dragging,
+          `vuelcalendar_day-${day}`, this.dragEvent
+      )
+    },
+    onDragLeave(day:number){
+      this.eventDragHandler.onDragLeave(this.bgBackup, `vuelcalendar_day-${day}`);
+    },
     onDrop(event:DragEvent, day:number, bgBackup:string | undefined, id:string){
       if(!this.dragEvent){
         return;
@@ -401,7 +446,7 @@ export default defineComponent({
         container.style.backgroundColor=bgBackup
       }
       const { clickedDay, clickedTime, daysEvents }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.endHourConfigurable, this.startDateConfigurable, this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.endHourConfigurable, this.startDateConfigurable)
       const droppedDate = this.helper.setTimeToDate(clickedDay,clickedTime);
 
 
@@ -434,13 +479,14 @@ export default defineComponent({
     onDayClick(event:MouseEvent, day:number)
     {
       const { clickedDay, clickedTime, daysEvents }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+
       this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
     onDayDblClick(event:MouseEvent, day:number)
     {
       const { clickedDay, clickedTime, daysEvents }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
       this.vuelCalendarApi.onDayDblClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
     onEventEndResizeDragOver(event:MouseEvent, day:number){
@@ -451,7 +497,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
 
       this.preventResize(()=>
       {
@@ -466,7 +512,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
 
       this.preventResize(()=>
       {
@@ -481,7 +527,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
         this.preventResize(()=>
         {
           this.eventResizeHandler.onEventStartResizeDrop(
@@ -499,7 +545,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
 
       this.preventResize(()=>
       {
@@ -527,7 +573,8 @@ export default defineComponent({
     },
     setDaysForward(days:number){
       if( days < 1){
-        this.daysForwardConfigurable = 1;
+        this.logger.customWarn('args', 'Days forward', 'daysForward must be greater or equal to 1')
+        return;
       }
       this.daysForwardConfigurable = days;
       this.rowHeight = this.height! / days
@@ -541,6 +588,9 @@ export default defineComponent({
       }
       if(typeof endDate ===  "string" ){
         endDate = new Date(endDate);
+      }
+      if(this.dateUltra.isBiggerDate(startDate, endDate)){
+        this.logger.customWarn('args', 'Date range', 'endDate must be greater or equal to startDate')
       }
       const timeDifference = this.helper.getDaysDifference(startDate, endDate);
       this.setDaysForward(timeDifference)
@@ -605,9 +655,10 @@ export default defineComponent({
     setStartHour(hour:number)
     {
       if(hour > this.endHourConfigurable || hour === this.endHourConfigurable){
-        this.startHourConfigurable = this.endHourConfigurable -1;
-        return;
+          this.logger.customWarn('args', 'Start hour', 'endHour must be greater than startHour')
+          return;
       }
+
       if(hour > 23){
         this.startHourConfigurable = 23;
         return;
@@ -622,7 +673,7 @@ export default defineComponent({
     setEndHour(hour:number)
     {
       if(hour < this.startHourConfigurable || hour === this.startHourConfigurable){
-        this.endHourConfigurable = this.startHourConfigurable +1;
+        this.logger.customWarn('args', 'End hour', 'endHour must be greater than startHour')
         return;
       }
       if(hour > 24){
@@ -637,6 +688,10 @@ export default defineComponent({
     },
     setTimeRange(startHour:number, endHour:number)
     {
+      if(startHour > endHour  || startHour === endHour ){
+        this.logger.customWarn('args', 'Time range', 'endHour must be greater than startHour')
+        return;
+      }
       this.setStartHour(startHour)
       this.setEndHour(endHour)
     },
@@ -650,7 +705,7 @@ export default defineComponent({
 
       for (const event of events)
       {
-        if(event.start) {
+        if(event.start < event.end) {
           if (
               (this.dateUltra.isSameDate(event.start, targetDate))
               ||

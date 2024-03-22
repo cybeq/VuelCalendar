@@ -215,8 +215,27 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
 
   public setTimeToDate(date:Date, time:string){
       const [hours, minutes] = time.split(':').map(Number);
-      date.setHours(hours);
-      date.setMinutes(minutes);
+      date.setHours(hours, minutes, 0);
+
       return new Date(date);
   }
+
+    public getClickAndDropData(event:MouseEvent|DragEvent, day:number, helper:Helper, startHourConfigurable:number, endHourConfigurable:number=24, startDateConfigurable:Date, getEventsToContainer?:Function){
+        const el = (event.currentTarget! as HTMLElement);
+        const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
+        const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
+        const clickedDay = helper.addToDate(startDateConfigurable!, day-1)
+        const clickedTime =    helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
+        let daysEvents  = []
+        if(getEventsToContainer){
+            daysEvents = getEventsToContainer(day)
+        }
+        return {el,clickedWidthFromLeft, percentClicked, clickedDay, clickedTime, daysEvents}
+    }
+    public getTimeFromClick (event:MouseEvent, helper:Helper, startHourConfigurable:number, endHourConfigurable:number) {
+        const el = (event.currentTarget! as HTMLElement);
+        const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
+        const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
+        return  helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
+    }
 }

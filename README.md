@@ -1,6 +1,6 @@
 ## VuelCalendar
 
-**[Since 19.03.2024]**
+**Since 19.03.2024**
 *All new features, issues, fixes, updates and **DOCS** will be available at below link*
 * Component preview 
 * Docs
@@ -8,6 +8,8 @@
 
 ----------------------------
 ![demo](https://s12.gifyu.com/images/SUPkq.gif)
+
+## *Fully supports backend integration.
 
 This Vue Calendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.
 
