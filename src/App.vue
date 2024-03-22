@@ -154,7 +154,7 @@ function addEvents() {
 
 function addEvents2() {
   const es = [];
-  for (let i = 0; i < 5000; i++) {
+  for (let i = 0; i < 1000; i++) {
     es.push({
       id: 123,
       label: 'Event #123',

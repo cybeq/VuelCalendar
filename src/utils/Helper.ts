@@ -1,4 +1,5 @@
 import {DateUltra} from "./DateUltra.ts";
+import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 
 export class Helper{
 
@@ -220,15 +221,15 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
       return new Date(date);
   }
 
-    public getClickAndDropData(event:MouseEvent|DragEvent, day:number, helper:Helper, startHourConfigurable:number, endHourConfigurable:number=24, startDateConfigurable:Date, getEventsToContainer?:Function){
+    public getClickAndDropData(event:MouseEvent|DragEvent, day:number, helper:Helper, startHourConfigurable:number, endHourConfigurable:number=24, startDateConfigurable:Date, eventsConfigurable?:VuelCalendarEvent[]){
         const el = (event.currentTarget! as HTMLElement);
         const clickedWidthFromLeft = event.clientX - el.getBoundingClientRect().left
         const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
         const clickedDay = helper.addToDate(startDateConfigurable!, day-1)
         const clickedTime =    helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
-        let daysEvents  = []
-        if(getEventsToContainer){
-            daysEvents = getEventsToContainer(day)
+        let daysEvents:VuelCalendarEvent[]  = []
+        if(eventsConfigurable) {
+            daysEvents = this.getEventsToContainer(day, startDateConfigurable, eventsConfigurable)
         }
         return {el,clickedWidthFromLeft, percentClicked, clickedDay, clickedTime, daysEvents}
     }
@@ -238,4 +239,39 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
         const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
         return  helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
     }
+
+    getEventsToContainer(day:number, startDateConfigurable:Date, eventsConfigurable:VuelCalendarEvent[])
+    {
+        const newDate = new Date(startDateConfigurable!);
+        const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
+
+        const events = eventsConfigurable ?? [];
+        const divEvents = [];
+
+        for (const event of events)
+        {
+            if(event.start < event.end) {
+                if (
+                    (this.dateUltra.isSameDate(event.start, targetDate))
+                    ||
+                    (this.dateUltra.isSameDate(event.end, targetDate))
+                    ||
+                    (
+                        this.dateUltra.isLowerDate(targetDate, event.end)
+                        && this.dateUltra.isBiggerDate(targetDate, event.start)
+                    )
+                )
+                {
+                    divEvents.push(event);
+                }
+            }
+        }
+        // console.log(
+        //     'divEvents',
+        //     divEvents
+        // );
+        return divEvents;
+    }
+
+
 }

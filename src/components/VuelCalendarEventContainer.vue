@@ -5,8 +5,10 @@ import type {Helper} from "../utils/Helper.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
+import VuelCalendarEventSingle from "./VuelCalendarEventSingle.vue";
 
 export default defineComponent({
+  components: {VuelCalendarEventSingle},
   setup(){
     return {
       dateUltra:new DateUltra(),
@@ -80,6 +82,38 @@ export default defineComponent({
     },
   },
   methods:{
+    getEventsToContainer(day:number)
+    {
+      const newDate = new Date(this.startDateConfigurable!);
+      const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
+
+      const events = this.events ?? [];
+      const divEvents = [];
+
+      for (const event of events)
+      {
+        if(event.start < event.end) {
+          if (
+              (this.dateUltra.isSameDate(event.start, targetDate))
+              ||
+              (this.dateUltra.isSameDate(event.end, targetDate))
+              ||
+              (
+                  this.dateUltra.isLowerDate(targetDate, event.end)
+                  && this.dateUltra.isBiggerDate(targetDate, event.start)
+              )
+          )
+          {
+            divEvents.push(event);
+          }
+        }
+      }
+      // console.log(
+      //     'divEvents',
+      //     divEvents
+      // );
+      return divEvents;
+    },
     getEventKey(id:number|string):string
     {
       let randomId = '';
@@ -125,8 +159,8 @@ export default defineComponent({
 <template>
   <div
     class="vuelcalendar-event"
-    v-for="event in events"
-    :key="getEventKey(event.id ?? 0)"
+    v-for="event in getEventsToContainer(loopedDay)"
+    :key="event.id ?? ''"
     @click.stop="onEventClicked(event)"
     :style="{
       height: renderer ?'unset':'20px',
@@ -143,46 +177,15 @@ export default defineComponent({
       transition:'opacity 0.2s ease',
       position:'sticky'}"
   >
-    <div :style="{
-        position:'absolute',
-        left:0,
-        width:'5px',
-        height:'100%',
-        backgroundColor:'transparent',
-        cursor:resizableEvents ? 'ew-resize' :'inherit',
-        }"
-       :draggable="resizableEvents"
-        @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event)"
-        @dragend="eventResizeHandler.onEventStartResizeEnd"
-       v-if="isSameDay(event.start)"
-    />
-    <div :style="{
-        position:'absolute',
-        right:0,
-        width:'5px',
-        height:'100%',
-        backgroundColor:'transparent',
-        cursor:resizableEvents ? 'ew-resize' :'inherit',
-        }"
-        :draggable="resizableEvents"
-        @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event)"
-        @dragend="eventResizeHandler.onEventEndResizeEnd"
-        v-if="isSameDay(event.end)"
-    />
-    <div :draggable="draggableEvents" style="user-select: none;"
-         @dragstart.stop="eventDragHandler.onDragStart($event, event, clone)"
-         @dragend="eventDragHandler.onDragEnd($event, clone)"
-    >
-      <div v-if="!renderer"> {{event.label}}</div>
-      <div v-if="renderer"
-           style="width:100%;height:100%"
-      >
-        <component
-            :is="renderer"
-            :event="event"/>
-
-      </div>
-    </div>
+    <VuelCalendarEventSingle :start-date-configurable="startDateConfigurable"
+                       :looped-day="loopedDay"
+                       :clone="clone"
+                       :renderer="renderer"
+                       :draggable-events="draggableEvents"
+                       :resizable-events="resizableEvents"
+                       :event-drag-handler="eventDragHandler"
+                       :event="event"
+                       :event-resize-handler="eventResizeHandler" />
   </div>
 </template>
 

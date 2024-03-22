@@ -29,7 +29,7 @@ Key features of VuelCalendar include:
 
 
 
-**Updated  20.03.2024 | 15:41 | Read about new features at the end of the document -> v.0.2**
+**Updated  22.03.2024 | 15:41 | Read about new features at the end of the document -> v.0.2**
 
 ## How to Use
 

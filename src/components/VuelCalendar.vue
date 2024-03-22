@@ -175,16 +175,16 @@
                boxSizing:'border-box' }"
         >
           <div style="margin-top:15px">
-
+          <div v-for="events in eventsConfigurableSplit" key="nokey">
             <VuelCalendarEventContainer
                 :theme="theme"
                 :helper="helper"
                 :loopedDay="day"
                 :renderer="vuelCalendarOptions.renderer"
+                :events="events"
                 :clone="clone"
                 :draggable-events="vuelCalendarOptions.draggableEvents"
                 :resizable-events="vuelCalendarOptions.resizableEvents"
-                :events="getEventsToContainer(day)"
                 :on-event-clicked="vuelCalendarApi.onEventClicked"
                 :start-hour-configurable="startHourConfigurable"
                 :end-hour-configurable="endHourConfigurable"
@@ -192,6 +192,8 @@
                 :event-resize-handler="eventResizeHandler"
                 :event-drag-handler="eventDragHandler"
             />
+          </div>
+
 
           </div>
             <div
@@ -380,6 +382,7 @@ export default defineComponent({
       },
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
       eventsConfigurable:      [] as VuelCalendarEvent[],
+      eventsConfigurableSplit: [] as Array<Array<VuelCalendarEvent>>,
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
 
       startHourConfigurable:   (this.vuelCalendarOptions.startHour ?? 0) < 1 ? 0 : (this.vuelCalendarOptions.startHour ?? 0),
@@ -479,14 +482,14 @@ export default defineComponent({
     onDayClick(event:MouseEvent, day:number)
     {
       const { clickedDay, clickedTime, daysEvents }
-          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable, this.eventsConfigurable)
 
       this.vuelCalendarApi.onDayClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
     onDayDblClick(event:MouseEvent, day:number)
     {
       const { clickedDay, clickedTime, daysEvents }
-          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable, this.eventsConfigurable)
       this.vuelCalendarApi.onDayDblClicked({clickEvent:event, date:this.helper.setTimeToDate(clickedDay,clickedTime), time:clickedTime, events:daysEvents })
     },
     onEventEndResizeDragOver(event:MouseEvent, day:number){
@@ -497,7 +500,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,  this.getEventsToContainer)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,this.eventsConfigurable)
 
       this.preventResize(()=>
       {
@@ -602,6 +605,9 @@ export default defineComponent({
         this.preventResize(()=>
         {
           this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
+          for (let i = 0; i < events.length; i += 5) {
+            this.eventsConfigurableSplit.push(events.slice(i, i + 5));
+          }
         })
       })
       return events;
@@ -616,6 +622,9 @@ export default defineComponent({
           {
             this.eventsConfigurable.push(event);
           });
+          for (let i = 0; i < events.length; i += 5) {
+            this.eventsConfigurableSplit.push(events.slice(i, i + 5));
+          }
         })
       })
       return events;
@@ -695,38 +704,38 @@ export default defineComponent({
       this.setStartHour(startHour)
       this.setEndHour(endHour)
     },
-    getEventsToContainer(day:number)
-    {
-      const newDate = new Date(this.startDateConfigurable!);
-      const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
-
-      const events = this.eventsConfigurable ?? [];
-      const divEvents = [];
-
-      for (const event of events)
-      {
-        if(event.start < event.end) {
-          if (
-              (this.dateUltra.isSameDate(event.start, targetDate))
-              ||
-              (this.dateUltra.isSameDate(event.end, targetDate))
-              ||
-              (
-                  this.dateUltra.isLowerDate(targetDate, event.end)
-                  && this.dateUltra.isBiggerDate(targetDate, event.start)
-              )
-          )
-          {
-            divEvents.push(event);
-          }
-        }
-      }
-      // console.log(
-      //     'divEvents',
-      //     divEvents
-      // );
-      return divEvents;
-    },
+    // getEventsToContainer(day:number)
+    // {
+    //   const newDate = new Date(this.startDateConfigurable!);
+    //   const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
+    //
+    //   const events = this.eventsConfigurable ?? [];
+    //   const divEvents = [];
+    //
+    //   for (const event of events)
+    //   {
+    //     if(event.start < event.end) {
+    //       if (
+    //           (this.dateUltra.isSameDate(event.start, targetDate))
+    //           ||
+    //           (this.dateUltra.isSameDate(event.end, targetDate))
+    //           ||
+    //           (
+    //               this.dateUltra.isLowerDate(targetDate, event.end)
+    //               && this.dateUltra.isBiggerDate(targetDate, event.start)
+    //           )
+    //       )
+    //       {
+    //         divEvents.push(event);
+    //       }
+    //     }
+    //   }
+    //   // console.log(
+    //   //     'divEvents',
+    //   //     divEvents
+    //   // );
+    //   return divEvents;
+    // },
 
     setDateFromMonthCalendar( dayToAdd: number )
     {

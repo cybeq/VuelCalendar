@@ -150,7 +150,7 @@ export default defineComponent({
 
           <div class="vuelcalendar-month-datelabel" :style="{position: 'absolute', bottom: '5px', left: '5px', fontSize:'0.8em', color:theme.colors.textPrimary}">
 
-            {{helper.dateToMonthAndDayContainer(startDateConfigurable!, day - 1,)}}
+            {{helper.dateToMonthAndDayContainer(startDateConfigurable!, day - 2)}}
 
           </div>
 
