@@ -161,7 +161,7 @@
              @dragleave.prevent.stop="onDragLeave(day)"
              @dragend.prevent.stop="onDragLeave(day)"
              @drop.prevent.stop="(e)=>{
-               onDrop(e, day, bgBackup,`vuelcalendar_day-${day}`);
+               onDrop(e, bgBackup,`vuelcalendar_day-${day}`);
                onEventStartResizeDrop(e, day);
                onEventEndResizeDrop(e, day);
              }"
@@ -390,7 +390,6 @@ export default defineComponent({
 
       viewMode:                'days',
 
-      dragClone:undefined as HTMLDivElement | undefined,
       dragEvent:undefined as VuelCalendarEvent | undefined,
       bodyOverflowState:undefined as undefined | string,
       bgBackup:undefined as string |undefined,
@@ -430,17 +429,30 @@ export default defineComponent({
       }
       this.mouseTimeHandler.out()
     },
-    clone(method:string, el?:HTMLDivElement, event?:VuelCalendarEvent){switch(method){case "append":this.dragClone = el;this.dragEvent = event;this.bodyOverflowState = document.body.style.overflow;document.body.style.overflow="hidden";document.body.appendChild(this.dragClone!);break;case "remove":document.body.style.overflow = this.bodyOverflowState!;this.bodyOverflowState = undefined;document.body.removeChild(this.dragClone!);this.dragClone = undefined;this.dragEvent = undefined;break;}},
+    clone(method:string, event?:VuelCalendarEvent){
+      switch(method)
+      {
+        case "append":
+          this.dragEvent = event;
+          break;
+        case "remove":
+          this.dragEvent = undefined;
+          break;
+      }
+    },
     onDragOver(e:DragEvent, day:number){
+      const { clickedDay, clickedTime }
+          = this.helper.getClickAndDropData(e, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
+
       this.eventDragHandler.onDragOver(
-          e, this.dragClone,this.bgBackup,this.theme.colors.dragging,
-          `vuelcalendar_day-${day}`, this.dragEvent
+          e, this.bgBackup,this.theme.colors.dragging,
+          `vuelcalendar_day-${day}`, this.dragEvent,clickedDay,clickedTime
       )
     },
     onDragLeave(day:number){
       this.eventDragHandler.onDragLeave(this.bgBackup, `vuelcalendar_day-${day}`);
     },
-    onDrop(event:DragEvent, day:number, bgBackup:string | undefined, id:string){
+    onDrop(event:DragEvent, bgBackup:string | undefined, id:string){
       if(!this.dragEvent){
         return;
       }
@@ -448,34 +460,9 @@ export default defineComponent({
       if(container && bgBackup){
         container.style.backgroundColor=bgBackup
       }
-      const { clickedDay, clickedTime, daysEvents }
-          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable, this.endHourConfigurable, this.startDateConfigurable)
-      const droppedDate = this.helper.setTimeToDate(clickedDay,clickedTime);
-
-
-      const previousEnd = new Date(this.dragEvent!.end);
-      const previousStart = new Date(this.dragEvent!.start);
-      const newStart = new Date(droppedDate);
-
-      const timeDifferenceMilliseconds = newStart.getTime() - previousStart.getTime();
-      const endDateCorrection = new Date(previousEnd.getTime() + timeDifferenceMilliseconds);
       this.preventResize(()=>
       {
-        this.vuelCalendarApi.onEventDropped(
-            {
-              clickEvent:event,
-              date:droppedDate,
-              time:clickedTime,
-              events:daysEvents,
-              event:this.dragEvent!,
-              endDateCorrection,
-              accept:()=>{
-                this.dragEvent!.start = droppedDate;
-                this.dragEvent!.end = endDateCorrection;
-              },
-              decline:()=>{}
-            }
-        )
+        this.eventDragHandler.onDrop(event, this.dragEvent!, this.vuelCalendarApi.onEventDropped)
       })
 
     },

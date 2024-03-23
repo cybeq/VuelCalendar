@@ -2,11 +2,11 @@ import {VuelCalendarEvent} from "./VuelCalendarEvent.ts";
 
 export type VuelCalendarDrop = {
     clickEvent:MouseEvent;
-    date:Date;
-    time:string;
-    events:Array<VuelCalendarEvent>
+    newStartDateTime:Date;
+    oldStartDateTime:Date;
+    newEndDateTime:Date;
+    oldEndDateTime:Date;
     event:VuelCalendarEvent;
-    endDateCorrection:Date;
     accept:()=>void;
     decline:()=>void;
 }

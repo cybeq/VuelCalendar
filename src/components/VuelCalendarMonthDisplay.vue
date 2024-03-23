@@ -33,7 +33,7 @@ export default defineComponent({
       required:true,
     },
     eventsConfigurable:{
-      type:Array as PropType<Array<VuelCalendarEvent[]>>,
+      type:Array as PropType<Array<VuelCalendarEvent>>,
       required:true,
     },
     rowHeight:{
@@ -52,7 +52,7 @@ export default defineComponent({
   computed:{
     countEventsForDay()
     {
-      return (day:number) => this.helper.countEventsForDay(this.startDateConfigurable!, day - 1, this.eventsConfigurable!.flat())
+      return (day:number) => this.helper.countEventsForDay(this.startDateConfigurable!, day - 1, this.eventsConfigurable)
     }
   }
 })

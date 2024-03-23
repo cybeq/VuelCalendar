@@ -1,25 +1,29 @@
 import type {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
+import {DateUltra} from "./DateUltra.ts";
+import {VuelCalendarDrop} from "./types/VuelCalendarDrop.ts";
 
 export class EventDragHandler{
+    dateUltra = new DateUltra();
+    oldStartDateTimeBackup?:Date;
+    oldEndDateTimeBackup?:Date;
     onDragStart(e:DragEvent, event:VuelCalendarEvent, cloneFunction:Function){
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer!.setDragImage(img, 0, 0);
+        cloneFunction('append', event);
 
-        ((e.target as HTMLElement).parentElement as HTMLElement).style.opacity='0.5'
-
-        const clone = ((e.target as HTMLElement).parentElement as HTMLElement).cloneNode(true) as HTMLDivElement;
-        clone.style.opacity='1'
-        clone.style.zIndex='6'
-        clone.style.position="fixed";
-        cloneFunction('append',clone, event);
+        const oldStartDateTime = new Date(event.start);
+        const oldEndDateTime = new Date(event.end);
+        this.oldStartDateTimeBackup = oldStartDateTime;
+        this.oldEndDateTimeBackup = oldEndDateTime;
     };
     onDragOver(event:DragEvent,
-               dragClone:HTMLDivElement | undefined,
                bgBackup:undefined|string,
                draggingColor:string,
                id:string,
-               dragEvent?:VuelCalendarEvent)
+               dragEvent:VuelCalendarEvent|undefined,
+               date:Date,
+               time:string)
     {
         if(!dragEvent){
             return;
@@ -30,14 +34,11 @@ export class EventDragHandler{
         if(container && bgBackup){
             container.style.backgroundColor=draggingColor
         }
-        if(dragClone) {
-            const x = event.clientX;
-            const y = event.clientY;
-            dragClone!.style.left = '0';
-            dragClone!.style.top = '0';
-            dragClone!.style.marginLeft = x + 'px';
-            dragClone!.style.marginTop = y + 'px';
-        }
+        const oldStartDateTime = new Date(dragEvent.start);
+        const newStartDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
+        const diff = newStartDateTime.getTime() - oldStartDateTime.getTime();
+        dragEvent.start = newStartDateTime;
+        dragEvent.end = new Date((dragEvent.end.getTime() + diff))
     }
     onDragLeave(bgBackup:string | undefined, id:string){
         const container = document.getElementById(id);
@@ -45,9 +46,26 @@ export class EventDragHandler{
             container.style.backgroundColor=bgBackup
         }
     }
-    onDragEnd(e:DragEvent, cloneFunction:Function){
-        ((e.target as HTMLElement).parentElement as HTMLElement).style.opacity='1'
+    onDragEnd(cloneFunction:Function){
         cloneFunction('remove');
+    }
+    onDrop(e:MouseEvent, event:VuelCalendarEvent, apiCall:(drop:VuelCalendarDrop)=>void ){
+        apiCall(
+            {
+                clickEvent:e,
+                event:event,
+                newStartDateTime:event.start,
+                newEndDateTime:event.end,
+                oldStartDateTime:this.oldStartDateTimeBackup!,
+                oldEndDateTime:this.oldEndDateTimeBackup!,
+                accept:()=>{
+                },
+                decline:()=>{
+                    event.start = this.oldStartDateTimeBackup!;
+                    event.end = this.oldEndDateTimeBackup!;
+                }
+            }
+        )
     }
 
 }

@@ -191,11 +191,12 @@ function onDayDblClicked(day: any) {
   console.log(day, 'day dbl clicked api');
 }
 function onEventDropped(dropped: VuelCalendarDrop) {
-  calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
-    start: dropped.date,
-    end: dropped.endDateCorrection
-  });
-  dropped.decline()
+  console.log('dropped', dropped)
+  // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
+  //   start: dropped.date,
+  //   end: dropped.endDateCorrection
+  // });
+  dropped.accept()
 }
 function onEventEndResized(resized:VuelCalendarResize){
   // calendarApi.value!.configureEventsByParam('id', resized.event.id, {
