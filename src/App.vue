@@ -78,9 +78,17 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
         label: 'Event #1',
         data: {},
         start: new Date(new Date(new Date().setHours(8, 0)).setDate(22)),
-        end: new Date(new Date(new Date().setHours(18, 2)).setDate(23)),
+        end: new Date(new Date(new Date().setHours(18, 2)).setDate(26)),
+      },
+      {
+        id: 20,
+        label: 'Event #20',
+        data: {},
+        start: new Date(new Date(new Date().setHours(8, 0)).setDate(22)),
+        end: new Date(new Date(new Date().setHours(18, 2)).setDate(22)),
       },
     ]);
+
     console.log('ready api', api);
   },
   onDayClicked: onDayClicked,
@@ -99,8 +107,8 @@ const events = [
       img:w1,
       color:'#89457f'
     },
-    start: new Date(new Date().setHours(8, 0)),
-    end: new Date(new Date().setHours(23, 0)),
+    start: new Date(new Date(new Date().setHours(8, 0)).setDate(25)),
+    end: new Date(new Date(new Date().setHours(18, 2)).setDate(27)),
   },
   {
     id: 3,

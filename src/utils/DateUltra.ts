@@ -25,6 +25,11 @@ export class DateUltra{
         const endZero = this.timeZero(end)
         return Math.round((startZero.getTime() - endZero.getTime()) / (1000 * 3600 * 24))
     }
+    public daysDifferenceCeil(start:Date, end:Date):number{
+        const startZero = this.timeZero(start)
+        const endZero = this.timeZero(end)
+        return Math.ceil((startZero.getTime() - endZero.getTime()) / (1000 * 3600 * 24))
+    }
     public convertToSameDate(start:Date, end:Date):Date[]{
         return [new Date(start),   new Date(new Date(new Date(new Date(end).setFullYear(start.getFullYear())).setDate(start.getDate())).setMonth(start.getMonth()))]
     }
