@@ -175,24 +175,34 @@
                boxSizing:'border-box' }"
         >
           <div style="margin-top:15px">
-          <div v-for="events in eventsConfigurableSplit" key="nokey">
-            <VuelCalendarEventContainer
-                :theme="theme"
-                :helper="helper"
-                :loopedDay="day"
-                :renderer="vuelCalendarOptions.renderer"
-                :events="events"
-                :clone="clone"
-                :draggable-events="vuelCalendarOptions.draggableEvents"
-                :resizable-events="vuelCalendarOptions.resizableEvents"
-                :on-event-clicked="vuelCalendarApi.onEventClicked"
-                :start-hour-configurable="startHourConfigurable"
-                :end-hour-configurable="endHourConfigurable"
-                :start-date-configurable="startDateConfigurable"
-                :event-resize-handler="eventResizeHandler"
-                :event-drag-handler="eventDragHandler"
-            />
-          </div>
+            <VirtualScroller :items="eventsConfigurableSplit"
+                             :day="day"
+                             :start-date-configurable="startDateConfigurable"
+                             :set-min-slice-count="setMinimumSliceCount"
+                             :get-min-slice-count="getMinimumSliceCount"
+                             :drag-event="dragEvent"
+                             :rowId="`vuelcalendar_day-${day}`"
+                             :default-row-height="rowHeight">
+              <template v-slot:vs="{items}">
+                <VuelCalendarEventContainer
+                    :theme="theme"
+                    :helper="helper"
+                    :loopedDay="day"
+                    :renderer="vuelCalendarOptions.renderer"
+                    :events="items"
+                    :clone="clone"
+                    :draggable-events="vuelCalendarOptions.draggableEvents"
+                    :resizable-events="vuelCalendarOptions.resizableEvents"
+                    :on-event-clicked="vuelCalendarApi.onEventClicked"
+                    :start-hour-configurable="startHourConfigurable"
+                    :end-hour-configurable="endHourConfigurable"
+                    :start-date-configurable="startDateConfigurable"
+                    :event-resize-handler="eventResizeHandler"
+                    :event-drag-handler="eventDragHandler"
+                />
+              </template>
+            </VirtualScroller>
+
 
 
           </div>
@@ -241,17 +251,17 @@
 
 <!-- month view -->
 
-<VuelCalendarMonthDisplay
-    :set-view-mode="setViewMode"
-    :days-forward-configurable="daysForwardConfigurable"
-    :row-height="rowHeight"
-    :events-configurable="eventsConfigurable"
-    :start-date-configurable="startDateConfigurable"
-    :set-date-from-month-calendar="setDateFromMonthCalendar"
-    :helper="helper"
-    :theme="theme"
-    :height="height"
-    :view-mode="viewMode"/>
+<!--<VuelCalendarMonthDisplay-->
+<!--    :set-view-mode="setViewMode"-->
+<!--    :days-forward-configurable="daysForwardConfigurable"-->
+<!--    :row-height="rowHeight"-->
+<!--    :events-configurable="eventsConfigurable"-->
+<!--    :start-date-configurable="startDateConfigurable"-->
+<!--    :set-date-from-month-calendar="setDateFromMonthCalendar"-->
+<!--    :helper="helper"-->
+<!--    :theme="theme"-->
+<!--    :height="height"-->
+<!--    :view-mode="viewMode"/>-->
 
 </template>
 <script lang="ts">
@@ -276,8 +286,11 @@ import {MouseTimeHandler} from "../utils/MouseTimeHandler.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import VuelCalendarMouseTime from "./VuelCalendarMouseTime.vue";
 import {Logger} from "../utils/Logger.ts";
+import VirtualScroller from "./VirtualScroller.vue";
+
 export default defineComponent({
   components:{
+    VirtualScroller,
     VuelCalendarMouseTime,
     VuelCalendarResizer,
     VuelCalendarEventContainer,
@@ -360,6 +373,7 @@ export default defineComponent({
   },
   data(){
     return{
+      minimumSliceCount:undefined as number |undefined,
       vuelCalendarApi:new VuelCalendarOptions(
         this.vuelCalendarOptions,
         this.setNewStartDate as SetStartDate,
@@ -409,6 +423,19 @@ export default defineComponent({
     })
   },
   methods:{
+    lazyCut(events:Array<Array<VuelCalendarEvent>>):Array<Array<VuelCalendarEvent>>{
+      // console.log('pawian', events)
+      // for(let i=0; i<events.length; i++){
+      //
+      // }
+      return events;
+    },
+    setMinimumSliceCount(minimumSliceCount:number){
+      this.minimumSliceCount = minimumSliceCount;
+    },
+    getMinimumSliceCount():number{
+      return this.minimumSliceCount ?? 0
+    },
     mouseTimeMove(event:MouseEvent){
       if(!this.vuelCalendarOptions.showCursorTime){
         return;
@@ -443,14 +470,20 @@ export default defineComponent({
     onDragOver(e:DragEvent, day:number){
       const { clickedDay, clickedTime }
           = this.helper.getClickAndDropData(e, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
+      this.preventResize(()=>
+      {
+        this.eventDragHandler.onDragOver(
+            e, this.bgBackup,this.theme.colors.dragging,
+            `vuelcalendar_day-${day}`, this.dragEvent,clickedDay,clickedTime)
+      })
 
-      this.eventDragHandler.onDragOver(
-          e, this.bgBackup,this.theme.colors.dragging,
-          `vuelcalendar_day-${day}`, this.dragEvent,clickedDay,clickedTime
-      )
     },
     onDragLeave(day:number){
-      this.eventDragHandler.onDragLeave(this.bgBackup, `vuelcalendar_day-${day}`);
+      this.preventResize(()=>
+      {
+        this.eventDragHandler.onDragLeave(this.bgBackup, `vuelcalendar_day-${day}`);
+      })
+
     },
     onDrop(event:DragEvent, bgBackup:string | undefined, id:string){
       if(!this.dragEvent){
@@ -588,72 +621,57 @@ export default defineComponent({
     },
     setEvents(events:[]):Array<VuelCalendarEvent>
     {
-      setTimeout(()=>{
-        this.preventResize(()=>
-        {
-          this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
-          for (let i = 0; i < events.length; i += 5) {
-            this.eventsConfigurableSplit.push(events.slice(i, i + 5));
-          }
-        })
-      })
+      this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
+      this.setEventsSplit()
       return events;
     },
-
+    setEventsSplit(){
+      setTimeout(()=>{
+        this.preventResize(()=> {
+          this.eventsConfigurableSplit = [];
+          for (let i = 0; i < this.eventsConfigurable.length; i += 20) {
+            this.eventsConfigurableSplit.push(this.eventsConfigurable.slice(i, i + 20));
+          }
+        })})
+    },
+    addEventsSplit(events:Array<VuelCalendarEvent>){
+      setTimeout(()=>{
+        this.preventResize(()=> {
+          for (let i = 0; i < events.length; i += 20) {
+            this.eventsConfigurableSplit.push(events.slice(i, i + 20));
+          }
+        })})
+    },
     addEvents(events:[]):Array<VuelCalendarEvent>
     {
-      setTimeout(()=>{
-        this.preventResize(()=>
-        {
-          reactive(structuredClone(toRaw(events))).forEach((event) =>
-          {
-            this.eventsConfigurable.push(event);
-          });
-          for (let i = 0; i < events.length; i += 5) {
-            this.eventsConfigurableSplit.push(events.slice(i, i + 5));
-          }
-        })
-      })
+      reactive(structuredClone(toRaw(events))).forEach((event) =>
+      {
+        this.eventsConfigurable.push(event);
+      });
+      this.addEventsSplit(events)
       return events;
     },
-
-    removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
+    removeEventsByParamSplit(param:string, value:any): Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>{
-
-
         this.eventsConfigurableSplit = this.eventsConfigurableSplit.map((array:any) => {
           return array.filter((e:any) => e[param] !== value);
         });
-
-
+      } , []) as Array<VuelCalendarEvent>
+    },
+    removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
+    {
         this.eventsConfigurable = this.eventsConfigurable.filter( (e:any) =>
         {
           return e[param] !== value
         })
-        // this.eventsConfigurable.forEach((event:any, index:number) => {
-        //   if (event[param] === value) {
-        //     this.eventsConfigurable.splice(index, 1); // Usuń element o zadanym parametrze i wartości
-        //   }
-        // });
-      }, []) as Array<VuelCalendarEvent>
+        return this.removeEventsByParamSplit(param,value)
     },
-
-    configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
+    configureEventsByParamSplit(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
     {
+      const flattenSplit = this.eventsConfigurableSplit.flat().filter((e:any)=>e[param] === value);
       return this.preventResize(()=>
       {
-        const pairedEvents = this.eventsConfigurable.filter((e:any)=>e[param] === value);
-        const flattenSplit = this.eventsConfigurableSplit.flat().filter((e:any)=>e[param] === value);
-
-        pairedEvents.forEach( (pe:any)=>
-        {
-          Object.entries(params).forEach( (paramsEntries:any)=>
-          {
-            pe[paramsEntries[0]] = paramsEntries[1]
-          })
-        })
-
         flattenSplit.forEach( (pe:any)=>
         {
           Object.entries(params).forEach( (paramsEntries:any)=>
@@ -662,6 +680,18 @@ export default defineComponent({
           })
         })
       }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
+    },
+    configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
+    {
+        const pairedEvents = this.eventsConfigurable.filter((e:any)=>e[param] === value);
+        pairedEvents.forEach( (pe:any)=>
+        {
+          Object.entries(params).forEach( (paramsEntries:any)=>
+          {
+            pe[paramsEntries[0]] = paramsEntries[1]
+          })
+        })
+      return this.configureEventsByParamSplit(param, value, params);
     },
 
     setStartHour(hour:number)

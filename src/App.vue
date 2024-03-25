@@ -6,6 +6,7 @@
   <button @click="setEvents">Set events</button>
   <button @click="addEvents">Add events</button>
   <button @click="addEvents2">Add XXSE</button>
+  <button @click="addEvents3">Add UURUR</button>
   <button @click="calendarApi!.switchViewMode()">MOTNHVIEW</button>
   <input type="number" v-model="num" />
   <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
@@ -99,9 +100,9 @@ const vuelCalendarOptions = ref<IVuelCalendarOptions>({
   onEventStartResized:onEventStartResized,
 });
 
-const events = [
+const  events =() => [
   {
-    id: 2,
+    id: rand(2),
     label: 'Marianna Kovalsky',
     data: {
       img:w1,
@@ -111,7 +112,7 @@ const events = [
     end: new Date(new Date(new Date().setHours(18, 2)).setDate(27)),
   },
   {
-    id: 3,
+    id: rand(3),
     label: 'Alan Fabric',
     data: {
       img:m1,
@@ -121,8 +122,8 @@ const events = [
     end: new Date(new Date().setHours(23, 0)),
   },
   {
-    id: 4,
-    label: 'Chris Cock',
+    id: rand(4),
+    label: 'Chris Cock'+ rand(4),
     data: {
       img:m2,
       color:'#56a36b'
@@ -131,7 +132,7 @@ const events = [
     end: new Date(new Date().setHours(23, 0)),
   },
   {
-    id: 5,
+    id: rand(5),
     label: 'Krzysiek Jerzyna ze Szczecina',
     data: {
       img:m3,
@@ -141,7 +142,7 @@ const events = [
     end: new Date(new Date().setHours(23, 0)),
   },
   {
-    id: 6,
+    id: rand(6),
     label: 'UmcaHUJEEECsiek Jerzyna ze Szczecina',
     data: {
       img:m3,
@@ -151,6 +152,19 @@ const events = [
     end: new Date(new Date().setHours(23, 0)),
   },
 ];
+function rand(id:any){
+  let randomId = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  const array = new Uint32Array(8);
+  crypto.getRandomValues(array);
+
+  for (let i = 0; i < 10; i++) {
+    randomId += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return id + '-' + randomId;
+}
 const calendarColors:Colors = {
       surface: '#334155',
       primary: '#1e293b',
@@ -163,22 +177,35 @@ function onDateChange() {
 }
 
 function setEvents() {
-  console.log(calendarApi.value!.setEvents(events), 'setEvents');
+  console.log(calendarApi.value!.setEvents(events()), 'setEvents');
 }
 
 function addEvents() {
-  calendarApi.value!.addEvents(events);
+  calendarApi.value!.addEvents(events());
 }
 
 function addEvents2() {
   const es = [];
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 10000; i++) {
     es.push({
-      id: 100 +i,
-      label: 'Event #123',
+      id: '100' + i + rand(i),
+      label: '100' + i + rand(i),
       data: {},
       start: new Date(new Date().setHours(8, 0)),
       end: new Date(new Date().setHours(23, 0)),
+    });
+  }
+  calendarApi.value!.addEvents(es);
+}
+function addEvents3() {
+  const es = [];
+  for (let i = 0; i < 10000; i++) {
+    es.push({
+      id: '4a00' + i + rand(i),
+      label: '4a00' + i + rand(i),
+      data: {},
+      start: new Date(new Date(new Date().setHours(8, 0)).setDate(26)),
+      end: new Date(new Date(new Date().setHours(23, 0)).setDate(26)),
     });
   }
   calendarApi.value!.addEvents(es);
@@ -201,8 +228,8 @@ function onDayDblClicked(day: any) {
 function onEventDropped(dropped: VuelCalendarDrop) {
   console.log('dropped', dropped)
   // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
-  //   start: dropped.date,
-  //   end: dropped.endDateCorrection
+  //   start: dropped.newStartDateTime,
+  //   end: dropped.newEndDateTime
   // });
   dropped.accept()
 }

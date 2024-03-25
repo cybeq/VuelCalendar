@@ -272,6 +272,39 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
         // );
         return divEvents;
     }
+    getEventsToContainerSplit(day:number, startDateConfigurable:Date, eventsConfigurableSplit:Array<VuelCalendarEvent[]>)
+    {
+        const newDate = new Date(startDateConfigurable!);
+        const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
 
+
+        const divEvents = [];
+        for(const events of eventsConfigurableSplit) {
+            const reg:any = []
+            for (const event of events) {
+                if (event.start < event.end) {
+                    if (
+                        (this.dateUltra.isSameDate(event.start, targetDate))
+                        ||
+                        (this.dateUltra.isSameDate(event.end, targetDate))
+                        ||
+                        (
+                            this.dateUltra.isLowerDate(targetDate, event.end)
+                            && this.dateUltra.isBiggerDate(targetDate, event.start)
+                        )
+                    ) {
+                        reg.push(event);
+                    }
+                }
+            }
+            if(reg.length>0)
+            divEvents.push(reg)
+        }
+        // console.log(
+        //     'divEvents',
+        //     divEvents
+        // );
+        return divEvents;
+    }
 
 }
