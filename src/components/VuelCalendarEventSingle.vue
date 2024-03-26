@@ -81,7 +81,7 @@ export default defineComponent({
         cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
        :draggable="resizableEvents"
-       @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event, pushToEventSplit)"
+       @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event, pushToEventSplit, preventResize, loopedDay)"
        @dragend="eventResizeHandler.onEventStartResizeEnd"
        v-if="isSameDay(event.start)"
   />
@@ -94,7 +94,7 @@ export default defineComponent({
         cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
        :draggable="resizableEvents"
-       @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event, pushToEventSplit)"
+       @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event, pushToEventSplit, preventResize, loopedDay)"
        @dragend="eventResizeHandler.onEventEndResizeEnd"
        v-if="isSameDay(event.end)"
   />

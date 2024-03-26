@@ -2,6 +2,7 @@ import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 import {DateUltra} from "./DateUltra.ts";
 import {VuelCalendarResize} from "./types/VuelCalendarResize.ts";
 import {Logger} from "./Logger.ts";
+import {PreventResize} from "./types/function-types/innerFunctionsTypes.ts";
 
 export class EventResizeHandler {
     endDateBackup?:Date;
@@ -14,10 +15,12 @@ export class EventResizeHandler {
     constructor(logger:Logger) {
         this.logger = logger
     }
-    public onEventStartResizeStart(event:VuelCalendarEvent, pushToSplit:Function){
-        this.startDateBackup = new Date(event.start);
-        this.startEvent = event;
-        pushToSplit(event);
+    public onEventStartResizeStart(event:VuelCalendarEvent, pushToSplit:Function, preventResize:PreventResize, excludedDay:number){
+        preventResize(()=>{
+            this.startDateBackup = new Date(event.start);
+            this.startEvent = event;
+            pushToSplit(event, excludedDay);
+        })
     }
     public onEventStartResizeDayOver(date:Date, time:string){
         this.continueAsync = true;
@@ -34,11 +37,12 @@ export class EventResizeHandler {
         this.startDateBackup = undefined;
         this.startEvent = undefined;
     }
-    public onEventEndResizeStart(event:VuelCalendarEvent, pushToSplit:Function){
-        this.endDateBackup = new Date(event.end);
-        this.endEvent = event;
-        pushToSplit(event);
-
+    public onEventEndResizeStart(event:VuelCalendarEvent, pushToSplit:Function, preventResize:PreventResize, excludedDay:number){
+        preventResize(()=>{
+            this.endDateBackup = new Date(event.end);
+            this.endEvent = event;
+            pushToSplit(event, excludedDay);
+        })
     }
     public onEventEndResizeDayOver(date:Date, time:string){
         this.continueAsync = true;

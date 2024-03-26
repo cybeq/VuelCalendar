@@ -14,6 +14,7 @@ export class EventDragHandler{
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer!.setDragImage(img, 0, 0);
+        console.log('excluded day', excludedDay)
         preventResize(()=>{
             cloneFunction('append', event);
             const oldStartDateTime = new Date(event.start);

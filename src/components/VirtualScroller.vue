@@ -25,10 +25,10 @@ export default defineComponent({
   },
   setup(props:any){
     let rowHeight = ref(props.defaultRowHeight);
-    let sliceCount = ref(5);
+    let sliceCount = ref(2);
     const observer = new  ResizeObserver((t:any)=>{
       rowHeight.value = t[0].contentRect.height;
-      sliceCount.value = ( (rowHeight.value/60) < 2 ? 2 : (rowHeight.value/60));
+      sliceCount.value = ( (rowHeight.value/120) < 2 ? 2 : (rowHeight.value/120));
     })
     return{
       helper: new Helper(),

@@ -422,6 +422,9 @@ export default defineComponent({
     })
   },
   methods:{
+    /* this method is quite complicated due to 2 dimensional virtual scrolling*/
+    /* performance of this component have some costs in readability*/
+    /* otherwise efficiency could not be estimated at the current level*/
     pushToEventsSplit(event:VuelCalendarEvent, excludedDay?:number){
       for(let day =1; day<=this.daysForwardConfigurable; day++)
       {
@@ -443,10 +446,15 @@ export default defineComponent({
         }
         else
         {
+
+          if(!excludedDay){
+            continue;
+          }
           /* in the case if the event already exists in the day - move it to the beginning of beginning to show it in front*/
           if(excludedDay === day){
             continue;
           }
+          console.log('excluded error', excludedDay, day)
           //find the first dimension array of event
           const indexA = this.eventsConfigurableSplit[`${day}`].findIndex((a:Array<VuelCalendarEvent>)=>
               a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id))
@@ -464,7 +472,6 @@ export default defineComponent({
             // and repeat action to place it in [0][0]
             this.pushToEventsSplit(event)
           }
-
         }
       }
     },
@@ -683,9 +690,11 @@ export default defineComponent({
             if(!this.eventsConfigurableSplit[`${day}`]){
               this.eventsConfigurableSplit[`${day}`] = [];
             }
+            const a = [] as VuelCalendarEvent[][];
             for (let i = 0; i < fd.length; i += 5) {
-              this.eventsConfigurableSplit[`${day}`].push(fd.slice(i, i + 5));
+              a.push(fd.slice(i, i + 5))
             }
+            this.eventsConfigurableSplit[`${day}`] = [...a, ...this.eventsConfigurableSplit[`${day}`]]
           }
 
         })})
