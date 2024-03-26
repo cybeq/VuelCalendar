@@ -1,21 +1,29 @@
 import type {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 import {DateUltra} from "./DateUltra.ts";
 import {VuelCalendarDrop} from "./types/VuelCalendarDrop.ts";
+import {Helper} from "./Helper.ts";
+import {PreventResize, PushToSplit} from "./types/function-types/innerFunctionsTypes.ts";
 
 export class EventDragHandler{
     dateUltra = new DateUltra();
     oldStartDateTimeBackup?:Date;
     oldEndDateTimeBackup?:Date;
-    onDragStart(e:DragEvent, event:VuelCalendarEvent, cloneFunction:Function){
+    helper:Helper = new Helper();
+
+    onDragStart(e:DragEvent, event:VuelCalendarEvent, cloneFunction:Function, pushSplit:PushToSplit, preventResize:PreventResize){
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer!.setDragImage(img, 0, 0);
-        cloneFunction('append', event);
+        preventResize(()=>{
+            cloneFunction('append', event);
+            const oldStartDateTime = new Date(event.start);
+            const oldEndDateTime = new Date(event.end);
+            this.oldStartDateTimeBackup = oldStartDateTime;
+            this.oldEndDateTimeBackup = oldEndDateTime;
+            pushSplit(event)
+        })
 
-        const oldStartDateTime = new Date(event.start);
-        const oldEndDateTime = new Date(event.end);
-        this.oldStartDateTimeBackup = oldStartDateTime;
-        this.oldEndDateTimeBackup = oldEndDateTime;
+        // event.independent = true;
     };
     onDragOver(event:DragEvent,
                bgBackup:undefined|string,
@@ -39,6 +47,8 @@ export class EventDragHandler{
         const diff = newStartDateTime.getTime() - oldStartDateTime.getTime();
         dragEvent.start = newStartDateTime;
         dragEvent.end = new Date((dragEvent.end.getTime() + diff))
+
+        console.log('drag over', date)
     }
     onDragLeave(bgBackup:string | undefined, id:string){
         const container = document.getElementById(id);
@@ -46,8 +56,10 @@ export class EventDragHandler{
             container.style.backgroundColor=bgBackup
         }
     }
-    onDragEnd(cloneFunction:Function){
-        cloneFunction('remove');
+    onDragEnd(cloneFunction:Function, preventResize:PreventResize){
+        preventResize(()=>{
+            cloneFunction('remove');
+        })
     }
     onDrop(e:MouseEvent, event:VuelCalendarEvent, apiCall:(drop:VuelCalendarDrop)=>void ){
         apiCall(

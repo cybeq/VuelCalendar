@@ -14,9 +14,10 @@ export class EventResizeHandler {
     constructor(logger:Logger) {
         this.logger = logger
     }
-    public onEventStartResizeStart(event:VuelCalendarEvent){
+    public onEventStartResizeStart(event:VuelCalendarEvent, pushToSplit:Function){
         this.startDateBackup = new Date(event.start);
         this.startEvent = event;
+        pushToSplit(event);
     }
     public onEventStartResizeDayOver(date:Date, time:string){
         this.continueAsync = true;
@@ -33,9 +34,11 @@ export class EventResizeHandler {
         this.startDateBackup = undefined;
         this.startEvent = undefined;
     }
-    public onEventEndResizeStart(event:VuelCalendarEvent){
+    public onEventEndResizeStart(event:VuelCalendarEvent, pushToSplit:Function){
         this.endDateBackup = new Date(event.end);
         this.endEvent = event;
+        pushToSplit(event);
+
     }
     public onEventEndResizeDayOver(date:Date, time:string){
         this.continueAsync = true;

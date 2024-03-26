@@ -239,7 +239,6 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
         const percentClicked = (clickedWidthFromLeft / el.offsetWidth) * 100;
         return  helper.convertPercentageToTime(percentClicked, startHourConfigurable, endHourConfigurable);
     }
-
     getEventsToContainer(day:number, startDateConfigurable:Date, eventsConfigurable:VuelCalendarEvent[])
     {
         const newDate = new Date(startDateConfigurable!);
@@ -260,6 +259,7 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
                         this.dateUltra.isLowerDate(targetDate, event.end)
                         && this.dateUltra.isBiggerDate(targetDate, event.start)
                     )
+
                 )
                 {
                     divEvents.push(event);

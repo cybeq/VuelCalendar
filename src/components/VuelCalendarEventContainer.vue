@@ -6,6 +6,7 @@ import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import VuelCalendarEventSingle from "./VuelCalendarEventSingle.vue";
+import {PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
 
 export default defineComponent({
   components: {VuelCalendarEventSingle},
@@ -80,16 +81,22 @@ export default defineComponent({
       type:Object as PropType<EventDragHandler>,
       required:true
     },
+    pushToEventSplit:{
+      type:Function as PropType<PushToSplit>,
+      required:true
+    },
+    preventResize:{
+      type:Function as PropType<PreventResize>,
+      required:true,
+    }
   },
   methods:{
     getEventsToContainer(day:number)
     {
       const newDate = new Date(this.startDateConfigurable!);
       const targetDate = new Date(newDate.setDate(newDate.getDate() + day - 1));
-
       const events = this.events ?? [];
-      const divEvents = [];
-
+      const divEvents = new Array<VuelCalendarEvent>();
       for (const event of events)
       {
         if(event.start < event.end) {
@@ -108,27 +115,8 @@ export default defineComponent({
           }
         }
       }
-      // console.log(
-      //     'divEvents',
-      //     divEvents
-      // );
       return divEvents;
     },
-    getEventKey(id:number|string):string
-    {
-      let randomId = '';
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      const charactersLength = characters.length;
-      const array = new Uint32Array(8);
-      crypto.getRandomValues(array);
-
-      for (let i = 0; i < 10; i++) {
-        randomId += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-
-      return id + '-' + randomId;
-    },
-
     getEventMarginLeft( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeToPercentage(
@@ -140,7 +128,6 @@ export default defineComponent({
           this.loopedDay
       )
     },
-
     getEventWidth( event: VuelCalendarEvent )
     {
       return this.helper.convertTimeDistanceToPercentage(
@@ -180,9 +167,11 @@ export default defineComponent({
                        :looped-day="loopedDay"
                        :clone="clone"
                        :key="event.id"
+                       :prevent-resize="preventResize"
                        :renderer="renderer"
                        :draggable-events="draggableEvents"
                        :resizable-events="resizableEvents"
+                       :push-to-event-split="pushToEventSplit"
                        :event-drag-handler="eventDragHandler"
                        :event="event"
                        :event-resize-handler="eventResizeHandler" />

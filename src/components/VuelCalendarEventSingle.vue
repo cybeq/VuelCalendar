@@ -4,6 +4,7 @@ import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
+import {PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
 
 export default defineComponent({
   name: "VuelCalendarEventSingle",
@@ -13,6 +14,10 @@ export default defineComponent({
     }
   },
   props:{
+    pushToEventSplit:{
+      type:Function as PropType<PushToSplit>,
+      required:true
+    },
     resizableEvents:{
       type:Boolean,
       default:false
@@ -49,6 +54,10 @@ export default defineComponent({
       type:Date,
       required:true,
     },
+    preventResize:{
+      type:Function as PropType<PreventResize>,
+      required:true,
+    }
   },
   computed:{
     isSameDay(){
@@ -72,7 +81,7 @@ export default defineComponent({
         cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
        :draggable="resizableEvents"
-       @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event)"
+       @dragstart.stop="eventResizeHandler.onEventStartResizeStart(event, pushToEventSplit)"
        @dragend="eventResizeHandler.onEventStartResizeEnd"
        v-if="isSameDay(event.start)"
   />
@@ -85,13 +94,13 @@ export default defineComponent({
         cursor:resizableEvents ? 'ew-resize' :'inherit',
         }"
        :draggable="resizableEvents"
-       @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event)"
+       @dragstart.stop="eventResizeHandler.onEventEndResizeStart(event, pushToEventSplit)"
        @dragend="eventResizeHandler.onEventEndResizeEnd"
        v-if="isSameDay(event.end)"
   />
   <div :draggable="draggableEvents" style="user-select: none;"
-       @dragstart.stop="eventDragHandler.onDragStart($event, event, clone)"
-       @dragend="eventDragHandler.onDragEnd(clone)"
+       @dragstart.stop="eventDragHandler.onDragStart($event, event, clone, pushToEventSplit, preventResize)"
+       @dragend="eventDragHandler.onDragEnd(clone, preventResize)"
        :key="event.id"
   >
     <div v-if="!renderer"> {{event.label}}</div>

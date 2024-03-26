@@ -175,11 +175,9 @@
                boxSizing:'border-box' }"
         >
           <div style="margin-top:15px">
-            <VirtualScroller :items="eventsConfigurableSplit"
+            <VirtualScroller :items="eventsConfigurableSplit[`${day}`] ?? []"
                              :day="day"
                              :start-date-configurable="startDateConfigurable"
-                             :set-min-slice-count="setMinimumSliceCount"
-                             :get-min-slice-count="getMinimumSliceCount"
                              :drag-event="dragEvent"
                              :rowId="`vuelcalendar_day-${day}`"
                              :default-row-height="rowHeight">
@@ -188,6 +186,7 @@
                     :theme="theme"
                     :helper="helper"
                     :loopedDay="day"
+                    :prevent-resize="preventResize"
                     :renderer="vuelCalendarOptions.renderer"
                     :events="items"
                     :clone="clone"
@@ -199,6 +198,7 @@
                     :start-date-configurable="startDateConfigurable"
                     :event-resize-handler="eventResizeHandler"
                     :event-drag-handler="eventDragHandler"
+                    :push-to-event-split="pushToEventsSplit"
                 />
               </template>
             </VirtualScroller>
@@ -287,6 +287,7 @@ import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import VuelCalendarMouseTime from "./VuelCalendarMouseTime.vue";
 import {Logger} from "../utils/Logger.ts";
 import VirtualScroller from "./VirtualScroller.vue";
+import {EventConfigurableByDay} from "../utils/types/EventConfigurableByDay.ts";
 
 export default defineComponent({
   components:{
@@ -373,7 +374,6 @@ export default defineComponent({
   },
   data(){
     return{
-      minimumSliceCount:undefined as number |undefined,
       vuelCalendarApi:new VuelCalendarOptions(
         this.vuelCalendarOptions,
         this.setNewStartDate as SetStartDate,
@@ -396,7 +396,7 @@ export default defineComponent({
       },
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
       eventsConfigurable:      [] as VuelCalendarEvent[],
-      eventsConfigurableSplit: [] as Array<Array<VuelCalendarEvent>>,
+      eventsConfigurableSplit: {} as EventConfigurableByDay,
       daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
 
       startHourConfigurable:   (this.vuelCalendarOptions.startHour ?? 0) < 1 ? 0 : (this.vuelCalendarOptions.startHour ?? 0),
@@ -423,18 +423,24 @@ export default defineComponent({
     })
   },
   methods:{
-    lazyCut(events:Array<Array<VuelCalendarEvent>>):Array<Array<VuelCalendarEvent>>{
-      // console.log('pawian', events)
-      // for(let i=0; i<events.length; i++){
-      //
-      // }
-      return events;
+    pushToEventsSplit(event:VuelCalendarEvent){
+      for(let day =1; day<=this.daysForwardConfigurable; day++){
+        if( !this.eventsConfigurableSplit[`${day}`].some((a:Array<VuelCalendarEvent>)=>
+            a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id)
+        )){
+          const lastOfFirst = this.eventsConfigurableSplit[`${day}`][0];
+          if(lastOfFirst && lastOfFirst.length <5){
+            lastOfFirst.unshift(event)
+            continue;
+          }
+          this.eventsConfigurableSplit[`${day}`].unshift([event])
+        }
+      }
     },
-    setMinimumSliceCount(minimumSliceCount:number){
-      this.minimumSliceCount = minimumSliceCount;
-    },
-    getMinimumSliceCount():number{
-      return this.minimumSliceCount ?? 0
+    pushCollectionToEventsSplit(events:Array<VuelCalendarEvent>){
+      for(const event of events) {
+        this.pushToEventsSplit(event)
+      }
     },
     mouseTimeMove(event:MouseEvent){
       if(!this.vuelCalendarOptions.showCursorTime){
@@ -520,7 +526,7 @@ export default defineComponent({
         return;
       }
       const { clickedDay, clickedTime }
-          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable,this.eventsConfigurable)
+          = this.helper.getClickAndDropData(event, day, this.helper, this.startHourConfigurable,this.endHourConfigurable, this.startDateConfigurable)
 
       this.preventResize(()=>
       {
@@ -626,20 +632,31 @@ export default defineComponent({
       return events;
     },
     setEventsSplit(){
-      setTimeout(()=>{
-        this.preventResize(()=> {
-          this.eventsConfigurableSplit = [];
-          for (let i = 0; i < this.eventsConfigurable.length; i += 20) {
-            this.eventsConfigurableSplit.push(this.eventsConfigurable.slice(i, i + 20));
+      setTimeout(()=> {
+        this.preventResize(() => {
+          for (let day = 1; day <= this.daysForwardConfigurable; day++) {
+            const fd = this.helper.getEventsToContainer(day, this.startDateConfigurable, this.eventsConfigurable)
+            this.eventsConfigurableSplit[`${day}`] = [];
+            for (let i = 0; i < fd.length; i += 5) {
+              this.eventsConfigurableSplit[`${day}`].push(fd.slice(i, i + 5));
+            }
           }
-        })})
+        })
+      })
     },
     addEventsSplit(events:Array<VuelCalendarEvent>){
       setTimeout(()=>{
         this.preventResize(()=> {
-          for (let i = 0; i < events.length; i += 20) {
-            this.eventsConfigurableSplit.push(events.slice(i, i + 20));
+          for (let day = 1; day <= this.daysForwardConfigurable; day++) {
+            const fd = this.helper.getEventsToContainer(day, this.startDateConfigurable, events)
+            if(!this.eventsConfigurableSplit[`${day}`]){
+              this.eventsConfigurableSplit[`${day}`] = [];
+            }
+            for (let i = 0; i < fd.length; i += 5) {
+              this.eventsConfigurableSplit[`${day}`].push(fd.slice(i, i + 5));
+            }
           }
+
         })})
     },
     addEvents(events:[]):Array<VuelCalendarEvent>
@@ -654,9 +671,15 @@ export default defineComponent({
     removeEventsByParamSplit(param:string, value:any): Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>{
-        this.eventsConfigurableSplit = this.eventsConfigurableSplit.map((array:any) => {
-          return array.filter((e:any) => e[param] !== value);
-        });
+        for(let day =1; day<=this.daysForwardConfigurable; day++){
+          if(!this.eventsConfigurableSplit[`${day}`]){
+            continue;
+          }
+          this.eventsConfigurableSplit[`${day}`] = this.eventsConfigurableSplit[`${day}`].map((array:any) => {
+            return array.filter((e:any) => e[param] !== value);
+          });
+        }
+
       } , []) as Array<VuelCalendarEvent>
     },
     removeEventsByParam(param:string, value:any): Array<VuelCalendarEvent>
@@ -669,16 +692,24 @@ export default defineComponent({
     },
     configureEventsByParamSplit(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
     {
-      const flattenSplit = this.eventsConfigurableSplit.flat().filter((e:any)=>e[param] === value);
       return this.preventResize(()=>
       {
-        flattenSplit.forEach( (pe:any)=>
-        {
-          Object.entries(params).forEach( (paramsEntries:any)=>
+        for(let day=1; day<=this.daysForwardConfigurable; day++){
+          if(!this.eventsConfigurableSplit[`${day}}`]){
+            continue;
+          }
+          const flattenSplit = this.eventsConfigurableSplit[`${day}`].flat().filter((e:any)=>e[param] === value);
+          console.log('coll push 1', flattenSplit)
+          flattenSplit.forEach( (pe:any)=>
           {
-            pe[paramsEntries[0]] = paramsEntries[1]
+            Object.entries(params).forEach( (paramsEntries:any)=>
+            {
+              pe[paramsEntries[0]] = paramsEntries[1]
+            })
           })
-        })
+
+        }
+
       }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
     },
     configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
@@ -691,7 +722,9 @@ export default defineComponent({
             pe[paramsEntries[0]] = paramsEntries[1]
           })
         })
-      return this.configureEventsByParamSplit(param, value, params);
+      this.pushCollectionToEventsSplit(pairedEvents)
+      return []
+      // return this.configureEventsByParamSplit(param, value, params);
     },
 
     setStartHour(hour:number)
@@ -786,7 +819,7 @@ export default defineComponent({
       // );
     },
 
-    preventResize(method:Function, returnable?:any){
+    preventResize(method:Function, returnable?:any):any{
       this.$nextTick( ()=>
       {
         const els:any[] = []

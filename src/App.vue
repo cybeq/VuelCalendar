@@ -108,8 +108,8 @@ const  events =() => [
       img:w1,
       color:'#89457f'
     },
-    start: new Date(new Date(new Date().setHours(8, 0)).setDate(25)),
-    end: new Date(new Date(new Date().setHours(18, 2)).setDate(27)),
+    start: new Date(new Date(new Date().setHours(8, 0)).setDate(26)),
+    end: new Date(new Date(new Date().setHours(18, 2)).setDate(29)),
   },
   {
     id: rand(3),
@@ -204,8 +204,8 @@ function addEvents3() {
       id: '4a00' + i + rand(i),
       label: '4a00' + i + rand(i),
       data: {},
-      start: new Date(new Date(new Date().setHours(8, 0)).setDate(26)),
-      end: new Date(new Date(new Date().setHours(23, 0)).setDate(26)),
+      start: new Date(new Date(new Date().setHours(8, 0)).setDate(27)),
+      end: new Date(new Date(new Date().setHours(23, 0)).setDate(27)),
     });
   }
   calendarApi.value!.addEvents(es);
@@ -227,11 +227,11 @@ function onDayDblClicked(day: any) {
 }
 function onEventDropped(dropped: VuelCalendarDrop) {
   console.log('dropped', dropped)
-  // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
-  //   start: dropped.newStartDateTime,
-  //   end: dropped.newEndDateTime
-  // });
-  dropped.accept()
+  calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
+    start: dropped.newStartDateTime,
+    end: dropped.newEndDateTime
+  });
+  // dropped.accept()
 }
 function onEventEndResized(resized:VuelCalendarResize){
   // calendarApi.value!.configureEventsByParam('id', resized.event.id, {
