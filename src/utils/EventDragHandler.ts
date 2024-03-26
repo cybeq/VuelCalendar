@@ -10,7 +10,7 @@ export class EventDragHandler{
     oldEndDateTimeBackup?:Date;
     helper:Helper = new Helper();
 
-    onDragStart(e:DragEvent, event:VuelCalendarEvent, cloneFunction:Function, pushSplit:PushToSplit, preventResize:PreventResize){
+    onDragStart(e:DragEvent, event:VuelCalendarEvent, cloneFunction:Function, pushSplit:PushToSplit, preventResize:PreventResize, excludedDay:number){
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer!.setDragImage(img, 0, 0);
@@ -20,7 +20,8 @@ export class EventDragHandler{
             const oldEndDateTime = new Date(event.end);
             this.oldStartDateTimeBackup = oldStartDateTime;
             this.oldEndDateTimeBackup = oldEndDateTime;
-            pushSplit(event)
+            event.dragged = true;
+            pushSplit(event, excludedDay)
         })
 
         // event.independent = true;

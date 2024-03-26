@@ -4,4 +4,5 @@ export type VuelCalendarEvent = {
     start:Date;
     end:Date;
     data?:any;
+    dragged?:boolean;
 }

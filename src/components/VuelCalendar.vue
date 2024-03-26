@@ -178,7 +178,6 @@
             <VirtualScroller :items="eventsConfigurableSplit[`${day}`] ?? []"
                              :day="day"
                              :start-date-configurable="startDateConfigurable"
-                             :drag-event="dragEvent"
                              :rowId="`vuelcalendar_day-${day}`"
                              :default-row-height="rowHeight">
               <template v-slot:vs="{items}">
@@ -423,17 +422,49 @@ export default defineComponent({
     })
   },
   methods:{
-    pushToEventsSplit(event:VuelCalendarEvent){
-      for(let day =1; day<=this.daysForwardConfigurable; day++){
+    pushToEventsSplit(event:VuelCalendarEvent, excludedDay?:number){
+      for(let day =1; day<=this.daysForwardConfigurable; day++)
+      {
         if( !this.eventsConfigurableSplit[`${day}`].some((a:Array<VuelCalendarEvent>)=>
-            a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id)
-        )){
+            a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id)) )
+        {
+          /* if there is no current event in specific day*/
+          /* check for the first array in the day and place it in the beginning
+            if the (array.length < estimated length of 2dim array)
+            or make new estimated length array and unshift to beginning
+           */
           const lastOfFirst = this.eventsConfigurableSplit[`${day}`][0];
-          if(lastOfFirst && lastOfFirst.length <5){
+          if( lastOfFirst && lastOfFirst.length <5 )
+          {
             lastOfFirst.unshift(event)
             continue;
           }
           this.eventsConfigurableSplit[`${day}`].unshift([event])
+        }
+        else
+        {
+          /* in the case if the event already exists in the day - move it to the beginning of beginning to show it in front*/
+          if(excludedDay === day){
+            continue;
+          }
+          //find the first dimension array of event
+          const indexA = this.eventsConfigurableSplit[`${day}`].findIndex((a:Array<VuelCalendarEvent>)=>
+              a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id))
+          // find the second dimension array of event
+          const indexE = this.eventsConfigurableSplit[`${day}`][indexA].findIndex((e:VuelCalendarEvent)=>
+              e === event || e.id === event.id );
+
+          // if the event is not in the begining of two arrays ( [[]] )
+          if(indexA !== 0 || indexE !== 0)
+          {
+            // remove it from there
+            this.eventsConfigurableSplit[`${day}`][indexA] = this.eventsConfigurableSplit[`${day}`][indexA].filter(
+                (e:VuelCalendarEvent)=> !(e === event || e.id === event.id)
+            )
+            // and repeat action to place it in [0][0]
+            this.pushToEventsSplit(event)
+          }
+
         }
       }
     },

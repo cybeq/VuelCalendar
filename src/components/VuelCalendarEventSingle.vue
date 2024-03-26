@@ -99,7 +99,7 @@ export default defineComponent({
        v-if="isSameDay(event.end)"
   />
   <div :draggable="draggableEvents" style="user-select: none;"
-       @dragstart.stop="eventDragHandler.onDragStart($event, event, clone, pushToEventSplit, preventResize)"
+       @dragstart.stop="eventDragHandler.onDragStart($event, event, clone, pushToEventSplit, preventResize, loopedDay)"
        @dragend="eventDragHandler.onDragEnd(clone, preventResize)"
        :key="event.id"
   >

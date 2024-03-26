@@ -1,7 +1,6 @@
 <script lang="ts">
-import {defineComponent, PropType, ref} from 'vue'
+import {defineComponent, PropType, ref} from 'vue';
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
-import {EventConfigurableByDay} from "../utils/types/EventConfigurableByDay.ts";
 import {Helper} from "../utils/Helper.ts";
 
 export default defineComponent({
@@ -10,10 +9,6 @@ export default defineComponent({
     rowId:{
       type:String,
       required:true
-    },
-    dragEvent:{
-      type:Object as PropType<VuelCalendarEvent | undefined>,
-
     },
     defaultRowHeight:{
       type:Number,
@@ -40,13 +35,6 @@ export default defineComponent({
       rowHeight,
       sliceCount,
       observer
-    }
-  },
-  data(){
-    return{
-      eventsByDay:{} as EventConfigurableByDay,
-
-      childrenBackup: [],
     }
   },
   created(){
