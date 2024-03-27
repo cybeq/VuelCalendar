@@ -287,6 +287,7 @@ import VuelCalendarMouseTime from "./VuelCalendarMouseTime.vue";
 import {Logger} from "../utils/Logger.ts";
 import VirtualScroller from "./VirtualScroller.vue";
 import {EventConfigurableByDay} from "../utils/types/EventConfigurableByDay.ts";
+import {genId} from "../utils/genId.ts";
 
 export default defineComponent({
   components:{
@@ -454,7 +455,6 @@ export default defineComponent({
           if(excludedDay === day){
             continue;
           }
-          console.log('excluded error', excludedDay, day)
           //find the first dimension array of event
           const indexA = this.eventsConfigurableSplit[`${day}`].findIndex((a:Array<VuelCalendarEvent>)=>
               a.includes(event) || a.some((e:VuelCalendarEvent)=> e.id === event.id))
@@ -539,7 +539,7 @@ export default defineComponent({
       }
       this.preventResize(()=>
       {
-        this.eventDragHandler.onDrop(event, this.dragEvent!, this.vuelCalendarApi.onEventDropped)
+        this.eventDragHandler.onDrop(event, this.dragEvent!, this.vuelCalendarApi.onEventDropped, this.eventsConfigurable)
       })
 
     },
@@ -636,6 +636,7 @@ export default defineComponent({
         date = new Date(date);
       }
       this.preventResize(()=>this.startDateConfigurable = date as Date);
+      this.setEventsSplit()
       return new Date(date);
     },
     setDaysForward(days:number){
@@ -662,10 +663,11 @@ export default defineComponent({
       const timeDifference = this.helper.getDaysDifference(startDate, endDate);
       this.setDaysForward(timeDifference)
       this.setNewStartDate(startDate);
+      this.setEventsSplit()
     },
     setEvents(events:[]):Array<VuelCalendarEvent>
     {
-      this.eventsConfigurable = reactive(structuredClone(toRaw(events)))
+      this.eventsConfigurable = reactive(structuredClone(toRaw(genId(events))))
       this.setEventsSplit()
       return events;
     },
@@ -701,7 +703,7 @@ export default defineComponent({
     },
     addEvents(events:[]):Array<VuelCalendarEvent>
     {
-      reactive(structuredClone(toRaw(events))).forEach((event) =>
+      reactive(structuredClone(toRaw(genId(events)))).forEach((event) =>
       {
         this.eventsConfigurable.push(event);
       });
@@ -728,18 +730,19 @@ export default defineComponent({
         {
           return e[param] !== value
         })
-        return this.removeEventsByParamSplit(param,value)
+        this.removeEventsByParamSplit(param,value)
+        return []
     },
     configureEventsByParamSplit(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
     {
       return this.preventResize(()=>
       {
         for(let day=1; day<=this.daysForwardConfigurable; day++){
-          if(!this.eventsConfigurableSplit[`${day}}`]){
-            continue;
+          if(!this.eventsConfigurableSplit[`${day}}`])
+          {
+            this.eventsConfigurableSplit[`${day}}`] = []
           }
           const flattenSplit = this.eventsConfigurableSplit[`${day}`].flat().filter((e:any)=>e[param] === value);
-          console.log('coll push 1', flattenSplit)
           flattenSplit.forEach( (pe:any)=>
           {
             Object.entries(params).forEach( (paramsEntries:any)=>
@@ -747,9 +750,8 @@ export default defineComponent({
               pe[paramsEntries[0]] = paramsEntries[1]
             })
           })
-
+          this.pushCollectionToEventsSplit(flattenSplit)
         }
-
       }, [{[param]:value,...params}]) as Array<VuelCalendarEvent>
     },
     configureEventsByParam(param:string, value:any, params:VuelCalendarEvent):Array<VuelCalendarEvent>
@@ -762,7 +764,7 @@ export default defineComponent({
             pe[paramsEntries[0]] = paramsEntries[1]
           })
         })
-      this.pushCollectionToEventsSplit(pairedEvents)
+      this.configureEventsByParamSplit(param, value, params)
       return []
       // return this.configureEventsByParamSplit(param, value, params);
     },

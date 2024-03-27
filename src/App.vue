@@ -9,7 +9,8 @@
   <button @click="addEvents3">Add UURUR</button>
   <button @click="calendarApi!.switchViewMode()">MOTNHVIEW</button>
   <input type="number" v-model="num" />
-  <button @click="removeEventsByParam('id', num)">REMOVE BY PARAM</button>
+  <input type="text" v-model="idx"  placeholder="id"/>
+  <button @click="removeEventsByParam('id', idx)">REMOVE BY PARAM</button>
   <button @click="configureEventsByParam">Configure Events By param</button>
   <button @click="setStartHour(num)">Set start hour</button>
   <button @click="calendarApi?.setEndHour(num)">Set end hour</button>
@@ -18,6 +19,7 @@
   <input type="date" v-model="dateRangeStart"/>
   <input type="date" v-model="dateRangeEnd"/>
   <button @click="calendarApi?.setDateRange(dateRangeStart, dateRangeEnd)">Set date range</button>
+  <button @click="calendarApi?.setDate(dateRangeStart)">Set new start date</button>
   <br/>
   <input type="number" v-model="timeStart" />
   <input type="number" v-model="timeEnd" />
@@ -41,7 +43,7 @@ import {VuelCalendarDrop} from "./utils/types/VuelCalendarDrop.ts";
 import {VuelCalendarResize} from "./utils/types/VuelCalendarResize.ts";
 
 const num = ref(1);
-
+const idx = ref('');
 const timeStart = ref(1);
 const timeEnd = ref(23);
 
@@ -226,12 +228,11 @@ function onDayDblClicked(day: any) {
   console.log(day, 'day dbl clicked api');
 }
 function onEventDropped(dropped: VuelCalendarDrop) {
-  console.log('dropped', dropped)
-  calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
-    start: dropped.newStartDateTime,
-    end: dropped.newEndDateTime
-  });
-  // dropped.accept()
+  // calendarApi.value!.configureEventsByParam('id', dropped.event.id!, {
+  //   start: dropped.newStartDateTime,
+  //   end: dropped.newEndDateTime
+  // });
+  dropped.accept()
 }
 function onEventEndResized(resized:VuelCalendarResize){
   // calendarApi.value!.configureEventsByParam('id', resized.event.id, {
@@ -248,13 +249,13 @@ function onEventStartResized(resized:VuelCalendarResize){
 
 function configureEventsByParam() {
   console.log(
-      calendarApi.value!.configureEventsByParam('id', num.value, {
+      calendarApi.value!.configureEventsByParam('id', idx.value, {
         end: dateY,
         start: dateX,
       }),
       'edit',
       'id',
-      num.value,
+      idx.value,
       { end: dateY, start: dateX, data: { id: 'xxx' } }
   );
 }

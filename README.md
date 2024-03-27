@@ -9,6 +9,10 @@
 ----------------------------
 ![demo](https://s12.gifyu.com/images/SUPkq.gif)
 
+## Important UPDATE 26.03.2024 -> v0.7
+Today's update on March 26, 2024 introduces the Performance Mode, which enables smooth handling of large volumes of events in the calendar. This mode operates on two main pillars: virtual scrolling and event caching in two-dimensional arrays. 
+By combining these solutions, it allows for loading unlimited events at once, ensuring smooth operations on them. Despite using Performance Mode, users still have access to the full list of events for the day through specific events.
+
 ## *Fully supports backend integration.
 
 This Vue Calendar is a versatile calendar search tool akin to V-Calendar, designed for efficient schedule management and event allocation along a horizontal timeline. It offers a range of features facilitating the manipulation, deletion, modification, and addition of events, along with configurations for timeline styling and date ranges.

@@ -1,5 +1,5 @@
 <script lang="ts">
-import {defineComponent, PropType, ref} from 'vue';
+import {defineComponent, ref} from 'vue';
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import {Helper} from "../utils/Helper.ts";
 

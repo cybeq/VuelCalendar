@@ -14,7 +14,6 @@ export class EventDragHandler{
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer!.setDragImage(img, 0, 0);
-        console.log('excluded day', excludedDay)
         preventResize(()=>{
             cloneFunction('append', event);
             const oldStartDateTime = new Date(event.start);
@@ -49,8 +48,6 @@ export class EventDragHandler{
         const diff = newStartDateTime.getTime() - oldStartDateTime.getTime();
         dragEvent.start = newStartDateTime;
         dragEvent.end = new Date((dragEvent.end.getTime() + diff))
-
-        console.log('drag over', date)
     }
     onDragLeave(bgBackup:string | undefined, id:string){
         const container = document.getElementById(id);
@@ -63,7 +60,7 @@ export class EventDragHandler{
             cloneFunction('remove');
         })
     }
-    onDrop(e:MouseEvent, event:VuelCalendarEvent, apiCall:(drop:VuelCalendarDrop)=>void ){
+    onDrop(e:MouseEvent, event:VuelCalendarEvent, apiCall:(drop:VuelCalendarDrop)=>void, eventsConfigurable:Array<VuelCalendarEvent> ){
         apiCall(
             {
                 clickEvent:e,
@@ -73,6 +70,10 @@ export class EventDragHandler{
                 oldStartDateTime:this.oldStartDateTimeBackup!,
                 oldEndDateTime:this.oldEndDateTimeBackup!,
                 accept:()=>{
+                    const inConfEv = eventsConfigurable.find((e:VuelCalendarEvent)=> e.id===event.id)
+                    if(!inConfEv) return;
+                    inConfEv.start = event.start;
+                    inConfEv.end = event.end
                 },
                 decline:()=>{
                     event.start = this.oldStartDateTimeBackup!;
