@@ -9,9 +9,21 @@
 ----------------------------
 ![demo](https://s12.gifyu.com/images/SUPkq.gif)
 
+## UPCOMING
+
+- v0.8.0 - Mobile support, Treshold Event Drag(eg. 15 min)
+- v0.9.0 - ListView, MonthView, DayView
+- v0.9.5 - Plugins: Toolbars, 
+- v1.0.0 - Fully stable version + VanillaJS support
+- v1.1.0 - Angular support
+
 ## Important UPDATE 26.03.2024 -> v0.7
 Today's update on March 26, 2024 introduces the Performance Mode, which enables smooth handling of large volumes of events in the calendar. This mode operates on two main pillars: virtual scrolling and event caching in two-dimensional arrays. 
 By combining these solutions, it allows for loading unlimited events at once, ensuring smooth operations on them. Despite using Performance Mode, users still have access to the full list of events for the day through specific events.
+
+
+
+
 
 ## *Fully supports backend integration.
 

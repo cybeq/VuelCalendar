@@ -88,7 +88,7 @@ public convertTimeDistanceToPercentage( start: Date, end: Date, startHour: numbe
 
     if(this.dateUltra.isSameDate(currentDay, end) && !this.dateUltra.isSameDate(currentDay, start)){
         let nd = new Date(new Date().setHours(24 + (startHour) ,0,0));
-        const _end = new Date(new Date(end).setDate(nd.getDate()))
+        const _end = new Date(new Date(new Date(new Date(end).setDate(nd.getDate())).setMonth(nd.getMonth())).setFullYear(nd.getFullYear()))
         eventDuration = _end.getTime() - nd.getTime();
         if(startTimelineMilis > endEventMilis ){
             eventDuration = 0;
