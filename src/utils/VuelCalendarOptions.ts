@@ -5,8 +5,8 @@ import {
   AddEvents,
   ConfigureEventsByParam,
   RemoveEventsByParam, SetDateRange, SetDaysForward, SetEndHour,
-  SetEvents,
-  SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
+  SetEvents, SetRenderer,
+  SetStartDate, SetStartHour, SetTimeRange, SetTresHold, SwitchViewMode
 } from "./types/function-types/apiFunctionsTypes.ts";
 import {VuelCalendarResize} from "./types/VuelCalendarResize.ts";
 import {Logger} from "./Logger.ts";
@@ -30,6 +30,7 @@ interface IVuelCalendarOptions {
   setEndHour?: SetEndHour;
   setViewMode?: SwitchViewMode;
   startDate?: Date;
+  endDate?:Date;
   daysForward?: number;
   events?: VuelCalendarEvent[];
   theme?: string;
@@ -45,6 +46,11 @@ interface IVuelCalendarOptions {
   setTimeRange?:SetTimeRange;
   showCursorTime?:boolean;
   throwErrors?:boolean;
+  tresHold?:number;
+  plugins?:[];
+  setRenderer?:SetRenderer;
+  setTresHold?:SetTresHold;
+  ignoreSafety?:boolean;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
   logger:Logger = new Logger();
@@ -68,7 +74,10 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   setDaysForward!:SetDaysForward;
   setDateRange!:SetDateRange;
   setTimeRange!:SetTimeRange;
+  setRenderer!:SetRenderer;
+  setTresHold!:SetTresHold;
   startDate?:Date = new Date()
+  endDate?:Date = new Date();
   daysForward = 7;
   events?:Array<VuelCalendarEvent> = [];
   theme?:string = 'dark';
@@ -81,6 +90,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   renderer?:string;
   showCursorTime?: boolean = false;
   throwErrors?:boolean = false;
+  tresHold?:number;
+  plugins?:[] = [];
+  ignoreSafety?:boolean = false;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
               componentSetNewStartDate: SetStartDate ,
               componentSetEvents: SetEvents,
@@ -92,7 +104,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
               componentSetDaysForward: SetDaysForward,
               componentSetDateRange: SetDateRange,
               componentSetEndHour: SetEndHour,
-              componentSetTimeRange:SetTimeRange
+              componentSetTimeRange:SetTimeRange,
+              componentSetRenderer:SetRenderer,
+              componentSetTresHold:SetTresHold
               ){
     this.setNewStartDate = componentSetNewStartDate;
     this.setEvents = componentSetEvents;
@@ -105,14 +119,22 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     this.setDateRange = componentSetDateRange
     this.setEndHour = componentSetEndHour
     this.setTimeRange = componentSetTimeRange
+    this.setRenderer = componentSetRenderer;
+    this.setTresHold = componentSetTresHold;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
     }
     if(vuelCalendarOptions.draggableEvents){
       this.draggableEvents = vuelCalendarOptions.draggableEvents
     }
+    if(vuelCalendarOptions.tresHold){
+      this.tresHold = vuelCalendarOptions.tresHold
+    }
     if(vuelCalendarOptions.resizableEvents){
       this.resizableEvents = vuelCalendarOptions.resizableEvents
+    }
+    if(vuelCalendarOptions.ignoreSafety){
+      this.ignoreSafety = vuelCalendarOptions.ignoreSafety
     }
     if(vuelCalendarOptions.renderer){
       this.renderer = vuelCalendarOptions.renderer
@@ -129,6 +151,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     if(vuelCalendarOptions.theme){
       this.theme = vuelCalendarOptions.theme
     }
+    if(vuelCalendarOptions.plugins){
+      this.plugins = vuelCalendarOptions.plugins
+    }
     if(vuelCalendarOptions.showCursorTime){
       this.showCursorTime = vuelCalendarOptions.showCursorTime
     }
@@ -144,7 +169,16 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
       }
       this.startDate = vuelCalendarOptions.startDate
     }
-    
+    if(vuelCalendarOptions.endDate)
+    {
+      if(!(vuelCalendarOptions.endDate instanceof Date))
+      {
+        console.error('Provided endDate must be a type of Date')
+        return;
+      }
+      this.endDate = vuelCalendarOptions.endDate
+    }
+
     if(vuelCalendarOptions.daysForward)
     {
       if(!( typeof  vuelCalendarOptions.daysForward === 'number'))
@@ -223,7 +257,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
       this.setDaysForward,
       this.setDateRange,
       this.setEndHour,
-      this.setTimeRange
+      this.setTimeRange,
+      this.setRenderer,
+      this.setTresHold
     ) as IVuelCalendarApi;
 
     this.onVuelCalendarReadyResolve = () =>{
@@ -242,7 +278,9 @@ interface IVuelCalendarApi {
   switchViewMode:SwitchViewMode;
   setDaysForward:SetDaysForward;
   setDateRange:SetDateRange;
-  setTimeRange:SetTimeRange
+  setTimeRange:SetTimeRange;
+  setRenderer:SetRenderer
+  setTresHold:SetTresHold;
 }
 class VuelCalendarApi implements IVuelCalendarApi{
   setDate!:SetStartDate;
@@ -256,6 +294,8 @@ class VuelCalendarApi implements IVuelCalendarApi{
   setDaysForward!:SetDaysForward;
   setDateRange!:SetDateRange;
   setTimeRange!:SetTimeRange;
+  setRenderer!:SetRenderer;
+  setTresHold!:SetTresHold;
   constructor(setDate:SetStartDate,
               setEvents:SetEvents,
               addEvents:AddEvents,
@@ -266,7 +306,9 @@ class VuelCalendarApi implements IVuelCalendarApi{
               setDaysForward:SetDaysForward,
               setDateRange:SetDateRange,
               setEndHour:SetEndHour,
-              setTimeRange:SetTimeRange
+              setTimeRange:SetTimeRange,
+              setRenderer:SetRenderer,
+              setTresHold:SetTresHold
               )
   {
     this.setDate = setDate
@@ -280,6 +322,8 @@ class VuelCalendarApi implements IVuelCalendarApi{
     this.setDateRange = setDateRange
     this.setEndHour = setEndHour;
     this.setTimeRange = setTimeRange
+    this.setRenderer = setRenderer;
+    this.setTresHold = setTresHold;
   }
 }
 

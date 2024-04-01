@@ -186,7 +186,7 @@
                     :helper="helper"
                     :loopedDay="day"
                     :prevent-resize="preventResize"
-                    :renderer="vuelCalendarOptions.renderer"
+                    :renderer="rendererConfigurable"
                     :events="items"
                     :clone="clone"
                     :draggable-events="vuelCalendarOptions.draggableEvents"
@@ -276,8 +276,8 @@ import {Colors} from "../utils/types/Colors.ts";
 import {
   AddEvents, ConfigureEventsByParam,
   RemoveEventsByParam, SetDateRange, SetDaysForward, SetEndHour,
-  SetEvents,
-  SetStartDate, SetStartHour, SetTimeRange, SwitchViewMode
+  SetEvents, SetRenderer,
+  SetStartDate, SetStartHour, SetTimeRange, SetTresHold, SwitchViewMode
 } from "../utils/types/function-types/apiFunctionsTypes.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
@@ -387,6 +387,8 @@ export default defineComponent({
         this.setDateRange as SetDateRange,
         this.setEndHour as SetEndHour,
         this.setTimeRange as SetTimeRange,
+        this.setRenderer as SetRenderer,
+        this.setTresHold as SetTresHold
       ),
       rowHeight: 0,
       resizer: {
@@ -397,8 +399,11 @@ export default defineComponent({
       startDateConfigurable:   this.vuelCalendarOptions.startDate ?? new Date(),
       eventsConfigurable:      [] as VuelCalendarEvent[],
       eventsConfigurableSplit: {} as EventConfigurableByDay,
-      daysForwardConfigurable: this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward,
-
+      rendererConfigurable:    this.vuelCalendarOptions.renderer as string | undefined,
+      tresHoldConfigurable:    this.vuelCalendarOptions.tresHold as number | undefined,
+      daysForwardConfigurable: this.vuelCalendarOptions.daysForward ?
+          (this.vuelCalendarOptions.daysForward <1 ? 1 : this.vuelCalendarOptions.daysForward)
+          : 1,
       startHourConfigurable:   (this.vuelCalendarOptions.startHour ?? 0) < 1 ? 0 : (this.vuelCalendarOptions.startHour ?? 0),
       endHourConfigurable:     (this.vuelCalendarOptions.endHour ?? 24) > 24 ? 24 :(this.vuelCalendarOptions.endHour ?? 24),
 
@@ -411,6 +416,7 @@ export default defineComponent({
   },
   created()
   {
+    this.setDateRangeByEndDate();
     this.$nextTick( () =>
     {
       const containerHeight = (this.$refs.container as HTMLDivElement).offsetHeight;
@@ -475,6 +481,12 @@ export default defineComponent({
         }
       }
     },
+    setDateRangeByEndDate(){
+      if(!this.vuelCalendarOptions.endDate){
+        return;
+      }
+      this.setDateRange(this.startDateConfigurable, this.vuelCalendarOptions.endDate)
+    },
     pushCollectionToEventsSplit(events:Array<VuelCalendarEvent>){
       for(const event of events) {
         this.pushToEventsSplit(event)
@@ -518,7 +530,9 @@ export default defineComponent({
       {
         this.eventDragHandler.onDragOver(
             e, this.bgBackup,this.theme.colors.dragging,
-            `vuelcalendar_day-${day}`, this.dragEvent,clickedDay,clickedTime)
+            `vuelcalendar_day-${day}`, this.dragEvent,clickedDay,clickedTime,
+            this.tresHoldConfigurable
+        )
       })
 
     },
@@ -639,9 +653,19 @@ export default defineComponent({
       this.setEventsSplit()
       return new Date(date);
     },
+    setRenderer(renderer:string):void{
+      this.rendererConfigurable = renderer;
+    },
+    setTresHold(tresHold:number):void{
+      this.tresHoldConfigurable = tresHold;
+    },
     setDaysForward(days:number){
       if( days < 1){
         this.logger.customWarn('args', 'Days forward', 'daysForward must be greater or equal to 1')
+        return;
+      }
+      if(days > 62 && !this.vuelCalendarOptions.ignoreSafety){
+        this.logger.customWarn('args', 'Days forward', 'daysForward must be lower or equal to 62')
         return;
       }
       this.daysForwardConfigurable = days;
@@ -661,6 +685,10 @@ export default defineComponent({
         this.logger.customWarn('args', 'Date range', 'endDate must be greater or equal to startDate')
       }
       const timeDifference = this.helper.getDaysDifference(startDate, endDate);
+      if(timeDifference > 62 && !this.vuelCalendarOptions.ignoreSafety){
+        this.logger.customWarn('args', 'Date range', 'A range between start date and end date should be shorter than 62 days')
+        return;
+      }
       this.setDaysForward(timeDifference)
       this.setNewStartDate(startDate);
       this.setEventsSplit()

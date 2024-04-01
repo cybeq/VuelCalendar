@@ -32,7 +32,8 @@ export class EventDragHandler{
                id:string,
                dragEvent:VuelCalendarEvent|undefined,
                date:Date,
-               time:string)
+               time:string,
+               tresHold?:number)
     {
         if(!dragEvent){
             return;
@@ -46,8 +47,18 @@ export class EventDragHandler{
         const oldStartDateTime = new Date(dragEvent.start);
         const newStartDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
         const diff = newStartDateTime.getTime() - oldStartDateTime.getTime();
+        if(tresHold){
+            const currentMinutes = newStartDateTime.getMinutes();
+            if(currentMinutes % tresHold === 0 ){
+                dragEvent.start = newStartDateTime;
+                dragEvent.end = new Date((dragEvent.end.getTime() + diff))
+            }
+            return;
+        }
         dragEvent.start = newStartDateTime;
         dragEvent.end = new Date((dragEvent.end.getTime() + diff))
+
+
     }
     onDragLeave(bgBackup:string | undefined, id:string){
         const container = document.getElementById(id);

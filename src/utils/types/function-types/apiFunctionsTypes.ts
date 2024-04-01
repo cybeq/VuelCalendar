@@ -12,7 +12,8 @@ type SetTimeRange = (startHour:number, endHour:number) => void;
 type SwitchViewMode = ()=>void;
 type SetDaysForward = (days:number) => void;
 type SetDateRange = (startDate:Date|string, endDate:Date|string) => void;
-
+type SetRenderer = (renderer:string) => void;
+type SetTresHold = (tresHold:number) => void;
 export type {
     SetStartDate,
     SetEvents,
@@ -24,5 +25,7 @@ export type {
     SwitchViewMode,
     SetDaysForward,
     SetDateRange,
-    SetTimeRange
+    SetTimeRange,
+    SetRenderer,
+    SetTresHold
 }
