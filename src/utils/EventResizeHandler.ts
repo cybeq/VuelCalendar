@@ -22,15 +22,23 @@ export class EventResizeHandler {
             pushToSplit(event, excludedDay);
         })
     }
-    public onEventStartResizeDayOver(date:Date, time:string){
+    public onEventStartResizeDayOver(date:Date, time:string, tresHold:number|undefined){
         this.continueAsync = true;
         const newDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
         // this.startEvent!.start = newDateTime;
-        this.onEventStartResizeGenerator(newDateTime)
+        this.onEventStartResizeGenerator(newDateTime,tresHold)
     }
-    private async onEventStartResizeGenerator (dateTime:Date){
-        if(this.continueAsync)
-        this.startEvent!.start = dateTime;
+    private async onEventStartResizeGenerator (dateTime:Date, tresHold:number|undefined){
+        if(this.continueAsync) {
+            if(tresHold){
+                const currentMinutes = dateTime.getMinutes();
+                if(currentMinutes % tresHold === 0 ){
+                    this.startEvent!.start = dateTime;
+                }
+                return;
+            }
+            this.startEvent!.start = dateTime;
+        }
     }
     public onEventStartResizeEnd(){
         // this.startEvent!.start = this.startDateBackup!;
@@ -44,13 +52,20 @@ export class EventResizeHandler {
             pushToSplit(event, excludedDay);
         })
     }
-    public onEventEndResizeDayOver(date:Date, time:string){
+    public onEventEndResizeDayOver(date:Date, time:string, tresHold:number | undefined){
         this.continueAsync = true;
         const newDateTime = this.dateUltra.setTimeToDateWithTimeString(date,time);
-        this.onEventEndResizeGenerator(newDateTime);
+        this.onEventEndResizeGenerator(newDateTime, tresHold);
     }
-    private async onEventEndResizeGenerator (dateTime:Date){
+    private async onEventEndResizeGenerator (dateTime:Date, tresHold:number|undefined){
         if(this.continueAsync) {
+            if(tresHold){
+                const currentMinutes = dateTime.getMinutes();
+                if(currentMinutes % tresHold === 0 ){
+                    this.endEvent!.end = dateTime;
+                }
+                return;
+            }
             this.endEvent!.end = dateTime;
         }
     }

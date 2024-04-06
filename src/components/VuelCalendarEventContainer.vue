@@ -6,7 +6,7 @@ import {DateUltra} from "../utils/DateUltra.ts";
 import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import VuelCalendarEventSingle from "./VuelCalendarEventSingle.vue";
-import {PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
+import {EventTemplate, PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
 
 export default defineComponent({
   components: {VuelCalendarEventSingle},
@@ -28,6 +28,10 @@ export default defineComponent({
     eventResizeHandler:{
       type:Object as PropType<EventResizeHandler>,
       required:true,
+    },
+    eventTemplate:{
+      type:Function as PropType<EventTemplate | undefined>,
+      required:true
     },
     onEventClicked:{
       type:Function,
@@ -149,7 +153,7 @@ export default defineComponent({
     v-for="event in getEventsToContainer(loopedDay)"
     @click.stop="onEventClicked(event)"
     :style="{
-      height: renderer ?'unset':'20px',
+      height: renderer || eventTemplate ?'unset':'20px',
       minHeight:'20px',
       marginTop:'1rem',
       marginLeft:`${getEventMarginLeft(event)}%`,
@@ -158,7 +162,7 @@ export default defineComponent({
       backgroundColor:theme.colors.event,
       color:theme.colors.textPrimary,
       overflow:'hidden',
-      borderRadius:'5px',
+      borderRadius:'2px',
       zIndex:3,
       transition:'opacity 0.2s ease',
       position:'sticky'}"
@@ -166,6 +170,7 @@ export default defineComponent({
     <VuelCalendarEventSingle :start-date-configurable="startDateConfigurable"
                        :looped-day="loopedDay"
                        :clone="clone"
+                       :event-template="eventTemplate"
                        :key="event.id"
                        :prevent-resize="preventResize"
                        :renderer="renderer"

@@ -4,7 +4,7 @@ import {EventResizeHandler} from "../utils/EventResizeHandler.ts";
 import {VuelCalendarEvent} from "../utils/types/VuelCalendarEvent.ts";
 import {EventDragHandler} from "../utils/EventDragHandler.ts";
 import {DateUltra} from "../utils/DateUltra.ts";
-import {PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
+import {EventTemplate, PreventResize, PushToSplit} from "../utils/types/function-types/innerFunctionsTypes.ts";
 
 export default defineComponent({
   name: "VuelCalendarEventSingle",
@@ -14,6 +14,10 @@ export default defineComponent({
     }
   },
   props:{
+    eventTemplate:{
+      type:Function as PropType<EventTemplate | undefined>,
+      required:true
+    },
     pushToEventSplit:{
       type:Function as PropType<PushToSplit>,
       required:true
@@ -103,7 +107,8 @@ export default defineComponent({
        @dragend="eventDragHandler.onDragEnd(clone, preventResize)"
        :key="event.id"
   >
-    <div v-if="!renderer"> {{event.label}}</div>
+    <div v-if="!renderer && !eventTemplate"> {{event.label}}</div>
+    <div v-if="!renderer && eventTemplate" v-html="eventTemplate(event)"> </div>
     <div v-if="renderer"
          style="width:100%;height:100%"
     >

@@ -4,7 +4,7 @@ import {VuelCalendarEvent} from "./types/VuelCalendarEvent.ts";
 export class Helper{
 
   public daysEnumerable = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  public daysEnumerableFromMonday = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  public daysEnumerableFromMonday = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   public monthsEnumerable: string[] = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"

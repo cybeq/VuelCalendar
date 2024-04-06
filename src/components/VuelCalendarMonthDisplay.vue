@@ -49,17 +49,31 @@ export default defineComponent({
       required:true,
     }
   },
-  computed:{
-    countEventsForDay()
-    {
-      return (day:number) => this.helper.countEventsForDay(this.startDateConfigurable!, day - 1, this.eventsConfigurable)
+  data(){
+    return{
+      counted: {} as {[key:string]:number}
+    }
+  },
+  created(){
+
+    // this.helper.countEventsForDay(this.startDateConfigurable!, day - 1, this.eventsConfigurable)
+  },
+  watch:{
+    viewMode(){
+      switch(this.viewMode){
+        case "month":
+          for(let day=1; day<=35;day++){
+            this.counted[`${day}`] = this.helper.countEventsForDay(this.startDateConfigurable!, day - 1, this.eventsConfigurable)
+          }
+        break;
+      }
     }
   }
 })
 </script>
 
 <template>
-  <section v-show="viewMode === 'month'"
+  <section v-if="viewMode === 'month'"
            :style="{
               width:'100%',
               display:'flex',
@@ -70,11 +84,11 @@ export default defineComponent({
               width:'100%',
               boxSizing:'border-box',
               height: height! + 50 +'px',
-              borderTopLeftRadius:'12px',
-              borderTopRightRadius:'12px',
-              borderBottomLeftRadius:'12px',
-              borderBottomRightRadius:'12px',
-              borderTop:'solid 2px',
+              borderTopLeftRadius:'2px',
+              borderTopRightRadius:'2px',
+              borderBottomLeftRadius:'2px',
+              borderBottomRightRadius:'2px',
+              borderTop:'solid 1px',
               borderRight:'solid 2px',
               borderLeft:'solid 2px',
               borderColor:theme.colors.surface,
@@ -94,7 +108,7 @@ export default defineComponent({
                 display: 'grid',
                 gridTemplateColumns:'repeat(7, 1fr)',
                 width:'100%',
-                height:50 +'px',
+                height:30 +'px',
                 background:theme.colors.primary,
                 borderBottom:'solid 1px',
                 borderColor:theme.colors.surface,
@@ -124,7 +138,7 @@ export default defineComponent({
         <div class="vuelcalendar-month-box"
              v-for="day in 35"
              :key="day"
-             @click="setDateFromMonthCalendar(day)"
+             @click="setDateFromMonthCalendar(day-1)"
              :style="{
                  background: theme.colors.primary,
                  borderLeft: 'solid 1px',
@@ -136,16 +150,16 @@ export default defineComponent({
                  cursor: 'pointer',
                  position: 'relative'}"
         >
-          <div  :class="`vuelcalendar-month-events${countEventsForDay(day - 1) > 0 ? '-active' :''}`"
+          <div  :class="`vuelcalendar-month-events${counted[`${day -1}`] ? '-active' :''}`"
                 :style="{
-                  backgroundColor: countEventsForDay(day - 1) > 0 ? theme.colors.event : theme.colors.surface,
+                  backgroundColor: counted[`${day -1}`] ? theme.colors.event : theme.colors.surface,
                   padding: '5px',
                   fontWeight: 'bold',
-                  borderRadius: '12px',
+                  borderRadius: '2px',
                   color: theme.colors.textPrimary,
                   position: 'relative'
              }"
-               v-text="countEventsForDay(day - 1)"
+               v-text="counted[`${day -1}`]"
           />
 
           <div class="vuelcalendar-month-datelabel" :style="{position: 'absolute', bottom: '5px', left: '5px', fontSize:'0.8em', color:theme.colors.textPrimary}">

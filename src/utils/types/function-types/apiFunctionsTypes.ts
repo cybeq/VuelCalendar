@@ -1,5 +1,6 @@
 import {VuelCalendarEvent} from "../VuelCalendarEvent.ts";
 import {VuelCalendarEventConfigure} from "../VuelCalendarEventConfigure.ts";
+import {EventTemplate} from "./innerFunctionsTypes.ts";
 
 type SetStartDate = (date: Date) => Date;
 type SetEvents = (events: VuelCalendarEvent[]) => VuelCalendarEvent[];
@@ -14,6 +15,7 @@ type SetDaysForward = (days:number) => void;
 type SetDateRange = (startDate:Date|string, endDate:Date|string) => void;
 type SetRenderer = (renderer:string) => void;
 type SetTresHold = (tresHold:number) => void;
+type SetEventTemplate = (eventTemplate:EventTemplate) => string;
 export type {
     SetStartDate,
     SetEvents,
@@ -27,5 +29,6 @@ export type {
     SetDateRange,
     SetTimeRange,
     SetRenderer,
-    SetTresHold
+    SetTresHold,
+    SetEventTemplate
 }

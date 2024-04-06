@@ -9,6 +9,8 @@ import type {IVuelCalendarOptions} from "../utils/VuelCalendarOptions.ts";
 import type {VuelCalendarDrop} from "../utils/types/VuelCalendarDrop.ts";
 import type {VuelCalendarEventConfigure} from "../utils/types/VuelCalendarEventConfigure.ts";
 import type {VuelCalendarResize} from "../utils/types/VuelCalendarResize.ts";
+import type {EventTemplate} from "../utils/types/function-types/innerFunctionsTypes.ts";
+import type {SetEventTemplate} from "../utils/types/function-types/apiFunctionsTypes.ts";
 import '../index.css';
 import type {
     SetStartDate,
@@ -47,7 +49,9 @@ export type {
     SwitchViewMode,
     SetDaysForward,
     SetDateRange,
-    SetTimeRange
+    SetTimeRange,
+    EventTemplate,
+    SetEventTemplate
 }
 
 export default VuelCalendar
