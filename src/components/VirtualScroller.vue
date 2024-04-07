@@ -28,7 +28,7 @@ export default defineComponent({
     let sliceCount = ref(2);
     const observer = new  ResizeObserver((t:any)=>{
       rowHeight.value = t[0].contentRect.height;
-      sliceCount.value = ( (rowHeight.value/120) < 2 ? 2 : (rowHeight.value/120));
+      sliceCount.value = ( (rowHeight.value/60) < 4 ? 4 : (rowHeight.value/60));
     })
     return{
       helper: new Helper(),

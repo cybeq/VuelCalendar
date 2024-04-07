@@ -16,7 +16,6 @@ export default defineComponent({
   props:{
     eventTemplate:{
       type:Function as PropType<EventTemplate | undefined>,
-      required:true
     },
     pushToEventSplit:{
       type:Function as PropType<PushToSplit>,
@@ -72,6 +71,7 @@ export default defineComponent({
           );
     },
   },
+
 })
 </script>
 

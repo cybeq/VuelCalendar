@@ -31,7 +31,6 @@ export default defineComponent({
     },
     eventTemplate:{
       type:Function as PropType<EventTemplate | undefined>,
-      required:true
     },
     onEventClicked:{
       type:Function,

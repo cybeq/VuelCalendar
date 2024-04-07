@@ -3,6 +3,10 @@ import {defineComponent, PropType} from "vue";
 
 export default defineComponent({
   props:{
+    showMobileButtons:{
+      type:Boolean,
+      default:false,
+    },
     targetOnSidebar:{
       type:Boolean,
       default:false
@@ -153,7 +157,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div v-if="viewMode==='days' && !targetOnSidebar && !targetOnMonthSidebar && !monthContainer"
+  <div v-if="viewMode==='days' && !targetOnSidebar && !targetOnMonthSidebar && !monthContainer && showMobileButtons"
        @click.stop="handleMobileDown($event, 'down')"
        :style="{position:'absolute',zIndex:3, bottom:'5px', left:'5px', width:'20px', height:'20px',cursor:'pointer' }">
     <svg
@@ -172,7 +176,7 @@ export default defineComponent({
       <line x1="12" y1="8" x2="12" y2="16" />
     </svg>
   </div>
-  <div v-if="viewMode==='days' && !targetOnSidebar && !targetOnMonthSidebar && !monthContainer"
+  <div v-if="viewMode==='days' && !targetOnSidebar && !targetOnMonthSidebar && !monthContainer && showMobileButtons"
        @click="handleMobileDown($event, 'up')"
        :style="{position:'absolute',zIndex:3, bottom:'5px', left:'40px', width:'20px', height:'20px',cursor:'pointer' }">
     <svg
@@ -204,6 +208,7 @@ export default defineComponent({
 
   </div>
   <div
+      @mousedown.stop.prevent="onResizerMouseDown($event, targetOnSidebar, targetOnMonthSidebar)"
         class="vuelcalendar-resizer"
         :style="{
                   width:'100%',

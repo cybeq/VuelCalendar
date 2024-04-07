@@ -55,6 +55,7 @@ interface IVuelCalendarOptions {
   toolbars?:Array<string>;
   eventTemplate?:EventTemplate;
   setEventTemplate?:SetEventTemplate;
+  showMobileButtons?:boolean;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
   logger:Logger = new Logger();
@@ -99,6 +100,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   plugins?:[] = [];
   ignoreSafety?:boolean = false;
   toolbars?:Array<string> = [];
+  showMobileButtons?:boolean = false;
   eventTemplate?:EventTemplate = undefined;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
               componentSetNewStartDate: SetStartDate ,
@@ -132,6 +134,9 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
     this.setEventTemplate = componentSetEventTemplate;
     if(vuelCalendarOptions.lockResize){
       this.lockResize = vuelCalendarOptions.lockResize
+    }
+    if(vuelCalendarOptions.showMobileButtons){
+      this.showMobileButtons = vuelCalendarOptions.showMobileButtons
     }
     if(vuelCalendarOptions.eventTemplate){
       this.eventTemplate = vuelCalendarOptions.eventTemplate

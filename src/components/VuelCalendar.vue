@@ -86,6 +86,7 @@
           target-on-sidebar
           :days-forward-configurable="daysForwardConfigurable"
           :view-mode="viewMode"
+          :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
           :row-height="rowHeight" />
 
     </nav>
@@ -229,17 +230,14 @@
                 :theme="theme"
                 :days-forward-configurable="daysForwardConfigurable"
                 :view-mode="viewMode"
+                :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
                 :row-height="rowHeight" />
 
           </div>
     </main>
   </div>
     <VuelCalendarResizer
-        :style="{
-           borderBottomLeftRadius:'2px',
-           borderBottomRightRadius:'2px',
-
-        }"
+        :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
         :theme="theme"
         target-on-sidebar
         :days-forward-configurable="daysForwardConfigurable"
