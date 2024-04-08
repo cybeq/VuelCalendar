@@ -3,6 +3,10 @@ import {defineComponent, PropType} from "vue";
 
 export default defineComponent({
   props:{
+    lockResize:{
+      type:Boolean,
+      default: false
+    },
     showMobileButtons:{
       type:Boolean,
       default:false,
@@ -49,6 +53,9 @@ export default defineComponent({
                         targetOnSidebar:boolean = false,
                         targetOnMonthSideBar = false )
     {
+      if(this.lockResize){
+        return;
+      }
       this.resizer.isResizing = true;
       let parentEl = (event.target! as HTMLDivElement).parentElement! as HTMLDivElement;
       if(targetOnSidebar)
@@ -73,6 +80,9 @@ export default defineComponent({
 
     onResizerMouseUp()
     {
+      if(this.lockResize){
+        return;
+      }
       this.resizer.isResizing      = false;
       this.resizer.resizedElBottom = null;
       this.resizer.resizedEl       = null;
@@ -87,6 +97,9 @@ export default defineComponent({
     },
     onResizerMouseMove( event: MouseEvent )
     {
+      if(this.lockResize){
+        return;
+      }
       if (!this.resizer.isResizing)
       {
         return;
@@ -119,6 +132,9 @@ export default defineComponent({
       }
     },
     handleMobileDown(event:MouseEvent, condition:'up'|'down' ){
+      if(this.lockResize){
+        return;
+      }
       let el = (event.target! as HTMLDivElement).parentElement! as HTMLDivElement;
       const dayNumber = el.id.split('-')[1];
       console.log('elxx', el)

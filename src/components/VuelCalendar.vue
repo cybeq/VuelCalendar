@@ -84,6 +84,7 @@
        <VuelCalendarResizer
           :theme="theme"
           target-on-sidebar
+          :lock-resize="vuelCalendarOptions.lockResize"
           :days-forward-configurable="daysForwardConfigurable"
           :view-mode="viewMode"
           :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
@@ -135,7 +136,7 @@
     <main ref="container"
           :style="{
               minHeight: height + 'px',
-              maxHeight:theme.lockResize ? height +'px' : 'unset',
+              maxHeight: 'unset',
               width:'100%',
               borderBottomRightRadius:'2px',
               height:'100%',
@@ -228,6 +229,7 @@
 
             <VuelCalendarResizer
                 :theme="theme"
+                :lock-resize="vuelCalendarOptions.lockResize"
                 :days-forward-configurable="daysForwardConfigurable"
                 :view-mode="viewMode"
                 :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
@@ -239,6 +241,7 @@
     <VuelCalendarResizer
         :show-mobile-buttons="vuelCalendarOptions.showMobileButtons"
         :theme="theme"
+        :lock-resize="vuelCalendarOptions.lockResize"
         target-on-sidebar
         :days-forward-configurable="daysForwardConfigurable"
         :view-mode="viewMode"
