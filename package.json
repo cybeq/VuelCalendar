@@ -1,7 +1,7 @@
 {
   "name": "vuelcalendar",
   "private": false,
-  "version": "1.0.25",
+  "version": "1.0.28",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -9,6 +9,11 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vuelcomponents/VuelCalendar.git"
+  },
+  "homepage": "https://vuelcomponents.github.io",
   "keywords": [
     "calendar",
     "vue",

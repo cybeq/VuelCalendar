@@ -56,6 +56,7 @@ interface IVuelCalendarOptions {
   eventTemplate?:EventTemplate;
   setEventTemplate?:SetEventTemplate;
   showMobileButtons?:boolean;
+  searchPhrase?:any;
 }
 class VuelCalendarOptions implements IVuelCalendarOptions{
   logger:Logger = new Logger();
@@ -101,6 +102,7 @@ class VuelCalendarOptions implements IVuelCalendarOptions{
   ignoreSafety?:boolean = false;
   toolbars?:Array<string> = [];
   showMobileButtons?:boolean = false;
+  searchPhrase = ''
   eventTemplate?:EventTemplate = undefined;
   constructor(vuelCalendarOptions:VuelCalendarOptions,
               componentSetNewStartDate: SetStartDate ,

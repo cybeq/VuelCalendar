@@ -186,6 +186,7 @@
               <template v-slot:vs="{items}">
                 <VuelCalendarEventContainer
                     :theme="theme"
+                    :search-phrase="vuelCalendarOptions.searchPhrase"
                     :helper="helper"
                     :loopedDay="day"
                     :event-template="eventTemplateConfigurable"
@@ -394,6 +395,7 @@ export default defineComponent({
         this.setEventTemplate as SetEventTemplate,
       ),
       rowHeight: 0,
+      searchPhrase:'Esdad',
       resizer: {
         isResizing: false,
         resizedElBottom: null as Number | null,

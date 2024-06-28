@@ -25,6 +25,10 @@ export default defineComponent({
     },
   },
   props:{
+    searchPhrase:{
+      type:String,
+      required:false,
+    },
     eventResizeHandler:{
       type:Object as PropType<EventResizeHandler>,
       required:true,
@@ -150,6 +154,7 @@ export default defineComponent({
   <div
     class="vuelcalendar-event"
     v-for="event in getEventsToContainer(loopedDay)"
+    v-show="event.label?.includes(searchPhrase ??'')"
     @click.stop="onEventClicked(event)"
     :style="{
       height: renderer || eventTemplate ?'unset':'20px',
